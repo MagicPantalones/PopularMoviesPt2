@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/mi_popular"
+            android:orderInCategory="99"
+            android:checked="true"
+            android:titleCondensed="@string/sort_popular_condensed"
+            app:showAsAction="never"
+            android:icon="@drawable/ic_grade_black_24dp"
+            android:title="@string/mi_sort_by_popular" />
+        <item
+            android:id="@+id/mi_top_rated"
+            android:orderInCategory="100"
+            app:showAsAction="never"
+            android:titleCondensed="@string/sort_top_rated_condensed"
+            android:icon="@drawable/ic_swap_vert_black_24dp"
+            android:title="@string/mi_sort_by_top_rated" />
+    </group>
+</menu>
