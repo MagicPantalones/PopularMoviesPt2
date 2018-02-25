@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
 
+def THE_MOVIE_DB_API_KEY = '"' + TheMovieDbApiKey + '"' ?: '"Have you defined an TMDB API get in the gradle.properties file"'
+
 android {
     compileSdkVersion 27
     defaultConfig {
@@ -9,6 +11,9 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes.each {
+        it.buildConfigField 'String', 'TMDB_API_KEY', THE_MOVIE_DB_API_KEY
     }
     buildTypes {
         release {

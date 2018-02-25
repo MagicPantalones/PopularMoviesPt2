@@ -5,10 +5,12 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -23,18 +25,15 @@ import butterknife.ButterKnife;
 import io.magics.popularmovies.models.ApiResult;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.networkutils.TMDBApi;
+import io.magics.popularmovies.networkutils.TMDBApiNetworkService;
 import io.reactivex.Observable;
-import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
-import retrofit2.HttpException;
-
-import static io.magics.popularmovies.networkutils.TMDBApiNetworkService.getClientForMovieList;
 
 
 public class PosterActivity extends AppCompatActivity
         implements PosterAdapter.PosterClickHandler{
+
+    private static final String TAG = PosterActivity.class.getSimpleName();
 
     int mPageNumber;
     TMDBApi.SortingMethod mSortMethod;
@@ -111,38 +110,24 @@ public class PosterActivity extends AppCompatActivity
     }
 
     public void getMovieList(TMDBApi.SortingMethod sortingMethod, int pageNumber){
-        String apikey = getResources().getString(R.string.THE_MOVIE_DB_API_TOKEN);
-        TMDBApi tmdbApi = getClientForMovieList().create(TMDBApi.class);
-        mObservable = tmdbApi.getMovieList(sortingMethod, apikey, "en-US", pageNumber);
+        TMDBApiNetworkService service = new TMDBApiNetworkService();
+        service.callTMDB(sortingMethod, pageNumber, new TMDBApiNetworkService.TMDBCallbackResult() {
+            @Override
+            public void onSuccess(ApiResult apiResult, Disposable d) {
+                mMovieListResponse = apiResult;
+                mPosterAdapter.setMovieData(mMovieListResponse.getMovies());
+                mMovieLoader.setVisibility(View.GONE);
+            }
 
-        mObservable.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<ApiResult>() {
-                    @Override
-                    public void onSubscribe(Disposable d) { mDisposable = d; }
-
-                    @Override
-                    public void onNext(ApiResult apiResult) { mMovieListResponse = apiResult; }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        if (mDisposable != null && !mDisposable.isDisposed()){
-                            mDisposable.dispose();
-                        }
-                        if (e instanceof HttpException){
-                            HttpException response = (HttpException) e;
-                            int code = response.code();
-                            Toast.makeText(PosterActivity.this, "Error Loading data. Code returned: " + code, Toast.LENGTH_LONG).show();
-                        }
-                        showErrorImage();
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        mPosterAdapter.setMovieData(mMovieListResponse.getMovies());
-                        mMovieLoader.setVisibility(View.GONE);
-                    }
-                });
+            @Override
+            public void onError(int error, String message, Throwable e) {
+                if (error != -1){
+                    Toast.makeText(PosterActivity.this, "OPS! " + message + " " + error, Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.d(TAG, message + " " + e.getMessage());
+                }
+            }
+        });
     }
 
     //Utility methods that shows/hides views on connecting, error or complete.
