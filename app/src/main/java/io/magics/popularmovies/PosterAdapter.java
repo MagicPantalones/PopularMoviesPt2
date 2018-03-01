@@ -16,8 +16,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.magics.popularmovies.models.Movie;
-import io.magics.popularmovies.networkutils.TMDBApiNetworkService;
+import io.magics.popularmovies.networkutils.ApiUtils;
 import io.magics.popularmovies.utils.GlideApp;
+import io.magics.popularmovies.utils.MovieUtils;
 
 /**
  * Adapter for my recycler
@@ -32,7 +33,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
     private int mViewHeight;
     private final PosterClickHandler mClickHandler;
     private ReachedEndHandler mReachedEndHandler;
-    private TMDBApiNetworkService.ImageSize mImageSize;
+    private MovieUtils.ImageSize mImageSize;
 
     public interface PosterClickHandler{
         void onClick(Movie movie, View view);
@@ -56,7 +57,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         Context context = parent.getContext();
         Boolean orientation = context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
 
-        mImageSize = TMDBApiNetworkService.getOptimalImgSize(context);
+        mImageSize = MovieUtils.getOptimalImgSize(context);
 
         //Sets the ViewHolder sizes based on the devise's orientation.
         mViewHeight = orientation ? parent.getMeasuredHeight() / 2 : parent.getMeasuredHeight();
@@ -69,11 +70,12 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
 
     @Override
     public void onBindViewHolder(PosterViewHolder holder, int position) {
+        String posterUrl;
         Movie mfg = mMovieData.get(position);
         ImageView iv = holder.mIv;
-        String posterUrl = TMDBApiNetworkService.posterUrlConverter(mImageSize, mfg.getPosterUrl());
 
-        if (position == mMovieData.size() - 1){
+        posterUrl = ApiUtils.posterUrlConverter(mImageSize, mfg.getPosterUrl());
+        if (position == mMovieData.size() - 1 && mReachedEndHandler != null){
             mReachedEndHandler.endReached(position);
         }
 
@@ -83,12 +85,12 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
 
 
         GlideApp.with(holder.itemView)
-                .load(posterUrl)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .placeholder(R.drawable.bg_loading_realydarkgrey)
-                .downsample(DownsampleStrategy.NONE)
-                .centerCrop()
-                .into(iv);
+                    .load(posterUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.drawable.bg_loading_realydarkgrey)
+                    .downsample(DownsampleStrategy.NONE)
+                    .centerCrop()
+                    .into(iv);
     }
 
     @Override
@@ -97,10 +99,11 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         return mMovieData.size();
     }
 
-    public void setMovieData(List<Movie> movies){
+    public void setMovieData(List<Movie> movies, Boolean listFromCursor){
         if (movies == null) {
             return;
-        }else if (mMovieData == null){
+        }else if (mMovieData == null || listFromCursor){
+            mMovieData = null;
             mMovieData = movies;
         } else {
             mMovieData.addAll(movies);

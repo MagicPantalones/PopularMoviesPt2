@@ -10,9 +10,9 @@ import retrofit2.http.Query;
 public interface TMDBApi {
     @GET("movie/{sortingMethod}")
     Observable<ApiResult> getMovieList(@Path("sortingMethod") SortingMethod sort,
-                                       @Query("api_key") String api,
-                                       @Query("language") String locale,
-                                       @Query("page") int page);
+                                                   @Query("api_key") String api,
+                                                   @Query("language") String locale,
+                                                   @Query("page") int page);
 
     enum SortingMethod{
         POPULAR("popular"),

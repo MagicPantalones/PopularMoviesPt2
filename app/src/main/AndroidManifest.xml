@@ -27,6 +27,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".PosterActivity"/>
         </activity>
+
+        <provider
+            android:authorities="io.magics.popularmovies"
+            android:name=".database.FavouritesProvider"
+            android:exported="false"
+            />
     </application>
 
 </manifest>

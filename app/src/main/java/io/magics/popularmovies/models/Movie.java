@@ -45,6 +45,10 @@ public class Movie implements Parcelable {
     @Expose
     private Double voteAverage;
 
+    private int itemId = -1;
+    private byte[] posterBytes = new byte[0];
+    private byte[] backdropBytes = new byte[0];
+
     public static final Parcelable.Creator<Movie> CREATOR = new Creator<Movie>() {
 
         @SuppressWarnings({ "unchecked" })
@@ -58,6 +62,7 @@ public class Movie implements Parcelable {
     };
 
     protected Movie(Parcel in) {
+        this.itemId = ((Integer) in.readValue((Integer.class.getClassLoader())));
         this.posterUrl = ((String) in.readValue((String.class.getClassLoader())));
         this.overview = ((String) in.readValue((String.class.getClassLoader())));
         this.releaseDate = ((String) in.readValue((String.class.getClassLoader())));
@@ -69,33 +74,56 @@ public class Movie implements Parcelable {
         this.backdropPath = ((String) in.readValue((String.class.getClassLoader())));
         this.voteCount = ((Integer) in.readValue((Integer.class.getClassLoader())));
         this.voteAverage = ((Double) in.readValue((Double.class.getClassLoader())));
+        this.posterBytes = in.createByteArray();
+        this.backdropBytes = in.createByteArray();
     }
 
     public Movie() {}
 
+    public int getItemId() { return itemId; }
+    public void setItemId(int itemId) { this.itemId = itemId; }
+
     public String getPosterUrl() { return posterUrl; }
+    public void setPosterUrl(String posterUrl) { this.posterUrl = posterUrl; }
 
     public String getOverview() { return overview; }
+    public void setOverview(String overview) { this.overview = overview; }
 
     public String getReleaseDate() { return releaseDate; }
+    public void setReleaseDate(String releaseDate) { this.releaseDate = releaseDate; }
 
     public List<Integer> getGenreIds() { return genreIds; }
+    public void setGenreIds(List<Integer> genreIds) { this.genreIds = genreIds; }
 
     public Integer getMovieId() { return movieId; }
+    public void setMovieId(Integer movieId) { this.movieId = movieId; }
 
     public String getOriginalTitle() { return originalTitle; }
+    public void setOriginalTitle(String originalTitle) { this.originalTitle = originalTitle;}
 
     public String getOriginalLanguage() { return originalLanguage; }
+    public void setOriginalLanguage(String originalLanguage) { this.originalLanguage = originalLanguage; }
 
     public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
 
     public String getBackdropPath() { return backdropPath; }
+    public void setBackdropPath(String backdropPath) { this.backdropPath = backdropPath; }
 
     public Integer getVoteCount() { return voteCount; }
+    public void setVoteCount(Integer voteCount) { this.voteCount = voteCount; }
 
     public Double getVoteAverage() { return voteAverage; }
+    public void setVoteAverage(Double voteAverage) { this.voteAverage = voteAverage; }
+
+    public byte[] getPosterBytes() { return posterBytes; }
+    public void setPosterBytes(byte[] posterBytes) { this.posterBytes = posterBytes; }
+
+    public byte[] getBackdropBytes() { return backdropBytes; }
+    public void setBackdropBytes(byte[] backdropBytes) { this.backdropBytes = backdropBytes; }
 
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(itemId);
         dest.writeValue(posterUrl);
         dest.writeValue(overview);
         dest.writeValue(releaseDate);
@@ -107,6 +135,8 @@ public class Movie implements Parcelable {
         dest.writeValue(backdropPath);
         dest.writeValue(voteCount);
         dest.writeValue(voteAverage);
+        dest.readByteArray(posterBytes);
+        dest.readByteArray(backdropBytes);
     }
 
     public int describeContents() {
