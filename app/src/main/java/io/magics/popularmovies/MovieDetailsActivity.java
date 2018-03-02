@@ -28,7 +28,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
     MovieUtils.ImageSize mImageSize;
     Disposable mDisposable;
     Disposable mDisp;
-    Boolean favIdMatched;
     List<Integer> mFavIds;
 
     @BindView(R.id.iv_poster_details) ImageView mPosterIv;
@@ -70,18 +69,19 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 .placeholder(R.drawable.bg_loading_realydarkgrey)
                 .into(mPosterIv);
 
-        ThreadingUtils.queryForFavourites(this, movieIdList -> mFavIds = movieIdList);
-
-        favIdMatched = ThreadingUtils.addToFavourites(this, mMovie, mFavIds);
-
-        mFab.setImageResource(favIdMatched ? R.drawable.ic_bookmark_black_24dp : R.drawable.ic_bookmark_border_black_24dp);
+        ThreadingUtils.queryForFavourites(this, movieIdList -> {
+            mFavIds = movieIdList;
+            mFab.setImageResource(ThreadingUtils.checkIfFav(mMovie.getMovieId(), mFavIds) ?
+                    R.drawable.ic_bookmark_black_24dp : R.drawable.ic_bookmark_border_black_24dp);
+        });
 
     }
 
     @OnClick(R.id.fab)
     public void onFabPressed(FloatingActionButton button){
-        favIdMatched = ThreadingUtils.addToFavourites(this, mMovie, mFavIds);
-        button.setImageResource(favIdMatched ? R.drawable.ic_bookmark_black_24dp : R.drawable.ic_bookmark_border_black_24dp);
+        ThreadingUtils.addToFavourites(this, mMovie, mFavIds, id -> {
+            button.setImageResource(id > 0 ? R.drawable.ic_bookmark_black_24dp : R.drawable.ic_bookmark_border_black_24dp);
+        });
     }
 
     @Override

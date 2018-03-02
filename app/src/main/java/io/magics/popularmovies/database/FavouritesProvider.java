@@ -83,7 +83,7 @@ public class FavouritesProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Unknown URI " + uri);
         }
         if (id == -1){
-            throw new UnsupportedOperationException("Nothing inserted at " + uri);
+            return null;
         }
 
         getContext().getContentResolver().notifyChange(uri, null);

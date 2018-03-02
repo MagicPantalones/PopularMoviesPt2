@@ -22,6 +22,8 @@ import static io.magics.popularmovies.utils.MovieUtils.createMovieFromCursor;
 
 public class ThreadingUtils {
 
+    private static final String TAG = ThreadingUtils.class.getSimpleName();
+
     public static final String[] FAVOURITES_COLUMNS = {
             FavouritesEntry._ID,
             FavouritesEntry.COLUMN_POSTER_PATH,
@@ -82,6 +84,14 @@ public class ThreadingUtils {
                         t -> Log.d("LIST-GETTER", t.getMessage()));
     }
 
+    public static boolean checkIfFav(int movieId, List<Integer> idList){
+        if (idList == null) return false;
+        for (int i : idList){
+            if (i == movieId) return true;
+        }
+        return false;
+    }
+
     public static void queryFavouritesCursor(Context context, final CursorResponseHandler responseHandler){
         ContentResolver cr = context.getContentResolver();
         String sortOrder = FavouritesEntry._ID + " ASC";
@@ -107,31 +117,33 @@ public class ThreadingUtils {
                 .subscribe(responseHandler::onReturnedCursor);
     }
 
-    public static boolean addToFavourites(Context context, Movie movie, List<Integer> movieIds){
-        Observable<Boolean> obs;
+    public static void addToFavourites(Context context, Movie movie, List<Integer> movieIds, IsFavouriteHandler handler){
 
         ContentResolver cr = context.getContentResolver();
-        for (int i : movieIds){
-            if (i == movie.getMovieId()){
-                obs = Observable.just(cr.delete(
-                        ContentUris.withAppendedId(FavouritesEntry.FAVOURITES_CONTENT_URI, movie.getItemId()),
-                        null,
-                        null))
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .map(id -> (id < 0));
-                return obs.blockingSingle();
+        if (movieIds != null) {
+            for (int i : movieIds) {
+                if (i == movie.getMovieId()) {
+                    Observable.just(cr.delete(
+                            ContentUris.withAppendedId(FavouritesEntry.FAVOURITES_CONTENT_URI, movie.getItemId()),
+                            null,
+                            null))
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(
+                                    handler::onIsFavouriteResponse,
+                                    throwable -> Log.d(TAG, "addToFavourites: " + throwable.getMessage()));
+                    return;
+                }
             }
         }
 
-        obs = Observable.just(makeContentVals(movie))
+        Observable.just(makeContentVals(movie))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .map(vals -> {
-                    Uri uriCheck = cr.insert(FavouritesEntry.FAVOURITES_CONTENT_URI, vals);
-                    return uriCheck != null;
-                });
-        return obs.blockingSingle();
+                .subscribe(value -> {
+                    Uri uri = cr.insert(FavouritesEntry.FAVOURITES_CONTENT_URI, value);
+                    handler.onIsFavouriteResponse(uri != null ? 1 : -1);
+                }, throwable -> Log.d(TAG, "addToFavourites: " + throwable.getMessage()));
     }
 
     public static ContentValues makeContentVals(Movie movie){
