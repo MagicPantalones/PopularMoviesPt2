@@ -72,7 +72,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         ThreadingUtils.queryForFavourites(this, movieIdList -> {
             mFavIds = movieIdList;
             mFab.setImageResource(ThreadingUtils.checkIfFav(mMovie.getMovieId(), mFavIds) ?
-                    R.drawable.ic_bookmark_black_24dp : R.drawable.ic_bookmark_border_black_24dp);
+                    R.drawable.ic_favourite_heart_red : R.drawable.ic_favourite_heart_gray);
         });
 
     }
@@ -80,7 +80,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     @OnClick(R.id.fab)
     public void onFabPressed(FloatingActionButton button){
         ThreadingUtils.addToFavourites(this, mMovie, mFavIds, id -> {
-            button.setImageResource(id > 0 ? R.drawable.ic_bookmark_black_24dp : R.drawable.ic_bookmark_border_black_24dp);
+            button.setImageResource(id > 0 ? R.drawable.ic_favourite_heart_red : R.drawable.ic_favourite_heart_gray);
         });
     }
 

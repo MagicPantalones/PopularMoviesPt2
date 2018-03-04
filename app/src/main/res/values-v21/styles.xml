@@ -3,14 +3,20 @@
     <!-- Base application theme. -->
     <style name="MovieAppTheme" parent="Theme.AppCompat.NoActionBar">
         <!-- Customize your theme here. -->
+        <item name="android:fontFamily">@font/asap_medium</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:windowBackground">?attr/colorPrimaryDark</item>
         <item name="android:textColorSecondary">@color/textColorSecondary</item>
         <item name="android:textColorPrimary">@color/textColorPrimary</item>
+        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
         <item name="android:colorBackground">@color/colorPrimaryDark</item>
-        <item name="android:colorForeground">?android:attr/colorForeground</item>
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowAllowEnterTransitionOverlap">true</item>
+        <item name="android:windowAllowReturnTransitionOverlap">true</item>
+        <item name="android:windowSharedElementEnterTransition">@android:transition/move</item>
+        <item name="android:windowSharedElementExitTransition">@android:transition/move</item>
+
     </style>
 
     <style name="MovieCardStyle" parent="MovieAppTheme">
@@ -21,7 +27,7 @@
     <!-- Found a lot of help to make the app compatible with pre lollipop here:
         https://medium.com/@etiennelawlor/layout-tips-for-pre-and-post-lollipop-bcb2e4cdd6b2 -->
     <style name="MovieCardStyle.PosterCard" parent="android:Widget.TextView">
-        <item name="android:foreground">@drawable/selector_bg_card</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
         <item name="cardCornerRadius">@dimen/card_radius</item>
         <item name="cardElevation">@dimen/card_elevation</item>
         <item name="cardPreventCornerOverlap">false</item>

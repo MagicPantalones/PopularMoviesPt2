@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="item_offset">10dp</dimen>
+    <dimen name="detail_backdrop_height">250dp</dimen>
+    <dimen name="backdrop_title">30dp</dimen>
+    <dimen name="backdrop_subtitle">18dp</dimen>
+    <dimen name="card_margin">5dp</dimen>
+    <dimen name="card_radius">10dp</dimen>
+    <dimen name="card_elevation">10dp</dimen>
+    <dimen name="poster_height">160dp</dimen>
+    <dimen name="poster_width">0dp</dimen>
+    <dimen name="title_padding">10dp</dimen>
+    <dimen name="title">15dp</dimen>
+    <dimen name="stars_padding">5dp</dimen>
+    <dimen name="stars">12dp</dimen>
+</resources>

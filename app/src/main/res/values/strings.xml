@@ -1,11 +1,15 @@
 <resources>
     <string name="app_name">Popular Movies</string>
     <string name="grid_error">Error Loading GridView</string>
+    <string name="calendar_icon_a11y">Released</string>
     
     <string name="details_release_day_title">Release Date:</string>
     <string name="details_vote_average_title">Vote Average:</string>
     <string name="details_vote_average_text">%1$s out of %2$d votes</string>
     <string name="details_plot_title">Plot:</string>
+
+    <string name="btn_trailer_text">Trailers</string>
+    <string name="btn_reviews_text">Reviews</string>
 
     <string name="mi_sort_by_popular">Most Popular</string>
     <string name="mi_sort_by_top_rated">Top Rated</string>
@@ -13,5 +17,9 @@
     <string name="mi_sort_top_rated_condensed">Top</string>
     <string name="mi_sort_favourites">Favourites</string>
     <string name="mi_sort_favourites_condensed">Fav</string>
+
+    <string name="bnav_overview_title">Overview</string>
+    <string name="bnav_trailers_title">Trailers</string>
+    <string name="bnav_reviews_title">Reviews</string>
 
 </resources>
