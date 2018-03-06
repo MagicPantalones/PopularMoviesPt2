@@ -26,7 +26,4 @@
         app:layout_constraintTop_toTopOf="parent"
         android:visibility="invisible"/>
 
-    <include layout="@layout/trailer_sheet"/>
-    <include layout="@layout/review_sheet"/>
-
 </android.support.design.widget.CoordinatorLayout>

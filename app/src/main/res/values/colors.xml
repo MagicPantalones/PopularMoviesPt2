@@ -13,5 +13,7 @@
 
     <color name="colorControlHighlight">@color/fifty_percent_transparency_grey_400</color>
     <color name="fifty_percent_transparency_grey_400">#80bdbdbd</color>
-
+    
+    <color name="nav_item_color_state">@drawable/bottom_nav_colors</color>
+    
 </resources>

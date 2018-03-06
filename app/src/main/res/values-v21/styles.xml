@@ -9,7 +9,6 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:textColorSecondary">@color/textColorSecondary</item>
         <item name="android:textColorPrimary">@color/textColorPrimary</item>
-        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
         <item name="android:colorBackground">@color/colorPrimaryDark</item>
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowAllowEnterTransitionOverlap">true</item>
@@ -22,16 +21,18 @@
     <style name="MovieCardStyle" parent="MovieAppTheme">
         <item name="cardCornerRadius">@dimen/card_radius</item>
         <item name="cardBackgroundColor">@color/colorPrimary</item>
+        <item name="cardElevation">@dimen/card_elevation</item>
     </style>
 
     <!-- Found a lot of help to make the app compatible with pre lollipop here:
         https://medium.com/@etiennelawlor/layout-tips-for-pre-and-post-lollipop-bcb2e4cdd6b2 -->
     <style name="MovieCardStyle.PosterCard" parent="android:Widget.TextView">
-        <item name="android:foreground">?attr/selectableItemBackground</item>
+        <!--<item name="android:foreground">?attr/itemBackground</item>-->
         <item name="cardCornerRadius">@dimen/card_radius</item>
         <item name="cardElevation">@dimen/card_elevation</item>
         <item name="cardPreventCornerOverlap">false</item>
         <item name="cardUseCompatPadding">true</item>
+        <item name="android:background">@color/colorPrimary</item>
     </style>
 
     <style name="MovieCardStyle.Text" parent="MovieCardStyle">
@@ -42,6 +43,10 @@
         <item name="android:textSize">12sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textAlignment">center</item>
+    </style>
+
+    <style name="Fab">
+        <item name="colorAccent">@color/colorPrimaryDark</item>
     </style>
 
     <style name="MovieCardStyle.Text.Header" parent="MovieCardStyle.Text">
