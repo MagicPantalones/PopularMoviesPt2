@@ -34,7 +34,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
     @BindView(R.id.tv_movie_title) TextView mTitleTv;
     @BindView(R.id.tv_release_date_text) TextView mReleaseDateTv;
     @BindView(R.id.tv_vote_average_text) TextView mVoteTv;
-    @BindView(R.id.tv_plot_text) TextView mPlotTv;
     @BindView(R.id.fab) FloatingActionButton mFab;
 
     @Override
@@ -56,11 +55,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
         mTitleTv.setText(mMovie.getTitle());
         mReleaseDateTv.setText(MovieUtils.formatDate(mMovie.getReleaseDate()));
-        mVoteTv.setText(getString(
-                R.string.details_vote_average_text,
-                Double.toString(mMovie.getVoteAverage()),
-                mMovie.getVoteCount()));
-        mPlotTv.setText(mMovie.getOverview());
+        mVoteTv.setText(Double.toString(mMovie.getVoteAverage()));
         String posterUrl = ApiUtils.posterUrlConverter(mImageSize, mMovie.getPosterUrl());
         GlideApp.with(mPosterIv)
                 .load(posterUrl)
