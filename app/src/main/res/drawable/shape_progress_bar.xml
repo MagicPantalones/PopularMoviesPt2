@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/pb_background_horizontal">
+        <shape>
+            <corners android:radius="@dimen/card_radius"/>
+            <solid android:color="@color/colorPrimaryDark"/>
+        </shape>
+    </item>
+
+    <item android:id="@+id/pb_progress_horizontal"
+        android:top="3dp"
+        android:right="3dp"
+        android:bottom="3dp"
+        android:left="3dp"
+        >
+        <scale android:scaleWidth="100%">
+            <shape>
+                <corners android:radius="@dimen/card_radius"/>
+                <solid android:color="@color/colorSecondary"/>
+            </shape>
+        </scale>
+    </item>
+
+</layer-list>

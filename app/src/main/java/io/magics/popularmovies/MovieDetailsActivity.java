@@ -1,10 +1,17 @@
 package io.magics.popularmovies;
 
+import android.animation.ObjectAnimator;
+import android.animation.TypeEvaluator;
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.BounceInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.List;
@@ -35,6 +42,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
     @BindView(R.id.tv_release_date_text) TextView mReleaseDateTv;
     @BindView(R.id.tv_vote_average_text) TextView mVoteTv;
     @BindView(R.id.fab) FloatingActionButton mFab;
+    @BindView(R.id.pb_vote_count)
+    ProgressBar mVoteProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +64,24 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
         mTitleTv.setText(mMovie.getTitle());
         mReleaseDateTv.setText(MovieUtils.formatDate(mMovie.getReleaseDate()));
-        mVoteTv.setText(Double.toString(mMovie.getVoteAverage()));
+
+        Long voteCalcLong = Math.round(mMovie.getVoteAverage() * 10);
+        ValueAnimator voteTextAnim = ValueAnimator.ofFloat(0.0f, mMovie.getVoteAverage().floatValue());
+
+        voteTextAnim.setDuration(2000);
+        voteTextAnim.setInterpolator(new BounceInterpolator());
+        voteTextAnim.addUpdateListener(valueAnimator -> {
+            String shownVal = valueAnimator.getAnimatedValue().toString();
+            shownVal = shownVal.substring(0, 3);
+            mVoteTv.setText(shownVal);
+        });
+        voteTextAnim.start();
+
+        ObjectAnimator voteProgressAnim = ObjectAnimator.ofInt(mVoteProgress, "progress", voteCalcLong.intValue());
+        voteProgressAnim.setDuration(2000);
+        voteProgressAnim.setInterpolator(new BounceInterpolator());
+        voteProgressAnim.start();
+
         String posterUrl = ApiUtils.posterUrlConverter(mImageSize, mMovie.getPosterUrl());
         GlideApp.with(mPosterIv)
                 .load(posterUrl)
