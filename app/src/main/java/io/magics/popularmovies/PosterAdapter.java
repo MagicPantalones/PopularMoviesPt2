@@ -2,6 +2,7 @@ package io.magics.popularmovies;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,8 +53,9 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         this.mReachedEndHandler = reachedEndHandler;
     }
 
+    @NonNull
     @Override
-    public PosterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public PosterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         Boolean orientation = context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
 
@@ -69,7 +71,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
     }
 
     @Override
-    public void onBindViewHolder(PosterViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull PosterViewHolder holder, int position) {
         String posterUrl;
         Movie mfg = mMovieData.get(position);
         ImageView iv = holder.mIv;
@@ -80,9 +82,6 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         }
 
         iv.setContentDescription(mfg.getTitle());
-        iv.setMinimumHeight(mViewHeight);
-        iv.setMinimumWidth(mViewWidth);
-
 
         GlideApp.with(holder.itemView)
                     .load(posterUrl)
@@ -90,6 +89,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
                     .placeholder(R.drawable.bg_loading_realydarkgrey)
                     .downsample(DownsampleStrategy.NONE)
                     .centerCrop()
+                    .override(mViewWidth, mViewHeight)
                     .into(iv);
     }
 

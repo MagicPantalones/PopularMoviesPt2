@@ -1,0 +1,25 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context="io.magics.popularmovies.MovieListFragment">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_poster_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:listitem="@layout/poster_view_holder"
+        />
+    <TextView
+        android:id="@+id/iv_error"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/list_no_network_available"
+        android:textSize="48sp"
+        android:rotation="-45"
+        android:fontFamily="@font/asap_medium"
+        android:gravity="center"
+        android:visibility="gone"
+        />
+
+</FrameLayout>

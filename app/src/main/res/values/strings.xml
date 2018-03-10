@@ -3,7 +3,7 @@
     <string name="grid_error" translatable="true">Error Loading GridView</string>
     <string name="calendar_icon_a11y" translatable="true">Released</string>
     <string name="favourite_btn_a11y" translatable="true">Add to favourites</string>
-    
+
     <string name="details_release_day_title" translatable="true">Release Date:</string>
     <string name="details_vote_average_title" translatable="true">Vote Average:</string>
     <string name="details_vote_average_text" translatable="true">%1$s out of %2$d votes</string>
@@ -22,5 +22,7 @@
     <string name="bnav_overview_title" translatable="true">Overview</string>
     <string name="bnav_trailers_title" translatable="true">Trailers</string>
     <string name="bnav_reviews_title" translatable="true">Reviews</string>
+
+    <string name="list_no_network_available" translatable="true">No Network Available</string>
 
 </resources>
