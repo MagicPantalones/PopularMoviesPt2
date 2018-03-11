@@ -103,15 +103,12 @@
 
                 <ProgressBar
                     android:id="@+id/pb_vote_count"
-                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    style="@style/MovieCardStyle.VoteBar"
                     android:layout_width="0dp"
                     android:layout_height="24dp"
                     android:layout_marginBottom="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginStart="8dp"
-                    android:max="100"
-                    android:progress="15"
-                    android:progressDrawable="@drawable/shape_progress_bar"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/end_guide"
                     app:layout_constraintHorizontal_bias="0.6"

@@ -46,7 +46,7 @@ public class Movie implements Parcelable {
     private Double voteAverage;
 
     private int itemId = -1;
-    private byte[] posterBytes = new byte[0];
+    private int[] shadowInt = new int[0];
     private byte[] backdropBytes = new byte[0];
 
     public static final Parcelable.Creator<Movie> CREATOR = new Creator<Movie>() {
@@ -74,7 +74,7 @@ public class Movie implements Parcelable {
         this.backdropPath = ((String) in.readValue((String.class.getClassLoader())));
         this.voteCount = ((Integer) in.readValue((Integer.class.getClassLoader())));
         this.voteAverage = ((Double) in.readValue((Double.class.getClassLoader())));
-        this.posterBytes = in.createByteArray();
+        this.shadowInt = in.createIntArray();
         this.backdropBytes = in.createByteArray();
     }
 
@@ -116,8 +116,8 @@ public class Movie implements Parcelable {
     public Double getVoteAverage() { return voteAverage; }
     public void setVoteAverage(Double voteAverage) { this.voteAverage = voteAverage; }
 
-    public byte[] getPosterBytes() { return posterBytes; }
-    public void setPosterBytes(byte[] posterBytes) { this.posterBytes = posterBytes; }
+    public int[] getShadowInt() { return shadowInt; }
+    public void setShadowInt(int[] shadowInt) { this.shadowInt = shadowInt; }
 
     public byte[] getBackdropBytes() { return backdropBytes; }
     public void setBackdropBytes(byte[] backdropBytes) { this.backdropBytes = backdropBytes; }
@@ -135,7 +135,7 @@ public class Movie implements Parcelable {
         dest.writeValue(backdropPath);
         dest.writeValue(voteCount);
         dest.writeValue(voteAverage);
-        dest.readByteArray(posterBytes);
+        dest.readIntArray(shadowInt);
         dest.readByteArray(backdropBytes);
     }
 

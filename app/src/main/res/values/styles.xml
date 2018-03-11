@@ -53,4 +53,10 @@
         <item name="android:textAllCaps">true</item>
     </style>
 
+    <style name="MovieCardStyle.VoteBar" parent="Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:max">100</item>
+        <item name="android:progress">15</item>
+        <item name="android:progressDrawable">@drawable/shape_progress_bar</item>
+    </style>
+
 </resources>
