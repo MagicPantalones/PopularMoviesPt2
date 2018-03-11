@@ -77,11 +77,13 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         ImageView iv = holder.mIv;
 
         posterUrl = ApiUtils.posterUrlConverter(mImageSize, mfg.getPosterUrl());
-        if (position == mMovieData.size() - 1 && mReachedEndHandler != null){
+        if (position == mMovieData.size() - 5 && mReachedEndHandler != null){
             mReachedEndHandler.endReached(position);
         }
 
         iv.setContentDescription(mfg.getTitle());
+        iv.setMinimumHeight(mViewHeight);
+        iv.setMinimumWidth(mViewWidth);
 
         GlideApp.with(holder.itemView)
                     .load(posterUrl)
@@ -89,7 +91,6 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
                     .placeholder(R.drawable.bg_loading_realydarkgrey)
                     .downsample(DownsampleStrategy.NONE)
                     .centerCrop()
-                    .override(mViewWidth, mViewHeight)
                     .into(iv);
     }
 

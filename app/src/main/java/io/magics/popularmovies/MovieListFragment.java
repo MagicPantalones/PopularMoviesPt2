@@ -81,20 +81,22 @@ implements PosterAdapter.PosterClickHandler{
         PosterAdapter adapter = new PosterAdapter(this);
         GridLayoutManager layoutManager = new GridLayoutManager(context, 2);
 
+        rootView.setPaddingRelative(16, 16, 16, 16);
+
         //From Tara's answer here: https://stackoverflow.com/questions/2680607/text-with-gradient-in-android
         paintTextView(context, tv);
 
         getDataSuccess = getDataFromNetwork(context, adapter);
 
         if (getDataSuccess) {
-            if (mTabPage == 2) {
-                adapter.setEndListener(handler -> {
-                    mPopPage += 1;
-                    getDataFromNetwork(context, adapter);
-                });
-            } else if (mTabPage == 1) {
+            if (mTabPage == 1) {
                 adapter.setEndListener(handler -> {
                     mTopPage += 1;
+                    getDataFromNetwork(context, adapter);
+                });
+            } else if (mTabPage == 2) {
+                adapter.setEndListener(handler -> {
+                    mPopPage += 1;
                     getDataFromNetwork(context, adapter);
                 });
             }
@@ -126,12 +128,12 @@ implements PosterAdapter.PosterClickHandler{
 
         if (!isConnected(context)) return false;
 
-        if (mTabPage == 2) {
-                sortingMethod = SortingMethod.POPULAR;
-                pageNumber = mPopPage;
-        } else {
+        if (mTabPage == 1) {
                 sortingMethod = SortingMethod.TOP_RATED;
                 pageNumber = mTopPage;
+        } else {
+                sortingMethod = SortingMethod.POPULAR;
+                pageNumber = mPopPage;
         }
 
         callApi(sortingMethod,
