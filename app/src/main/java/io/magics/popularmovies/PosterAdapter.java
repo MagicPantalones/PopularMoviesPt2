@@ -1,14 +1,18 @@
 package io.magics.popularmovies;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.graphics.ColorUtils;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -19,7 +23,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.GenericTransitionOptions;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.target.ImageViewTarget;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 
@@ -45,13 +52,16 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
     private final PosterClickHandler mClickHandler;
     private ReachedEndHandler mReachedEndHandler;
     private MovieUtils.ImageSize mImageSize;
+    private GradientDrawable mPosterShadow;
+    private Context mContext;
+    private int[] mColorReset = new int[]{Color.TRANSPARENT, Color.TRANSPARENT};
 
-    public interface PosterClickHandler{
+    public interface PosterClickHandler {
         void onClick(Movie movie, int position);
     }
 
     //Help from https://medium.com/@ayhamorfali/android-detect-when-the-recyclerview-reaches-the-bottom-43f810430e1e
-    public interface ReachedEndHandler{
+    public interface ReachedEndHandler {
         void endReached(int position);
     }
 
@@ -59,23 +69,28 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         this.mClickHandler = posterClickHandler;
     }
 
-    public void setEndListener(ReachedEndHandler reachedEndHandler){
+    public void setEndListener(ReachedEndHandler reachedEndHandler) {
         this.mReachedEndHandler = reachedEndHandler;
     }
 
     @NonNull
     @Override
     public PosterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Context context = parent.getContext();
-        Boolean orientation = context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+        mContext = parent.getContext();
+        Boolean orientation = mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
 
-        mImageSize = MovieUtils.getOptimalImgSize(context);
+        mImageSize = MovieUtils.getOptimalImgSize(mContext);
+        mPosterShadow = (GradientDrawable) ResourcesCompat.getDrawable(
+                mContext.getResources(),
+                R.drawable.fg_gradient,
+                mContext.getTheme()
+        );
 
         //Sets the ViewHolder sizes based on the devise's orientation.
         mViewHeight = orientation ? parent.getMeasuredHeight() / 2 : parent.getMeasuredHeight();
         mViewWidth = orientation ? parent.getMeasuredWidth() / 2 : parent.getMeasuredWidth() / 3;
 
-        View v = LayoutInflater.from(context).inflate(R.layout.poster_view_holder, parent, false);
+        View v = LayoutInflater.from(mContext).inflate(R.layout.poster_view_holder, parent, false);
 
         return new PosterViewHolder(v);
     }
@@ -83,18 +98,17 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull PosterViewHolder holder, int position) {
-        String posterUrl;
-        Movie mfg = mMovieData.get(position);
-        ImageView iv = holder.mIv;
-        CardView cvWrapper = holder.mCvWrapper;
-        TextView tvTitle = holder.mTvTitle;
-        ProgressBar pbVotes = holder.mPbVoteBar;
-        TextView tvVotes = holder.mTvVote;
-        View shadow = holder.mShadowLayer;
-        GradientDrawable gradientDrawable = (GradientDrawable) shadow.getBackground();
+        final String posterUrl;
+        final Movie mfg = mMovieData.get(position);
+        final ImageView iv = holder.mIv;
+        final CardView cvWrapper = holder.mCvWrapper;
+        final TextView tvTitle = holder.mTvTitle;
+        final ProgressBar pbVotes = holder.mPbVoteBar;
+        final TextView tvVotes = holder.mTvVote;
+        final View shadow = holder.mShadowLayer;
 
         posterUrl = ApiUtils.posterUrlConverter(mImageSize, mfg.getPosterUrl());
-        if (position == mMovieData.size() - 5 && mReachedEndHandler != null){
+        if (position == mMovieData.size() - 5 && mReachedEndHandler != null) {
             mReachedEndHandler.endReached(position);
         }
 
@@ -106,48 +120,33 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         tvVotes.setText(Double.toString(mfg.getVoteAverage()));
         iv.setContentDescription(mfg.getTitle());
 
-        if (mfg.getShadowInt().length == 0) {
-            GlideApp.with(iv)
-                    .asBitmap()
-                    .load(posterUrl)
-                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                    .override(mViewWidth, mViewHeight)
-                    .centerCrop()
-                    .into(new SimpleTarget<Bitmap>() {
-                        @Override
-                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                            Palette palette = new Palette.Builder(resource).generate();
-                            int defColor = Color.parseColor("#e96a6a");
-                            int color = palette.getVibrantColor(
-                                    palette.getDarkVibrantColor(
-                                    palette.getDominantColor(defColor)));
+        GlideApp.with(iv)
+                .load(posterUrl)
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .override(mViewWidth, mViewHeight)
+                .centerCrop()
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(new ImageViewTarget<Drawable>(iv) {
 
-                            Paint transparentColor = new Paint(0);
-                            transparentColor.setColor(color);
-                            transparentColor.setAlpha(0);
 
-                            int[] colors = new int[]{color, transparentColor.getColor()};
-
-                            gradientDrawable.setColors(colors);
-                            shadow.setBackground(gradientDrawable);
-                            mfg.setShadowInt(colors);
-
-                            mMovieData.remove(position);
-                            mMovieData.add(position, mfg);
-
-                            iv.setImageBitmap(resource);
+                    @Override
+                    public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                        iv.setImageDrawable(resource.getCurrent());
+                        if (mfg.getShadowInt().length == 0) {
+                            Bitmap b = ((BitmapDrawable) iv.getDrawable().getCurrent()).getBitmap();
+                            setColorBleed(b, holder, position);
+                        } else {
+                            mPosterShadow.setColors(mfg.getShadowInt());
+                            shadow.setBackground(mPosterShadow);
                         }
-                    });
-        } else {
-            gradientDrawable.setColors(mfg.getShadowInt());
-            shadow.setBackground(gradientDrawable);
-            GlideApp.with(iv)
-                    .load(posterUrl)
-                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                    .override(mViewWidth, mViewHeight)
-                    .centerCrop()
-                    .into(iv);
-        }
+                        super.onResourceReady(resource, transition);
+                    }
+
+                    @Override
+                    protected void setResource(@Nullable Drawable resource) {
+                        //Intentionally empty as drawable is not ready
+                    }
+                });
     }
 
     @Override
@@ -156,10 +155,28 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         return mMovieData.size();
     }
 
-    public void setMovieData(List<Movie> movies, int position, Boolean listFromCursor){
+    private void setColorBleed(final Bitmap bitmap, final PosterViewHolder holder, final int position) {
+
+        Palette palette = Palette.from(bitmap).generate();
+        int solid =
+                palette.getVibrantColor(palette.getDarkVibrantColor(palette.getDominantColor(ResourcesCompat.getColor(
+                        mContext.getResources(),
+                        R.color.colorSecondary,
+                        mContext.getTheme()))));
+
+        int transparent = ColorUtils.setAlphaComponent(solid, 0);
+
+        int[] colors = new int[]{solid, transparent};
+        mPosterShadow.setColors(colors);
+        holder.mShadowLayer.setBackground(mPosterShadow);
+        mMovieData.get(position).setShadowInt(colors);
+
+    }
+
+    public void setMovieData(List<Movie> movies, int position, Boolean listFromCursor) {
         if (movies == null) {
             return;
-        }else if (mMovieData == null || listFromCursor){
+        } else if (mMovieData == null || listFromCursor) {
             mMovieData = null;
             mMovieData = movies;
         } else {
@@ -170,17 +187,30 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
     }
 
     public class PosterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        @BindView(R.id.iv_poster) ImageView mIv;
-        @BindView(R.id.v_card_shadow) View mShadowLayer;
-        @BindView(R.id.cv_view_holder_wrapper) CardView mCvWrapper;
-        @BindView(R.id.tv_movie_title_list) TextView mTvTitle;
-        @BindView(R.id.pb_vote_list) ProgressBar mPbVoteBar;
-        @BindView(R.id.tv_vote_list) TextView mTvVote;
+        @BindView(R.id.iv_poster)
+        ImageView mIv;
+        @BindView(R.id.v_card_shadow)
+        View mShadowLayer;
+        @BindView(R.id.cv_view_holder_wrapper)
+        CardView mCvWrapper;
+        @BindView(R.id.tv_movie_title_list)
+        TextView mTvTitle;
+        @BindView(R.id.pb_vote_list)
+        ProgressBar mPbVoteBar;
+        @BindView(R.id.tv_vote_list)
+        TextView mTvVote;
+        GradientDrawable mGradientDrawable;
+
 
         public PosterViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
+
+            mGradientDrawable = (GradientDrawable) ResourcesCompat.getDrawable(
+                    itemView.getResources(),
+                    R.drawable.fg_gradient,
+                    itemView.getContext().getTheme());
         }
 
         @Override

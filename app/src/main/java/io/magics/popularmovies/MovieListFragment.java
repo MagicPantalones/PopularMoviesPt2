@@ -117,6 +117,11 @@ implements PosterAdapter.PosterClickHandler{
         //TODO Implement details fragment.
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
     private boolean getDataFromNetwork(Context context, PosterAdapter posterAdapter){
         SortingMethod sortingMethod;
         int pageNumber;

@@ -1,14 +1,17 @@
 package io.magics.popularmovies;
 
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 
 import com.facebook.stetho.Stetho;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class MovieListsActivity extends AppCompatActivity {
 
@@ -30,4 +33,6 @@ public class MovieListsActivity extends AppCompatActivity {
 
         mTabLayout.setupWithViewPager(mViewPager);
     }
+
+
 }
