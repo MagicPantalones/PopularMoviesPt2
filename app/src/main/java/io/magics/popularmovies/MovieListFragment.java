@@ -113,7 +113,7 @@ implements PosterAdapter.PosterClickHandler{
     }
 
     @Override
-    public void onClick(Movie movie, View view) {
+    public void onClick(Movie movie, int position) {
         //TODO Implement details fragment.
     }
 
@@ -122,7 +122,7 @@ implements PosterAdapter.PosterClickHandler{
         int pageNumber;
         if (mTabPage == 3){
             ThreadingUtils.queryFavouritesCursor(context, result ->
-            posterAdapter.setMovieData(result, true));
+            posterAdapter.setMovieData(result, posterAdapter.getItemCount(), true));
             return true;
         }
 
@@ -138,7 +138,7 @@ implements PosterAdapter.PosterClickHandler{
 
         callApi(sortingMethod,
                 pageNumber,
-                apiResult -> posterAdapter.setMovieData(apiResult.getMovies(), false));
+                apiResult -> posterAdapter.setMovieData(apiResult.getMovies(), posterAdapter.getItemCount(),false));
         return true;
     }
 

@@ -127,26 +127,24 @@ public class PosterActivity extends AppCompatActivity
     public void getMoviesFromNetwork(TMDBApi.SortingMethod sortingMethod, int pageNumber){
         mNetworkDisposable = callApi(sortingMethod, pageNumber, apiResult -> {
             mMovieListResponse = apiResult;
-            mPosterAdapter.setMovieData(mMovieListResponse.getMovies(), false);
+            mPosterAdapter.setMovieData(mMovieListResponse.getMovies(), mPosterAdapter.getItemCount(), false);
             MovieUtils.hideAndShowView(mGridRecyclerView, mMovieLoader);
         });
     }
 
     public void getMoviesFromFavourites(){
         queryFavouritesCursor(this, movieList -> {
-            mPosterAdapter.setMovieData(movieList, true);
+            mPosterAdapter.setMovieData(movieList, mPosterAdapter.getItemCount(),true);
             MovieUtils.hideAndShowView(mGridRecyclerView, mMovieLoader);
         });
     }
 
     //On click method to start the details activity.
     @Override
-    public void onClick(Movie movie, View v) {
+    public void onClick(Movie movie, int position) {
         Intent intent = new Intent(this, MovieDetailsActivity.class);
         Bundle extras = new Bundle();
         extras.putParcelable("movie", movie);
-        extras.putInt("width", v.getWidth());
-        extras.putInt("height", v.getMeasuredHeight());
         intent.putExtras(extras);
         startActivity(intent);
     }

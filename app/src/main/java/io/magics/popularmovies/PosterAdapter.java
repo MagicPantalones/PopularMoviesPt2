@@ -47,7 +47,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
     private MovieUtils.ImageSize mImageSize;
 
     public interface PosterClickHandler{
-        void onClick(Movie movie, View view);
+        void onClick(Movie movie, int position);
     }
 
     //Help from https://medium.com/@ayhamorfali/android-detect-when-the-recyclerview-reaches-the-bottom-43f810430e1e
@@ -156,7 +156,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         return mMovieData.size();
     }
 
-    public void setMovieData(List<Movie> movies, Boolean listFromCursor){
+    public void setMovieData(List<Movie> movies, int position, Boolean listFromCursor){
         if (movies == null) {
             return;
         }else if (mMovieData == null || listFromCursor){
@@ -165,7 +165,8 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         } else {
             mMovieData.addAll(movies);
         }
-        notifyDataSetChanged();
+        if (position == 0) notifyDataSetChanged();
+        else notifyItemInserted(position);
     }
 
     public class PosterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -184,7 +185,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
 
         @Override
         public void onClick(View v) {
-            mClickHandler.onClick(mMovieData.get(getAdapterPosition()), v);
+            mClickHandler.onClick(mMovieData.get(getAdapterPosition()), getAdapterPosition());
         }
 
     }
