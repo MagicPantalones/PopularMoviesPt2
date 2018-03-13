@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -55,6 +56,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
     private GradientDrawable mPosterShadow;
     private Context mContext;
     private int[] mColorReset = new int[]{Color.TRANSPARENT, Color.TRANSPARENT};
+    private int mDefaultColor;
 
     public interface PosterClickHandler {
         void onClick(Movie movie, int position);
@@ -78,7 +80,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
     public PosterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         mContext = parent.getContext();
         Boolean orientation = mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
-
+        mDefaultColor = ResourcesCompat.getColor(mContext.getResources(), R.color.colorSecondary, mContext.getTheme());
         mImageSize = MovieUtils.getOptimalImgSize(mContext);
         mPosterShadow = (GradientDrawable) ResourcesCompat.getDrawable(
                 mContext.getResources(),
@@ -105,7 +107,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         final TextView tvTitle = holder.mTvTitle;
         final ProgressBar pbVotes = holder.mPbVoteBar;
         final TextView tvVotes = holder.mTvVote;
-        final View shadow = holder.mShadowLayer;
+        final ImageView shadow = holder.mShadowLayer;
 
         posterUrl = ApiUtils.posterUrlConverter(mImageSize, mfg.getPosterUrl());
         if (position == mMovieData.size() - 5 && mReachedEndHandler != null) {
@@ -119,6 +121,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         pbVotes.setProgress(mfg.getVoteAverage().intValue() * 10);
         tvVotes.setText(Double.toString(mfg.getVoteAverage()));
         iv.setContentDescription(mfg.getTitle());
+        shadow.setImageDrawable(mPosterShadow);
 
         GlideApp.with(iv)
                 .load(posterUrl)
@@ -136,8 +139,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
                             Bitmap b = ((BitmapDrawable) iv.getDrawable().getCurrent()).getBitmap();
                             setColorBleed(b, holder, position);
                         } else {
-                            mPosterShadow.setColors(mfg.getShadowInt());
-                            shadow.setBackground(mPosterShadow);
+                            shadow.setColorFilter(mfg.getShadowInt()[0], PorterDuff.Mode.SRC_IN);
                         }
                         super.onResourceReady(resource, transition);
                     }
@@ -167,8 +169,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         int transparent = ColorUtils.setAlphaComponent(solid, 0);
 
         int[] colors = new int[]{solid, transparent};
-        mPosterShadow.setColors(colors);
-        holder.mShadowLayer.setBackground(mPosterShadow);
+        holder.mShadowLayer.setColorFilter(solid, PorterDuff.Mode.SRC_IN);
         mMovieData.get(position).setShadowInt(colors);
 
     }
@@ -190,7 +191,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         @BindView(R.id.iv_poster)
         ImageView mIv;
         @BindView(R.id.v_card_shadow)
-        View mShadowLayer;
+        ImageView mShadowLayer;
         @BindView(R.id.cv_view_holder_wrapper)
         CardView mCvWrapper;
         @BindView(R.id.tv_movie_title_list)

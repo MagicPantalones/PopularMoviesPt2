@@ -5,6 +5,7 @@ import android.graphics.LinearGradient;
 import android.graphics.Shader;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -80,6 +81,7 @@ implements PosterAdapter.PosterClickHandler{
         TextView tv = rootView.findViewById(R.id.iv_error);
         PosterAdapter adapter = new PosterAdapter(this);
         GridLayoutManager layoutManager = new GridLayoutManager(context, 2);
+        FloatingActionButton upFab = rootView.findViewById(R.id.up_fab);
 
         rootView.setPaddingRelative(16, 16, 16, 16);
 
@@ -107,6 +109,8 @@ implements PosterAdapter.PosterClickHandler{
 
         rv.setAdapter(adapter);
         rv.setLayoutManager(layoutManager);
+
+        upFab.setOnClickListener(v -> rv.scrollToPosition(0));
 
         return rootView;
 

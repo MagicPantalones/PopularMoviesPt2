@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="io.magics.popularmovies.MovieListFragment">
 
     <android.support.v7.widget.RecyclerView
@@ -20,6 +21,14 @@
         android:fontFamily="@font/asap_medium"
         android:gravity="center"
         android:visibility="gone"
+        />
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/up_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="@dimen/fab_margin"
+        app:srcCompat="@drawable/ic_keyboard_arrow_up_white_24dp"
         />
 
 </FrameLayout>
