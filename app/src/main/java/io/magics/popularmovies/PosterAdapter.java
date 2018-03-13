@@ -54,8 +54,6 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
     private ReachedEndHandler mReachedEndHandler;
     private MovieUtils.ImageSize mImageSize;
     private GradientDrawable mPosterShadow;
-    private Context mContext;
-    private int[] mColorReset = new int[]{Color.TRANSPARENT, Color.TRANSPARENT};
     private int mDefaultColor;
 
     public interface PosterClickHandler {
@@ -78,21 +76,21 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
     @NonNull
     @Override
     public PosterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        mContext = parent.getContext();
-        Boolean orientation = mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
-        mDefaultColor = ResourcesCompat.getColor(mContext.getResources(), R.color.colorSecondary, mContext.getTheme());
-        mImageSize = MovieUtils.getOptimalImgSize(mContext);
+        Context context = parent.getContext();
+        Boolean orientation = context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+        mDefaultColor = ResourcesCompat.getColor(context.getResources(), R.color.colorSecondary, context.getTheme());
+        mImageSize = MovieUtils.getOptimalImgSize(context);
         mPosterShadow = (GradientDrawable) ResourcesCompat.getDrawable(
-                mContext.getResources(),
+                context.getResources(),
                 R.drawable.fg_gradient,
-                mContext.getTheme()
+                context.getTheme()
         );
 
         //Sets the ViewHolder sizes based on the devise's orientation.
         mViewHeight = orientation ? parent.getMeasuredHeight() / 2 : parent.getMeasuredHeight();
         mViewWidth = orientation ? parent.getMeasuredWidth() / 2 : parent.getMeasuredWidth() / 3;
 
-        View v = LayoutInflater.from(mContext).inflate(R.layout.poster_view_holder, parent, false);
+        View v = LayoutInflater.from(context).inflate(R.layout.poster_view_holder, parent, false);
 
         return new PosterViewHolder(v);
     }
@@ -135,12 +133,8 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
                     @Override
                     public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
                         iv.setImageDrawable(resource.getCurrent());
-                        if (mfg.getShadowInt().length == 0) {
-                            Bitmap b = ((BitmapDrawable) iv.getDrawable().getCurrent()).getBitmap();
-                            setColorBleed(b, holder, position);
-                        } else {
-                            shadow.setColorFilter(mfg.getShadowInt()[0], PorterDuff.Mode.SRC_IN);
-                        }
+                        Bitmap b = ((BitmapDrawable) iv.getDrawable().getCurrent()).getBitmap();
+                        setColorBleed(b, shadow);
                         super.onResourceReady(resource, transition);
                     }
 
@@ -157,20 +151,15 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         return mMovieData.size();
     }
 
-    private void setColorBleed(final Bitmap bitmap, final PosterViewHolder holder, final int position) {
+    private void setColorBleed(final Bitmap bitmap, final ImageView view) {
 
         Palette palette = Palette.from(bitmap).generate();
         int solid =
-                palette.getVibrantColor(palette.getDarkVibrantColor(palette.getDominantColor(ResourcesCompat.getColor(
-                        mContext.getResources(),
-                        R.color.colorSecondary,
-                        mContext.getTheme()))));
+                palette.getVibrantColor(
+                        palette.getDarkVibrantColor(
+                        palette.getDominantColor(mDefaultColor)));
 
-        int transparent = ColorUtils.setAlphaComponent(solid, 0);
-
-        int[] colors = new int[]{solid, transparent};
-        holder.mShadowLayer.setColorFilter(solid, PorterDuff.Mode.SRC_IN);
-        mMovieData.get(position).setShadowInt(colors);
+        view.setColorFilter(solid, PorterDuff.Mode.SRC_IN);
 
     }
 
