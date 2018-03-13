@@ -4,26 +4,192 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="io.magics.popularmovies.MovieDetailsActivity">
+    android:layout_margin="8dp">
 
-    <include
-        android:id="@+id/details_activity_frag"
-        layout="@layout/movie_details_fragment"
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar_main_details"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        android:background="@drawable/bg_bottom_nav"
+        app:elevation="0dp"
+        >
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true"
+            >
+
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/cv_backdrop"
+                style="@style/MovieCardStyle.PosterCard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_movie_title">
+
+                <ImageView
+                    android:id="@+id/iv_poster_details"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:scaleType="center"
+                    tools:ignore="ContentDescription"
+                    tools:src="@drawable/minions_poster_placehodler" />
+            </android.support.v7.widget.CardView>
+
+
+            <TextView
+                android:id="@+id/tv_movie_title"
+                style="@style/MovieCardStyle.Text.Header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Minions" />
+
+        </android.support.constraint.ConstraintLayout>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/detail_widget"
+            style="@style/MovieCardStyle"
+            android:layout_gravity="bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:cardElevation="5dp"
+            android:layout_marginBottom="-10dp"
+            >
+
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                >
+
+                <android.support.constraint.Guideline
+                    android:id="@+id/guideline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.5" />
+
+                <ImageView
+                    android:id="@+id/ic_calendar_icon_details"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/calendar_icon_a11y"
+                    app:layout_constraintBottom_toBottomOf="@+id/pb_vote_count"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/pb_vote_count"
+                    app:srcCompat="@drawable/ic_date_range_black_24dp" />
+
+                <TextView
+                    android:id="@+id/tv_release_date_text"
+                    style="@style/MovieCardStyle.Text.Normal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAllCaps="true"
+                    app:layout_constraintBottom_toBottomOf="@+id/ic_calendar_icon_details"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline"
+                    app:layout_constraintStart_toEndOf="@+id/ic_calendar_icon_details"
+                    app:layout_constraintTop_toTopOf="@+id/ic_calendar_icon_details"
+                    tools:text="September 17th, 2015" />
+
+
+                <ProgressBar
+                    android:id="@+id/pb_vote_count"
+                    style="@style/MovieCardStyle.VoteBar"
+                    android:layout_width="0dp"
+                    android:layout_height="24dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/end_guide"
+                    app:layout_constraintHorizontal_bias="0.6"
+                    app:layout_constraintStart_toStartOf="@+id/guideline"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_vote_average_text"
+                    style="@style/MovieCardStyle.Text.Normal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorPrimary"
+                    app:layout_constraintHorizontal_bias="0.07"
+                    app:layout_constraintBottom_toBottomOf="@+id/pb_vote_count"
+                    app:layout_constraintEnd_toEndOf="@+id/pb_vote_count"
+                    app:layout_constraintStart_toStartOf="@+id/pb_vote_count"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="7.5" />
+
+                <android.support.constraint.Guideline
+                    android:id="@+id/end_guide"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.895"
+                    />
+
+
+
+            </android.support.constraint.ConstraintLayout>
+
+        </android.support.v7.widget.CardView>
+
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/nsv_details"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:background="@drawable/bg_bottom_nav"
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <ProgressBar
-        android:id="@+id/pb_details_loading"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:visibility="invisible"/>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_trailer_and_review"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:paddingTop="10dp"
+            android:layout_marginTop="16dp"
+            android:background="@color/colorSecondary"
+            />
 
+    </android.support.v4.widget.NestedScrollView>
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:theme="@style/Fab"
+        android:scaleType="fitXY"
+        app:layout_anchorGravity="end|top"
+        app:fabSize="mini"
+        app:layout_anchor="@id/detail_widget"
+        app:srcCompat="@drawable/ic_favourite_heart_gray" />
+
+
+    <android.support.design.widget.BottomNavigationView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:id="@+id/bottom_nav_details_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:itemBackground="@color/colorPrimary"
+        app:itemIconTint="@drawable/selector_bottom_nav"
+        app:itemTextColor="@drawable/selector_bottom_nav"
+        app:menu="@menu/movie_details_bottom_nav" />
 </android.support.design.widget.CoordinatorLayout>

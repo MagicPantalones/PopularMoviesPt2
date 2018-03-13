@@ -133,7 +133,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
                     @Override
                     public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
                         iv.setImageDrawable(resource.getCurrent());
-                        Bitmap b = ((BitmapDrawable) iv.getDrawable().getCurrent()).getBitmap();
+                        final Bitmap b = ((BitmapDrawable) iv.getDrawable().getCurrent()).getBitmap();
                         setColorBleed(b, shadow);
                         super.onResourceReady(resource, transition);
                     }
@@ -149,6 +149,16 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
     public int getItemCount() {
         if (mMovieData == null) return 0;
         return mMovieData.size();
+    }
+
+    @Override
+    public void onViewAttachedToWindow(@NonNull PosterViewHolder holder) {
+        final Drawable drawable = holder.mIv.getDrawable();
+        if (drawable != null && drawable instanceof BitmapDrawable) {
+            final Bitmap m = ((BitmapDrawable) drawable).getBitmap();
+            setColorBleed(m, holder.mShadowLayer);
+        }
+        super.onViewAttachedToWindow(holder);
     }
 
     private void setColorBleed(final Bitmap bitmap, final ImageView view) {

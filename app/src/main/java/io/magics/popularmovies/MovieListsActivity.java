@@ -31,6 +31,7 @@ public class MovieListsActivity extends AppCompatActivity {
         mViewPager.setAdapter(new MovieListsPagerAdapter(getSupportFragmentManager(),
                 MovieListsActivity.this));
 
+
         mTabLayout.setupWithViewPager(mViewPager);
     }
 

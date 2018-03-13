@@ -110,7 +110,9 @@ implements PosterAdapter.PosterClickHandler{
         rv.setAdapter(adapter);
         rv.setLayoutManager(layoutManager);
 
-        upFab.setOnClickListener(v -> rv.scrollToPosition(0));
+
+        upFab.setOnClickListener(v -> rv.smoothScrollToPosition(1));
+
 
         return rootView;
 
