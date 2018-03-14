@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -30,7 +31,7 @@ import static io.magics.popularmovies.networkutils.TMDBApi.*;
  * create an instance of this fragment.
  */
 public class MovieListFragment extends Fragment
-implements PosterAdapter.PosterClickHandler{
+implements PosterAdapter.PosterClickHandler, ViewPager.OnPageChangeListener{
     private static final String ARG_TAB_PAGE = "ARG_TAB_PAGE";
     private static final String ARG_POPULAR_PAGE = "ARG_POP_PAGE";
     private static final String ARG_TOP_RATED_PAGE = "ARG_TOP_PAGE";
@@ -39,9 +40,8 @@ implements PosterAdapter.PosterClickHandler{
     private int mPopPage = 1;
     private int mTopPage = 1;
 
-    public MovieListFragment() {
-        // Required empty public constructor
-    }
+    RecyclerView mActivityRv;
+    MovementCatcher mMovementCatcher;
 
     /**
      * Use this factory method to create a new instance of
@@ -62,6 +62,27 @@ implements PosterAdapter.PosterClickHandler{
     }
 
     @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        //Intentinally empty
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        //Intentinally empty
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+        if (state == ViewPager.SCROLL_STATE_DRAGGING) mMovementCatcher.fragmentActionListener(FragmentAction.ACTION_SCROLLING_HORIZONTAL);
+        else mMovementCatcher.fragmentActionListener(FragmentAction.ACTION_SCROLLED_HORIZONTAL);
+    }
+
+
+    public interface MovementCatcher{
+        void fragmentActionListener(FragmentAction action);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
@@ -77,11 +98,10 @@ implements PosterAdapter.PosterClickHandler{
         Context context = getContext();
         Boolean getDataSuccess;
         View rootView = inflater.inflate(R.layout.movie_list_fragment, container, false);
-        RecyclerView rv = rootView.findViewById(R.id.rv_poster_list);
+        mActivityRv = rootView.findViewById(R.id.rv_poster_list);
         TextView tv = rootView.findViewById(R.id.iv_error);
         PosterAdapter adapter = new PosterAdapter(this);
         GridLayoutManager layoutManager = new GridLayoutManager(context, 2);
-        FloatingActionButton upFab = rootView.findViewById(R.id.up_fab);
 
         rootView.setPaddingRelative(16, 16, 16, 16);
 
@@ -104,19 +124,28 @@ implements PosterAdapter.PosterClickHandler{
             }
         }
 
-        rv.setVisibility(getDataSuccess ? View.VISIBLE : View.GONE);
+        mActivityRv.setVisibility(getDataSuccess ? View.VISIBLE : View.GONE);
         tv.setVisibility(getDataSuccess ? View.GONE : View.VISIBLE);
 
-        rv.setAdapter(adapter);
-        rv.setLayoutManager(layoutManager);
+        mActivityRv.setAdapter(adapter);
+        mActivityRv.setLayoutManager(layoutManager);
 
-
-        upFab.setOnClickListener(v -> rv.smoothScrollToPosition(1));
-
+        mActivityRv.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if (dy > 0){
+                    mMovementCatcher.fragmentActionListener(FragmentAction.ACTION_SCROLLING_DOWN);
+                } else {
+                    mMovementCatcher.fragmentActionListener(FragmentAction.ACTION_SCROLLING_UP);
+                }
+                super.onScrolled(recyclerView, dx, dy);
+            }
+        });
 
         return rootView;
 
     }
+
 
     @Override
     public void onClick(Movie movie, int position) {
@@ -124,8 +153,9 @@ implements PosterAdapter.PosterClickHandler{
     }
 
     @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
+    public void onAttach(Context context) {
+        mMovementCatcher = (MovementCatcher) context;
+        super.onAttach(context);
     }
 
     private boolean getDataFromNetwork(Context context, PosterAdapter posterAdapter){
@@ -153,6 +183,8 @@ implements PosterAdapter.PosterClickHandler{
         return true;
     }
 
+
+
     private void paintTextView(Context context, TextView textView){
         int colorOne = context.getResources().getColor(R.color.colorSecondaryLight);
         int colorTwo = context.getResources().getColor(R.color.colorSecondaryAccent);
@@ -161,6 +193,13 @@ implements PosterAdapter.PosterClickHandler{
                 new int[]{colorOne, colorTwo},
                 new float[]{0,1}, Shader.TileMode.CLAMP);
         textView.getPaint().setShader(shader);
+    }
+
+    public enum FragmentAction{
+        ACTION_SCROLLING_HORIZONTAL,
+        ACTION_SCROLLED_HORIZONTAL,
+        ACTION_SCROLLING_UP,
+        ACTION_SCROLLING_DOWN
     }
 
 }
