@@ -48,7 +48,6 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
     private final PosterClickHandler mClickHandler;
     private ReachedEndHandler mReachedEndHandler;
     private MovieUtils.ImageSize mImageSize;
-    private GradientDrawable mPosterShadow;
     private int mDefaultColor;
 
     public interface PosterClickHandler {
@@ -75,11 +74,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         Boolean orientation = context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
         mDefaultColor = ResourcesCompat.getColor(context.getResources(), R.color.colorSecondary, context.getTheme());
         mImageSize = MovieUtils.getOptimalImgSize(context);
-        mPosterShadow = (GradientDrawable) ResourcesCompat.getDrawable(
-                context.getResources(),
-                R.drawable.fg_gradient,
-                context.getTheme()
-        );
+
 
         //Sets the ViewHolder sizes based on the devise's orientation.
         mViewHeight = orientation ? parent.getMeasuredHeight() / 2 : parent.getMeasuredHeight();
@@ -93,14 +88,14 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull PosterViewHolder holder, int position) {
-        final String posterUrl;
-        final Movie mfg = mMovieData.get(position);
-        final ImageView iv = holder.mIv;
-        final CardView cvWrapper = holder.mCvWrapper;
-        final TextView tvTitle = holder.mTvTitle;
-        final ProgressBar pbVotes = holder.mPbVoteBar;
-        final TextView tvVotes = holder.mTvVote;
-        final ImageView shadow = holder.mShadowLayer;
+        String posterUrl;
+        Movie mfg = mMovieData.get(position);
+        ImageView iv = holder.mIv;
+        CardView cvWrapper = holder.mCvWrapper;
+        TextView tvTitle = holder.mTvTitle;
+        ProgressBar pbVotes = holder.mPbVoteBar;
+        TextView tvVotes = holder.mTvVote;
+        ImageView shadow = holder.mShadowLayer;
 
         posterUrl = ApiUtils.posterUrlConverter(mImageSize, mfg.getPosterUrl());
         if (position == mMovieData.size() - 5 && mReachedEndHandler != null) {
@@ -123,13 +118,20 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
                 .centerCrop()
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(new ImageViewTarget<Drawable>(iv) {
-
-
+                    
                     @Override
                     public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
                         iv.setImageDrawable(resource.getCurrent());
-                        final Bitmap b = ((BitmapDrawable) iv.getDrawable().getCurrent()).getBitmap();
-                        setColorBleed(b, shadow);
+                        Bitmap b = ((BitmapDrawable) resource).getBitmap();
+
+                        Palette.from(b).generate(palette -> {
+                            int solid =
+                                    palette.getVibrantColor(
+                                            palette.getDarkVibrantColor(
+                                                    palette.getDominantColor(mDefaultColor)));
+                            shadow.setColorFilter(solid, PorterDuff.Mode.SRC_IN);
+                        });
+
                         super.onResourceReady(resource, transition);
                     }
 
@@ -146,27 +148,6 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         return mMovieData.size();
     }
 
-    @Override
-    public void onViewAttachedToWindow(@NonNull PosterViewHolder holder) {
-        final Drawable drawable = holder.mIv.getDrawable();
-        if (drawable != null && drawable instanceof BitmapDrawable) {
-            final Bitmap m = ((BitmapDrawable) drawable).getBitmap();
-            setColorBleed(m, holder.mShadowLayer);
-        }
-        super.onViewAttachedToWindow(holder);
-    }
-
-    private void setColorBleed(final Bitmap bitmap, final ImageView view) {
-
-        Palette palette = Palette.from(bitmap).generate();
-        int solid =
-                palette.getVibrantColor(
-                        palette.getDarkVibrantColor(
-                        palette.getDominantColor(mDefaultColor)));
-
-        view.setColorFilter(solid, PorterDuff.Mode.SRC_IN);
-
-    }
 
     public void setMovieData(List<Movie> movies, int position, Boolean listFromCursor) {
         if (movies == null) {

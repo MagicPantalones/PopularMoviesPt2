@@ -11,6 +11,7 @@
         android:id="@+id/cv_view_holder_wrapper"
         style="@style/MovieCardStyle"
         app:cardElevation="2dp"
+        app:cardUseCompatPadding="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
