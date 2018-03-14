@@ -1,11 +1,9 @@
 package io.magics.popularmovies;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -13,7 +11,6 @@ import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.res.ResourcesCompat;
-import android.support.v4.graphics.ColorUtils;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -24,11 +21,9 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.bumptech.glide.GenericTransitionOptions;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.target.ImageViewTarget;
-import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 
 import java.util.List;
@@ -119,7 +114,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         pbVotes.setProgress(mfg.getVoteAverage().intValue() * 10);
         tvVotes.setText(Double.toString(mfg.getVoteAverage()));
         iv.setContentDescription(mfg.getTitle());
-        shadow.setImageDrawable(mPosterShadow);
+        shadow.setImageDrawable(holder.mGradientDrawable.mutate());
 
         GlideApp.with(iv)
                 .load(posterUrl)
