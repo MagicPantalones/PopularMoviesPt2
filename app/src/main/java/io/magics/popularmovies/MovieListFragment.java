@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -31,7 +30,7 @@ import static io.magics.popularmovies.networkutils.TMDBApi.*;
  * create an instance of this fragment.
  */
 public class MovieListFragment extends Fragment
-implements PosterAdapter.PosterClickHandler, ViewPager.OnPageChangeListener{
+implements PosterAdapter.PosterClickHandler, MovieListsActivity.UpFabListener{
     private static final String ARG_TAB_PAGE = "ARG_TAB_PAGE";
     private static final String ARG_POPULAR_PAGE = "ARG_POP_PAGE";
     private static final String ARG_TOP_RATED_PAGE = "ARG_TOP_PAGE";
@@ -41,7 +40,6 @@ implements PosterAdapter.PosterClickHandler, ViewPager.OnPageChangeListener{
     private int mTopPage = 1;
 
     RecyclerView mActivityRv;
-    MovementCatcher mMovementCatcher;
 
     /**
      * Use this factory method to create a new instance of
@@ -59,27 +57,6 @@ implements PosterAdapter.PosterClickHandler, ViewPager.OnPageChangeListener{
         args.putInt(ARG_TOP_RATED_PAGE, 1);
         fragment.setArguments(args);
         return fragment;
-    }
-
-    @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        //Intentinally empty
-    }
-
-    @Override
-    public void onPageSelected(int position) {
-        //Intentinally empty
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int state) {
-        if (state == ViewPager.SCROLL_STATE_DRAGGING) mMovementCatcher.fragmentActionListener(FragmentAction.ACTION_SCROLLING_HORIZONTAL);
-        else mMovementCatcher.fragmentActionListener(FragmentAction.ACTION_SCROLLED_HORIZONTAL);
-    }
-
-
-    public interface MovementCatcher{
-        void fragmentActionListener(FragmentAction action);
     }
 
     @Override
@@ -102,6 +79,8 @@ implements PosterAdapter.PosterClickHandler, ViewPager.OnPageChangeListener{
         TextView tv = rootView.findViewById(R.id.iv_error);
         PosterAdapter adapter = new PosterAdapter(this);
         GridLayoutManager layoutManager = new GridLayoutManager(context, 2);
+        FloatingActionButton mainUpFab = this.getActivity().findViewById(R.id.up_fab);
+
 
         rootView.setPaddingRelative(16, 16, 16, 16);
 
@@ -133,29 +112,29 @@ implements PosterAdapter.PosterClickHandler, ViewPager.OnPageChangeListener{
         mActivityRv.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                if (dy > 0){
-                    mMovementCatcher.fragmentActionListener(FragmentAction.ACTION_SCROLLING_DOWN);
-                } else {
-                    mMovementCatcher.fragmentActionListener(FragmentAction.ACTION_SCROLLING_UP);
-                }
+                if (dy > 0) mainUpFab.hide();
+                if (dy <= 0) mainUpFab.show();
                 super.onScrolled(recyclerView, dx, dy);
             }
         });
-
         return rootView;
-
-    }
-
-
-    @Override
-    public void onClick(Movie movie, int position) {
-        //TODO Implement details fragment.
     }
 
     @Override
     public void onAttach(Context context) {
-        mMovementCatcher = (MovementCatcher) context;
+        ((MovieListsActivity)context).registerUpFab(this);
         super.onAttach(context);
+    }
+
+    @Override
+    public void onDestroy() {
+        ((MovieListsActivity)getContext()).unRegisterUpFab(this);
+        super.onDestroy();
+    }
+
+    @Override
+    public void onClick(Movie movie, int position) {
+
     }
 
     private boolean getDataFromNetwork(Context context, PosterAdapter posterAdapter){
@@ -195,11 +174,8 @@ implements PosterAdapter.PosterClickHandler, ViewPager.OnPageChangeListener{
         textView.getPaint().setShader(shader);
     }
 
-    public enum FragmentAction{
-        ACTION_SCROLLING_HORIZONTAL,
-        ACTION_SCROLLED_HORIZONTAL,
-        ACTION_SCROLLING_UP,
-        ACTION_SCROLLING_DOWN
+    @Override
+    public void upFabUp() {
+        mActivityRv.smoothScrollToPosition(0);
     }
-
 }
