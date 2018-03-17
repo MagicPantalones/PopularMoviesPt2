@@ -1,5 +1,6 @@
 package io.magics.popularmovies;
 
+import android.app.Fragment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -15,6 +16,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.magics.popularmovies.models.Movie;
 
 public class MovieListsActivity extends AppCompatActivity {
 
@@ -61,6 +63,14 @@ public class MovieListsActivity extends AppCompatActivity {
 
     public void unRegisterUpFab(UpFabListener upFabListener){
         if (!mUpFabListeners.isEmpty()) mUpFabListeners.remove(upFabListener);
+    }
+
+    public void startFrag(Movie movie, boolean check){
+        MovieDetailsFragment frag = MovieDetailsFragment.newInstance(movie, check);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.activity_container, frag)
+                .commit();
     }
 
 }

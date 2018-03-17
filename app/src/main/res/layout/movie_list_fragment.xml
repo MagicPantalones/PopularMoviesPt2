@@ -12,7 +12,7 @@
         tools:listitem="@layout/poster_view_holder"
         />
     <TextView
-        android:id="@+id/iv_error"
+        android:id="@+id/tv_error"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="@string/list_no_network_available"

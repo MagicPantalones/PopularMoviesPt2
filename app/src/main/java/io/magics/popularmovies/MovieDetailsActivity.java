@@ -1,15 +1,12 @@
 package io.magics.popularmovies;
 
 import android.animation.ObjectAnimator;
-import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.animation.AccelerateInterpolator;
 import android.view.animation.BounceInterpolator;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -39,10 +36,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
     @BindView(R.id.iv_poster_details) ImageView mPosterIv;
     @BindView(R.id.tv_movie_title) TextView mTitleTv;
-    @BindView(R.id.tv_release_date_text) TextView mReleaseDateTv;
-    @BindView(R.id.tv_vote_average_text) TextView mVoteTv;
-    @BindView(R.id.fab) FloatingActionButton mFab;
-    @BindView(R.id.pb_vote_count)
+    @BindView(R.id.tv_release_date_detail) TextView mReleaseDateTv;
+    @BindView(R.id.tv_vote_average_detail) TextView mVoteTv;
+    @BindView(R.id.fav_fab) FloatingActionButton mFab;
+    @BindView(R.id.pb_vote_count_detail)
     ProgressBar mVoteProgress;
 
     @Override
@@ -57,9 +54,9 @@ public class MovieDetailsActivity extends AppCompatActivity {
         Bundle bundle;
         if (intent != null){
             bundle = intent.getExtras();
-            mImageHeight = bundle.getInt("height");
-            mImageWidth = bundle.getInt("width");
-            mMovie = bundle.getParcelable("movie");
+            if (bundle != null) {
+                mMovie = bundle.getParcelable("movie");
+            }
         }
 
         mTitleTv.setText(mMovie.getTitle());
@@ -67,6 +64,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
         Long voteCalcLong = Math.round(mMovie.getVoteAverage() * 10);
         ValueAnimator voteTextAnim = ValueAnimator.ofFloat(0.0f, mMovie.getVoteAverage().floatValue());
+        ObjectAnimator voteProgressAnim = ObjectAnimator.ofInt(mVoteProgress, "progress", voteCalcLong.intValue());
 
         voteTextAnim.setDuration(2000);
         voteTextAnim.setInterpolator(new BounceInterpolator());
@@ -77,7 +75,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         });
         voteTextAnim.start();
 
-        ObjectAnimator voteProgressAnim = ObjectAnimator.ofInt(mVoteProgress, "progress", voteCalcLong.intValue());
+
         voteProgressAnim.setDuration(2000);
         voteProgressAnim.setInterpolator(new BounceInterpolator());
         voteProgressAnim.start();
@@ -98,7 +96,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
     }
 
-    @OnClick(R.id.fab)
+    @OnClick(R.id.fav_fab)
     public void onFabPressed(FloatingActionButton button){
         ThreadingUtils.addToFavourites(this, mMovie, mFavIds, id -> {
             button.setImageResource(id > 0 ? R.drawable.ic_favourite_heart_red : R.drawable.ic_favourite_heart_gray);

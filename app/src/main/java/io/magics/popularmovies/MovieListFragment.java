@@ -14,6 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.utils.ThreadingUtils;
 
@@ -24,7 +27,7 @@ import static io.magics.popularmovies.networkutils.TMDBApi.*;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link MovieListFragment}.OnFragmentInteractionListener} interface
+ * {@link MovieListFragment}.OnFavouriteMovieSelected} interface
  * to handle interaction events.
  * Use the {@link MovieListFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -39,7 +42,10 @@ implements PosterAdapter.PosterClickHandler, MovieListsActivity.UpFabListener{
     private int mPopPage = 1;
     private int mTopPage = 1;
 
-    RecyclerView mActivityRv;
+    @BindView(R.id.rv_poster_list) RecyclerView mRvPoster;
+    @BindView(R.id.tv_error) TextView mTvError;
+    private Unbinder unbinder;
+
 
     /**
      * Use this factory method to create a new instance of
@@ -75,17 +81,17 @@ implements PosterAdapter.PosterClickHandler, MovieListsActivity.UpFabListener{
         Context context = getContext();
         Boolean getDataSuccess;
         View rootView = inflater.inflate(R.layout.movie_list_fragment, container, false);
-        mActivityRv = rootView.findViewById(R.id.rv_poster_list);
-        TextView tv = rootView.findViewById(R.id.iv_error);
+        unbinder = ButterKnife.bind(this, rootView);
         PosterAdapter adapter = new PosterAdapter(this);
         GridLayoutManager layoutManager = new GridLayoutManager(context, 2);
+        //noinspection ConstantConditions
         FloatingActionButton mainUpFab = this.getActivity().findViewById(R.id.up_fab);
 
 
         rootView.setPaddingRelative(16, 16, 16, 16);
 
         //From Tara's answer here: https://stackoverflow.com/questions/2680607/text-with-gradient-in-android
-        paintTextView(context, tv);
+        paintTextView(context, mTvError);
 
         getDataSuccess = getDataFromNetwork(context, adapter);
 
@@ -103,13 +109,13 @@ implements PosterAdapter.PosterClickHandler, MovieListsActivity.UpFabListener{
             }
         }
 
-        mActivityRv.setVisibility(getDataSuccess ? View.VISIBLE : View.GONE);
-        tv.setVisibility(getDataSuccess ? View.GONE : View.VISIBLE);
+        mRvPoster.setVisibility(getDataSuccess ? View.VISIBLE : View.GONE);
+        mTvError.setVisibility(getDataSuccess ? View.GONE : View.VISIBLE);
 
-        mActivityRv.setAdapter(adapter);
-        mActivityRv.setLayoutManager(layoutManager);
+        mRvPoster.setAdapter(adapter);
+        mRvPoster.setLayoutManager(layoutManager);
 
-        mActivityRv.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        mRvPoster.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 if (dy > 0) mainUpFab.hide();
@@ -127,13 +133,21 @@ implements PosterAdapter.PosterClickHandler, MovieListsActivity.UpFabListener{
     }
 
     @Override
-    public void onDestroy() {
+    public void onDetach() {
+        //noinspection ConstantConditions
         ((MovieListsActivity)getContext()).unRegisterUpFab(this);
+        super.onDetach();
+    }
+
+    @Override
+    public void onDestroy() {
+        unbinder.unbind();
         super.onDestroy();
     }
 
     @Override
     public void onClick(Movie movie, int position) {
+        ((MovieListsActivity)getContext()).startFrag(movie, false);
 
     }
 
@@ -176,6 +190,6 @@ implements PosterAdapter.PosterClickHandler, MovieListsActivity.UpFabListener{
 
     @Override
     public void upFabUp() {
-        mActivityRv.smoothScrollToPosition(0);
+        mRvPoster.smoothScrollToPosition(0);
     }
 }

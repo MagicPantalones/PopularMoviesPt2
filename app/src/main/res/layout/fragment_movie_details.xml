@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/detail_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="8dp">
@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
-        android:background="@drawable/bg_bottom_nav"
+        android:background="@drawable/bg_top_round"
         app:elevation="0dp"
         >
 
@@ -30,10 +30,10 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_movie_title">
+                app:layout_constraintTop_toBottomOf="@+id/tv_movie_title_detail">
 
                 <ImageView
-                    android:id="@+id/iv_poster_details"
+                    android:id="@+id/iv_poster_detail"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:scaleType="center"
@@ -43,7 +43,7 @@
 
 
             <TextView
-                android:id="@+id/tv_movie_title"
+                android:id="@+id/tv_movie_title_detail"
                 style="@style/MovieCardStyle.Text.Header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -51,6 +51,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Minions" />
+
 
         </android.support.constraint.ConstraintLayout>
 
@@ -68,52 +69,37 @@
             <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
+                android:paddingBottom="10dp"
                 >
-
                 <android.support.constraint.Guideline
-                    android:id="@+id/guideline"
+                    android:id="@+id/widget_guide"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    app:layout_constraintGuide_percent="0.5" />
-
-                <ImageView
-                    android:id="@+id/ic_calendar_icon_detail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="@string/calendar_icon_a11y"
-                    app:layout_constraintBottom_toBottomOf="@+id/pb_vote_count_detail"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/pb_vote_count_detail"
-                    app:srcCompat="@drawable/ic_date_range_black_24dp" />
+                    app:layout_constraintGuide_percent="0.8"
+                    />
 
                 <TextView
                     android:id="@+id/tv_release_date_detail"
                     style="@style/MovieCardStyle.Text.Normal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
                     android:textAllCaps="true"
-                    app:layout_constraintBottom_toBottomOf="@+id/ic_calendar_icon_detail"
-                    app:layout_constraintEnd_toStartOf="@+id/guideline"
-                    app:layout_constraintStart_toEndOf="@+id/ic_calendar_icon_detail"
-                    app:layout_constraintTop_toTopOf="@+id/ic_calendar_icon_detail"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
                     tools:text="September 17th, 2015" />
-
 
                 <ProgressBar
                     android:id="@+id/pb_vote_count_detail"
                     style="@style/MovieCardStyle.VoteBar"
                     android:layout_width="0dp"
-                    android:layout_height="24dp"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginStart="8dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/end_guide"
-                    app:layout_constraintHorizontal_bias="0.6"
-                    app:layout_constraintStart_toStartOf="@+id/guideline"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:layout_height="22dp"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintEnd_toEndOf="@+id/tv_release_date_detail"
+                    app:layout_constraintStart_toStartOf="@+id/tv_release_date_detail"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_release_date_detail" />
 
                 <TextView
                     android:id="@+id/tv_vote_average_detail"
@@ -121,22 +107,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/colorPrimary"
-                    app:layout_constraintHorizontal_bias="0.07"
                     app:layout_constraintBottom_toBottomOf="@+id/pb_vote_count_detail"
                     app:layout_constraintEnd_toEndOf="@+id/pb_vote_count_detail"
+                    app:layout_constraintHorizontal_bias="0.07"
                     app:layout_constraintStart_toStartOf="@+id/pb_vote_count_detail"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/pb_vote_count_detail"
                     tools:text="7.5" />
-
-                <android.support.constraint.Guideline
-                    android:id="@+id/end_guide"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    app:layout_constraintGuide_percent="0.895"
-                    />
-
-
 
             </android.support.constraint.ConstraintLayout>
 
@@ -170,7 +146,8 @@
         android:id="@+id/fav_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="16dp"
+
         android:theme="@style/Fab"
         android:scaleType="fitXY"
         app:layout_anchorGravity="end|top"
@@ -192,4 +169,5 @@
         app:itemIconTint="@drawable/selector_bottom_nav"
         app:itemTextColor="@drawable/selector_bottom_nav"
         app:menu="@menu/movie_details_bottom_nav" />
+
 </android.support.design.widget.CoordinatorLayout>
