@@ -33,7 +33,7 @@ import static io.magics.popularmovies.networkutils.TMDBApi.*;
  * create an instance of this fragment.
  */
 public class MovieListFragment extends Fragment
-implements PosterAdapter.PosterClickHandler, MovieListsActivity.UpFabListener{
+implements PosterAdapter.PosterClickHandler, FragmentListTabLayout.UpFabListener{
     private static final String ARG_TAB_PAGE = "ARG_TAB_PAGE";
     private static final String ARG_POPULAR_PAGE = "ARG_POP_PAGE";
     private static final String ARG_TOP_RATED_PAGE = "ARG_TOP_PAGE";
@@ -45,15 +45,8 @@ implements PosterAdapter.PosterClickHandler, MovieListsActivity.UpFabListener{
     @BindView(R.id.rv_poster_list) RecyclerView mRvPoster;
     @BindView(R.id.tv_error) TextView mTvError;
     private Unbinder unbinder;
+    private PosterAdapter mAdapter;
 
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param page tab page number
-     * @return A new instance of fragment MovieListFragment.
-     */
 
     public static MovieListFragment newInstance(int page) {
         MovieListFragment fragment = new MovieListFragment();
@@ -80,31 +73,32 @@ implements PosterAdapter.PosterClickHandler, MovieListsActivity.UpFabListener{
                              Bundle savedInstanceState) {
         Context context = getContext();
         Boolean getDataSuccess;
-        View rootView = inflater.inflate(R.layout.movie_list_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_list_movie_lists, container, false);
         unbinder = ButterKnife.bind(this, rootView);
-        PosterAdapter adapter = new PosterAdapter(this);
         GridLayoutManager layoutManager = new GridLayoutManager(context, 2);
         //noinspection ConstantConditions
-        FloatingActionButton mainUpFab = this.getActivity().findViewById(R.id.up_fab);
-
+        FloatingActionButton mainUpFab = ((FragmentListTabLayout)this.getParentFragment()).mUpFab;
+        if (mAdapter == null){
+            mAdapter = new PosterAdapter(this);
+        }
 
         rootView.setPaddingRelative(16, 16, 16, 16);
 
         //From Tara's answer here: https://stackoverflow.com/questions/2680607/text-with-gradient-in-android
         paintTextView(context, mTvError);
 
-        getDataSuccess = getDataFromNetwork(context, adapter);
+        getDataSuccess = getDataFromNetwork(context, mAdapter);
 
         if (getDataSuccess) {
             if (mTabPage == 1) {
-                adapter.setEndListener(handler -> {
+                mAdapter.setEndListener(handler -> {
                     mTopPage += 1;
-                    getDataFromNetwork(context, adapter);
+                    getDataFromNetwork(context, mAdapter);
                 });
             } else if (mTabPage == 2) {
-                adapter.setEndListener(handler -> {
+                mAdapter.setEndListener(handler -> {
                     mPopPage += 1;
-                    getDataFromNetwork(context, adapter);
+                    getDataFromNetwork(context, mAdapter);
                 });
             }
         }
@@ -112,7 +106,7 @@ implements PosterAdapter.PosterClickHandler, MovieListsActivity.UpFabListener{
         mRvPoster.setVisibility(getDataSuccess ? View.VISIBLE : View.GONE);
         mTvError.setVisibility(getDataSuccess ? View.GONE : View.VISIBLE);
 
-        mRvPoster.setAdapter(adapter);
+        mRvPoster.setAdapter(mAdapter);
         mRvPoster.setLayoutManager(layoutManager);
 
         mRvPoster.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -128,14 +122,15 @@ implements PosterAdapter.PosterClickHandler, MovieListsActivity.UpFabListener{
 
     @Override
     public void onAttach(Context context) {
-        ((MovieListsActivity)context).registerUpFab(this);
+        //noinspection ConstantConditions
+        ((FragmentListTabLayout)this.getParentFragment()).registerUpFab(this);
         super.onAttach(context);
     }
 
     @Override
     public void onDetach() {
         //noinspection ConstantConditions
-        ((MovieListsActivity)getContext()).unRegisterUpFab(this);
+        ((FragmentListTabLayout)this.getParentFragment()).unRegisterUpFab(this);
         super.onDetach();
     }
 
@@ -147,8 +142,8 @@ implements PosterAdapter.PosterClickHandler, MovieListsActivity.UpFabListener{
 
     @Override
     public void onClick(Movie movie, int position) {
+        //noinspection ConstantConditions
         ((MovieListsActivity)getContext()).startFrag(movie, false);
-
     }
 
     private boolean getDataFromNetwork(Context context, PosterAdapter posterAdapter){
@@ -170,7 +165,7 @@ implements PosterAdapter.PosterClickHandler, MovieListsActivity.UpFabListener{
                 pageNumber = mPopPage;
         }
 
-        callApi(sortingMethod,
+        callApiForMovieList(sortingMethod,
                 pageNumber,
                 apiResult -> posterAdapter.setMovieData(apiResult.getMovies(), posterAdapter.getItemCount(),false));
         return true;
@@ -184,7 +179,7 @@ implements PosterAdapter.PosterClickHandler, MovieListsActivity.UpFabListener{
 
         Shader shader = new LinearGradient(0, 0, 0, 45,
                 new int[]{colorOne, colorTwo},
-                new float[]{0,1}, Shader.TileMode.CLAMP);
+                new float[]{0,1}, Shader.TileMode.REPEAT);
         textView.getPaint().setShader(shader);
     }
 

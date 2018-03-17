@@ -31,12 +31,16 @@ public class ApiUtils {
         void onSuccess(io.magics.popularmovies.models.ApiResult apiResult);
     }
 
-    public static Disposable callApi(SortingMethod sortingMethod, int pageNumber, final ApiCallResult callback){
+    public static Disposable callApiForMovieList(SortingMethod sortingMethod, int pageNumber, final ApiCallResult callback){
         return getClientForMovieList().create(TMDBApi.class)
                 .getMovieList(sortingMethod, TMDB_API_KEY, "en-US", pageNumber)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(callback::onSuccess);
+    }
+
+    public static Disposable callApiForTrailersAndReviews(){
+        return null;
     }
 
     private static Retrofit getClientForMovieList() {

@@ -80,7 +80,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         mViewHeight = orientation ? parent.getMeasuredHeight() / 2 : parent.getMeasuredHeight();
         mViewWidth = orientation ? parent.getMeasuredWidth() / 2 : parent.getMeasuredWidth() / 3;
 
-        View v = LayoutInflater.from(context).inflate(R.layout.poster_view_holder, parent, false);
+        View v = LayoutInflater.from(context).inflate(R.layout.fragment_list_view_holder, parent, false);
 
         return new PosterViewHolder(v);
     }

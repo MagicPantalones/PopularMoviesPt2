@@ -3,6 +3,8 @@ package io.magics.popularmovies;
 import android.app.Fragment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.SimpleOnPageChangeListener;
 import android.support.v7.app.AppCompatActivity;
@@ -20,19 +22,6 @@ import io.magics.popularmovies.models.Movie;
 
 public class MovieListsActivity extends AppCompatActivity {
 
-    @BindView(R.id.view_pager)
-    ViewPager mViewPager;
-    @BindView(R.id.sliding_tabs)
-    TabLayout mTabLayout;
-    @BindView(R.id.up_fab)
-    FloatingActionButton mUpFab;
-    List<UpFabListener> mUpFabListeners = new ArrayList<>();
-
-    public interface UpFabListener{
-        void upFabUp();
-    }
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,37 +29,20 @@ public class MovieListsActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         Stetho.initializeWithDefaults(this);
 
-        mViewPager.setOffscreenPageLimit(3);
-        mViewPager.setAdapter(new MovieListsPagerAdapter(getSupportFragmentManager()));
-        mViewPager.addOnPageChangeListener(new SimpleOnPageChangeListener(){
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                if (state == ViewPager.SCROLL_STATE_DRAGGING && mUpFab.getVisibility() == View.VISIBLE) mUpFab.hide();
-                else if (state == ViewPager.SCROLL_STATE_IDLE && mUpFab.getVisibility() != View.VISIBLE) mUpFab.show();
-                super.onPageScrollStateChanged(state);
-            }
-
-        });
-
-        mTabLayout.setupWithViewPager(mViewPager);
-        mUpFab.setOnClickListener(v -> mUpFabListeners.get(mTabLayout.getSelectedTabPosition()).upFabUp());
-
+        if (savedInstanceState == null) {
+            FragmentListTabLayout frag = FragmentListTabLayout.instantiateFragment();
+            getSupportFragmentManager().beginTransaction().add(R.id.container_main, frag).commit();
+        }
     }
 
-    public void registerUpFab(UpFabListener upFabListener){
-        mUpFabListeners.add(upFabListener);
-    }
 
-    public void unRegisterUpFab(UpFabListener upFabListener){
-        if (!mUpFabListeners.isEmpty()) mUpFabListeners.remove(upFabListener);
-    }
 
     public void startFrag(Movie movie, boolean check){
         MovieDetailsFragment frag = MovieDetailsFragment.newInstance(movie, check);
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.activity_container, frag)
-                .commit();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.container_main, frag);
+        ft.addToBackStack(null);
+        ft.commit();
     }
 
 }

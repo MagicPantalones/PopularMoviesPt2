@@ -4,7 +4,9 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.res.ResourcesCompat;
 import android.view.LayoutInflater;
@@ -15,13 +17,14 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.networkutils.ApiUtils;
 import io.magics.popularmovies.utils.GlideApp;
-import io.magics.popularmovies.utils.MovieUtils;
 
 import static io.magics.popularmovies.utils.MovieUtils.*;
 
@@ -31,7 +34,7 @@ import static io.magics.popularmovies.utils.MovieUtils.*;
  * Use the {@link MovieDetailsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MovieDetailsFragment extends Fragment {
+public class MovieDetailsFragment extends DialogFragment {
     public static final String ARG_MOVIE = "movie";
     public static final String ARG_IS_FAVOURITE = "isFavourite";
 
@@ -46,6 +49,8 @@ public class MovieDetailsFragment extends Fragment {
     @BindView(R.id.fav_fab) FloatingActionButton mFavFab;
 
     private Unbinder mUnbinder;
+    private ValueAnimator mVoteTextAnim;
+    private ObjectAnimator mVoteProgressAnim;
 
     public MovieDetailsFragment() {
         // Required empty public constructor
@@ -70,14 +75,14 @@ public class MovieDetailsFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_movie_details, container, false);
+        View root = inflater.inflate(R.layout.fragment_detail_movie_details, container, false);
         mUnbinder = ButterKnife.bind(this, root);
         Context context = root.getContext();
         Long voteCalcLong = Math.round(mMovie.getVoteAverage() * 10);
-        ValueAnimator voteTextAnim = ValueAnimator.ofFloat(0.0f, mMovie.getVoteAverage().floatValue());
-        ObjectAnimator voteProgressAnim = ObjectAnimator.ofInt(mVoteBar, "progress", voteCalcLong.intValue());
+        mVoteTextAnim = ValueAnimator.ofFloat(0.0f, mMovie.getVoteAverage().floatValue());
+        mVoteProgressAnim = ObjectAnimator.ofInt(mVoteBar, "progress", voteCalcLong.intValue());
         ImageSize imageSize = getOptimalImgSize(context);
         String posterUrl = ApiUtils.posterUrlConverter(imageSize, mMovie.getPosterUrl());
 
@@ -90,24 +95,24 @@ public class MovieDetailsFragment extends Fragment {
         mTitle.setText(mMovie.getTitle());
         mRealeaseDate.setText(formatDate(mMovie.getReleaseDate()));
 
-        voteTextAnim.setDuration(2000);
-        voteTextAnim.setInterpolator(new BounceInterpolator());
-        voteTextAnim.addUpdateListener(valueAnimator -> {
+        mVoteTextAnim.setDuration(2000);
+        mVoteTextAnim.setInterpolator(new BounceInterpolator());
+        mVoteTextAnim.addUpdateListener(valueAnimator -> {
             String shownVal = valueAnimator.getAnimatedValue().toString();
             shownVal = shownVal.substring(0, 3);
             mVoteNumber.setText(shownVal);
         });
-        voteTextAnim.start();
+        mVoteTextAnim.start();
 
-        voteProgressAnim.setDuration(2000);
-        voteProgressAnim.setInterpolator(new BounceInterpolator());
-        voteProgressAnim.start();
+        mVoteProgressAnim.setDuration(2000);
+        mVoteProgressAnim.setInterpolator(new BounceInterpolator());
+        mVoteProgressAnim.start();
 
         GlideApp.with(mPoster)
                 .load(posterUrl)
-                .override(360, 720)
                 .centerCrop()
                 .placeholder(R.drawable.bg_loading_realydarkgrey)
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .into(mPoster);
 
         return root;
@@ -115,6 +120,8 @@ public class MovieDetailsFragment extends Fragment {
 
     @Override
     public void onDestroy() {
+        if (mVoteProgressAnim != null && mVoteProgressAnim.isStarted())mVoteProgressAnim.cancel();
+        if (mVoteTextAnim != null && mVoteTextAnim.isStarted())mVoteTextAnim.cancel();
         mUnbinder.unbind();
         super.onDestroy();
     }
