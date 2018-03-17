@@ -10,6 +10,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import io.magics.popularmovies.BuildConfig;
+import io.magics.popularmovies.models.ApiResult;
+import io.magics.popularmovies.models.Reviews;
+import io.magics.popularmovies.models.TrailersAndReviews;
 import io.magics.popularmovies.networkutils.TMDBApi.SortingMethod;
 import io.magics.popularmovies.utils.MovieUtils;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -28,7 +31,15 @@ public class ApiUtils {
     private ApiUtils(){}
 
     public interface ApiCallResult {
-        void onSuccess(io.magics.popularmovies.models.ApiResult apiResult);
+        void onSuccess(ApiResult apiResult);
+    }
+
+    public interface TrailersAndReviewsResult{
+        void onCompleted(TrailersAndReviews results);
+    }
+
+    public interface MoreReviewsResult{
+        void onCompleted(Reviews result);
     }
 
     public static Disposable callApiForMovieList(SortingMethod sortingMethod, int pageNumber, final ApiCallResult callback){
@@ -39,8 +50,20 @@ public class ApiUtils {
                 .subscribe(callback::onSuccess);
     }
 
-    public static Disposable callApiForTrailersAndReviews(){
-        return null;
+    public static Disposable callApiForTrailersAndReviews(String movieId, final TrailersAndReviewsResult result){
+        return getClientForMovieList().create(TMDBApi.class)
+                .getTrailersAndReviews(movieId, TMDB_API_KEY, "en-US", "videos,reviews")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(result::onCompleted);
+    }
+
+    public static Disposable callForMoreReviews(String movieId, int pagenumber, final MoreReviewsResult result){
+        return getClientForMovieList().create(TMDBApi.class)
+                .getMoreReviews(movieId, TMDB_API_KEY, "en-US", pagenumber)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(result::onCompleted);
     }
 
     private static Retrofit getClientForMovieList() {
