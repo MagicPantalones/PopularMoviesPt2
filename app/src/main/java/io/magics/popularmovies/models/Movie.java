@@ -3,6 +3,8 @@ package io.magics.popularmovies.models;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -45,9 +47,8 @@ public class Movie implements Parcelable {
     @Expose
     private Double voteAverage;
 
-    private int itemId = -1;
-    private int[] shadowInt = new int[0];
-    private byte[] backdropBytes = new byte[0];
+    private Uri favouriteUri;
+    private int shadowInt;
 
     public static final Parcelable.Creator<Movie> CREATOR = new Creator<Movie>() {
 
@@ -62,7 +63,7 @@ public class Movie implements Parcelable {
     };
 
     protected Movie(Parcel in) {
-        this.itemId = ((Integer) in.readValue((Integer.class.getClassLoader())));
+        this.favouriteUri = ((Uri) in.readValue((Uri.class.getClassLoader())));
         this.posterUrl = ((String) in.readValue((String.class.getClassLoader())));
         this.overview = ((String) in.readValue((String.class.getClassLoader())));
         this.releaseDate = ((String) in.readValue((String.class.getClassLoader())));
@@ -74,14 +75,13 @@ public class Movie implements Parcelable {
         this.backdropPath = ((String) in.readValue((String.class.getClassLoader())));
         this.voteCount = ((Integer) in.readValue((Integer.class.getClassLoader())));
         this.voteAverage = ((Double) in.readValue((Double.class.getClassLoader())));
-        this.shadowInt = in.createIntArray();
-        this.backdropBytes = in.createByteArray();
+        this.shadowInt = ((Integer) in.readValue((Integer.class.getClassLoader())));
     }
 
     public Movie() {}
 
-    public int getItemId() { return itemId; }
-    public void setItemId(int itemId) { this.itemId = itemId; }
+    public Uri getFavouriteUri() { return favouriteUri; }
+    public void setFavouriteUri(Uri favouriteUri) { this.favouriteUri = favouriteUri; }
 
     public String getPosterUrl() { return posterUrl; }
     public void setPosterUrl(String posterUrl) { this.posterUrl = posterUrl; }
@@ -116,14 +116,11 @@ public class Movie implements Parcelable {
     public Double getVoteAverage() { return voteAverage; }
     public void setVoteAverage(Double voteAverage) { this.voteAverage = voteAverage; }
 
-    public int[] getShadowInt() { return shadowInt; }
-    public void setShadowInt(int[] shadowInt) { this.shadowInt = shadowInt; }
-
-    public byte[] getBackdropBytes() { return backdropBytes; }
-    public void setBackdropBytes(byte[] backdropBytes) { this.backdropBytes = backdropBytes; }
+    public int getShadowInt() { return shadowInt; }
+    public void setShadowInt(int shadowInt) { this.shadowInt = shadowInt; }
 
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(itemId);
+        dest.writeValue(favouriteUri);
         dest.writeValue(posterUrl);
         dest.writeValue(overview);
         dest.writeValue(releaseDate);
@@ -135,8 +132,7 @@ public class Movie implements Parcelable {
         dest.writeValue(backdropPath);
         dest.writeValue(voteCount);
         dest.writeValue(voteAverage);
-        dest.readIntArray(shadowInt);
-        dest.readByteArray(backdropBytes);
+        dest.writeValue(shadowInt);
     }
 
     public int describeContents() {

@@ -46,42 +46,15 @@ public class ThreadingUtils {
     public static final int VOTE_CO_I = 8;
 
     public interface CursorResponseHandler{
-        void onReturnedCursor(List<Movie> movies);
+        void movieListFromCursor(List<Movie> movies);
     }
 
-    public interface IsFavouriteHandler {
-        void onIsFavouriteResponse(int id);
+    public interface DeleteQueryResponse {
+        void deleteResponse(int success);
     }
 
-    public interface FavouritesQueryHandler{
-        void onQuerySuccess(List<Integer> movieIdList);
-    }
-
-    public static Disposable queryForFavourites(Context context, final FavouritesQueryHandler queryHandler){
-        ContentResolver cr = context.getContentResolver();
-        String sortOrder = FavouritesEntry._ID + " ASC";
-
-        //noinspection ConstantConditions
-        return Observable.just(cr.query(FavouritesEntry.FAVOURITES_CONTENT_URI,
-                FAVOURITES_COLUMNS,
-                FavouritesEntry.COLUMN_MOVIE_ID,
-                null,
-                sortOrder))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .map(cursor -> {
-                    if (cursor != null) {
-                        List<Integer> retList = new ArrayList<>();
-                        while (cursor.moveToNext()) {
-                            retList.add(MOVIE_ID_I);
-                        }
-                        cursor.close();
-                        return retList;
-                    }
-                    return new ArrayList<Integer>(0);
-                })
-                .subscribe(queryHandler::onQuerySuccess,
-                        t -> Log.d("LIST-GETTER", t.getMessage()));
+    public interface InsertQueryResponse {
+        void insertResponse(Boolean success, Uri favUri);
     }
 
     public static boolean checkIfFav(int movieId, List<Integer> idList){
@@ -92,11 +65,11 @@ public class ThreadingUtils {
         return false;
     }
 
-    public static void queryFavouritesCursor(Context context, final CursorResponseHandler responseHandler){
+    public static Disposable queryForFavouriteMovies(Context context, final CursorResponseHandler responseHandler){
         ContentResolver cr = context.getContentResolver();
         String sortOrder = FavouritesEntry._ID + " ASC";
         //noinspection ConstantConditions
-        Observable.just(cr.query(FavouritesEntry.FAVOURITES_CONTENT_URI,
+        return Observable.just(cr.query(FavouritesEntry.FAVOURITES_CONTENT_URI,
                 FAVOURITES_COLUMNS,
                 null,
                 null,
@@ -114,36 +87,29 @@ public class ThreadingUtils {
                     }
                     return null;
                 })
-                .subscribe(responseHandler::onReturnedCursor);
+                .subscribe(responseHandler::movieListFromCursor);
     }
 
-    public static void addToFavourites(Context context, Movie movie, List<Integer> movieIds, IsFavouriteHandler handler){
-
+    public static void addToFavourites(Context context, Movie movie, InsertQueryResponse insertHandler){
         ContentResolver cr = context.getContentResolver();
-        if (movieIds != null) {
-            for (int i : movieIds) {
-                if (i == movie.getMovieId()) {
-                    Observable.just(cr.delete(
-                            ContentUris.withAppendedId(FavouritesEntry.FAVOURITES_CONTENT_URI, movie.getItemId()),
-                            null,
-                            null))
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(
-                                    handler::onIsFavouriteResponse,
-                                    throwable -> Log.d(TAG, "addToFavourites: " + throwable.getMessage()));
-                    return;
-                }
-            }
-        }
-
         Observable.just(makeContentVals(movie))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(value -> {
-                    Uri uri = cr.insert(FavouritesEntry.FAVOURITES_CONTENT_URI, value);
-                    handler.onIsFavouriteResponse(uri != null ? 1 : -1);
+                .subscribe(contentValues -> {
+                    Uri uri = cr.insert(FavouritesEntry.FAVOURITES_CONTENT_URI, contentValues);
+                    insertHandler.insertResponse(uri != null, uri);
                 }, throwable -> Log.d(TAG, "addToFavourites: " + throwable.getMessage()));
+    }
+
+    public static void deleteFromFavourites(Context context, Movie movie, DeleteQueryResponse deleteHandler){
+        ContentResolver cr = context.getContentResolver();
+        Observable.just(cr.delete(
+                movie.getFavouriteUri(),
+                null,
+                null))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(deleteHandler::deleteResponse);
     }
 
     public static ContentValues makeContentVals(Movie movie){

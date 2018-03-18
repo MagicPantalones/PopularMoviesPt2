@@ -38,7 +38,7 @@ public class MovieUtils {
         Movie retMovie = new Movie();
         cursor.moveToPosition(position);
 
-        retMovie.setItemId(cursor.getInt(ThreadingUtils.ITEM_ID));
+        retMovie.setFavouriteUri(cursor.getInt(ThreadingUtils.ITEM_ID));
         retMovie.setPosterUrl(cursor.getString(ThreadingUtils.POSTER_I));
         retMovie.setOverview(cursor.getString(ThreadingUtils.OVERVIEW_I));
         retMovie.setReleaseDate(cursor.getString(ThreadingUtils.REL_DATE_I));

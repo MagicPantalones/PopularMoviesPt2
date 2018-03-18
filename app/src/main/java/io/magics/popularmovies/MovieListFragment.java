@@ -143,14 +143,14 @@ implements PosterAdapter.PosterClickHandler, FragmentListTabLayout.UpFabListener
     @Override
     public void onClick(Movie movie, int position) {
         //noinspection ConstantConditions
-        ((MovieListsActivity)getContext()).startFrag(movie, false);
+        ((MovieListsActivity)getContext()).showMovieDetailsFrag(movie, false);
     }
 
     private boolean getDataFromNetwork(Context context, PosterAdapter posterAdapter){
         SortingMethod sortingMethod;
         int pageNumber;
         if (mTabPage == 3){
-            ThreadingUtils.queryFavouritesCursor(context, result ->
+            ThreadingUtils.queryForFavouriteMovies(context, result ->
             posterAdapter.setMovieData(result, posterAdapter.getItemCount(), true));
             return true;
         }

@@ -16,12 +16,12 @@ public interface TMDBApi {
                                                    @Query("language") String locale,
                                                    @Query("page") int page);
     @GET("movie/{movieId}")
-    Observable<TrailersAndReviews> getTrailersAndReviews(@Path("movieId") String movieId,
+    Observable<TrailersAndReviews> getTrailersAndReviews(@Path("movieId") int movieId,
                                                          @Query("api_key") String api,
                                                          @Query("language") String locale,
                                                          @Query("append_to_response") String appendString);
     @GET("movie/{movieId}/reviews")
-    Observable<Reviews> getMoreReviews(@Path("movieId") String movieId,
+    Observable<Reviews> getMoreReviews(@Path("movieId") int movieId,
                                        @Query("api_key") String api,
                                        @Query("language") String locale,
                                        @Query("page") int page);

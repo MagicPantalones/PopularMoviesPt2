@@ -50,7 +50,7 @@ public class ApiUtils {
                 .subscribe(callback::onSuccess);
     }
 
-    public static Disposable callApiForTrailersAndReviews(String movieId, final TrailersAndReviewsResult result){
+    public static Disposable callApiForTrailersAndReviews(int movieId, final TrailersAndReviewsResult result){
         return getClientForMovieList().create(TMDBApi.class)
                 .getTrailersAndReviews(movieId, TMDB_API_KEY, "en-US", "videos,reviews")
                 .subscribeOn(Schedulers.io())
@@ -58,9 +58,9 @@ public class ApiUtils {
                 .subscribe(result::onCompleted);
     }
 
-    public static Disposable callForMoreReviews(String movieId, int pagenumber, final MoreReviewsResult result){
+    public static Disposable callForMoreReviews(int movieId, int pageNumber, final MoreReviewsResult result){
         return getClientForMovieList().create(TMDBApi.class)
-                .getMoreReviews(movieId, TMDB_API_KEY, "en-US", pagenumber)
+                .getMoreReviews(movieId, TMDB_API_KEY, "en-US", pageNumber)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(result::onCompleted);
@@ -82,8 +82,7 @@ public class ApiUtils {
                 .build().toString();
     }
 
-
-
+    @SuppressWarnings("ConstantConditions")
     public static boolean isConnected(Context context){
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo ni = cm.getActiveNetworkInfo();
