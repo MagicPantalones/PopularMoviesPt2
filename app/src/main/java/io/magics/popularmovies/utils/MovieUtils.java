@@ -7,11 +7,14 @@ import java.util.Locale;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.util.Log;
 import android.view.View;
 
 import com.google.gson.annotations.SerializedName;
 
+import io.magics.popularmovies.database.FavouritesDBHelper;
+import io.magics.popularmovies.database.FavouritesDBHelper.FavouritesEntry;
 import io.magics.popularmovies.models.Movie;
 
 import static io.magics.popularmovies.utils.MovieUtils.ImageSize.SIZE_DEFAULT;
@@ -37,16 +40,17 @@ public class MovieUtils {
     public static Movie createMovieFromCursor(Cursor cursor, int position){
         Movie retMovie = new Movie();
         cursor.moveToPosition(position);
-
-        retMovie.setFavouriteUri(cursor.getInt(ThreadingUtils.ITEM_ID));
+        Uri itemUri = FavouritesEntry.FAVOURITES_CONTENT_URI.buildUpon()
+                .appendEncodedPath(cursor.getString(ThreadingUtils.ITEM_ID))
+                .build();
+        retMovie.setFavouriteUri(itemUri);
         retMovie.setPosterUrl(cursor.getString(ThreadingUtils.POSTER_I));
         retMovie.setOverview(cursor.getString(ThreadingUtils.OVERVIEW_I));
         retMovie.setReleaseDate(cursor.getString(ThreadingUtils.REL_DATE_I));
         retMovie.setMovieId(cursor.getInt(ThreadingUtils.MOVIE_ID_I));
         retMovie.setTitle(cursor.getString(ThreadingUtils.TITLE_I));
-        retMovie.setBackdropPath(cursor.getString(ThreadingUtils.BACKDROP_I));
         retMovie.setVoteAverage(cursor.getDouble(ThreadingUtils.VOTE_AV_I));
-        retMovie.setVoteCount(cursor.getInt(ThreadingUtils.VOTE_CO_I));
+        retMovie.setShadowInt(cursor.getInt(ThreadingUtils.COLOR_I));
 
         return retMovie;
     }

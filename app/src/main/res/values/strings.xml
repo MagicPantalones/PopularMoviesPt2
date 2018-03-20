@@ -23,9 +23,7 @@
     <string name="bnav_trailers_title" translatable="true">Trailers</string>
     <string name="bnav_reviews_title" translatable="true">Reviews</string>
 
-    <string name="list_no_network_available" translatable="true">No Network Available</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="list_no_network_available" translatable="true">No Network Available!</string>
+    <string name="list_no_favourites_added" translatable="true">No Favourites Added!</string>
 
 </resources>

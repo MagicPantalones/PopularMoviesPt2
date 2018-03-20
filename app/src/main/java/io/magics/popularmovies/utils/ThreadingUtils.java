@@ -31,9 +31,8 @@ public class ThreadingUtils {
             FavouritesEntry.COLUMN_RELEASE_DATE,
             FavouritesEntry.COLUMN_MOVIE_ID,
             FavouritesEntry.COLUMN_TITLE,
-            FavouritesEntry.COLUMN_BACKDROP_PATH,
             FavouritesEntry.COLUMN_VOTE_AVERAGE,
-            FavouritesEntry.COLUMN_VOTE_COUNT
+            FavouritesEntry.COLUMN_COLOR_PATH
     };
     public static final int ITEM_ID = 0;
     public static final int POSTER_I = 1;
@@ -41,9 +40,8 @@ public class ThreadingUtils {
     public static final int REL_DATE_I = 3;
     public static final int MOVIE_ID_I = 4;
     public static final int TITLE_I = 5;
-    public static final int BACKDROP_I = 6;
-    public static final int VOTE_AV_I = 7;
-    public static final int VOTE_CO_I = 8;
+    public static final int VOTE_AV_I = 6;
+    public static final int COLOR_I = 7;
 
     public interface CursorResponseHandler{
         void movieListFromCursor(List<Movie> movies);
@@ -85,7 +83,7 @@ public class ThreadingUtils {
                         cursor.close();
                         return moviesFromCursor;
                     }
-                    return null;
+                    return new ArrayList<Movie>();
                 })
                 .subscribe(responseHandler::movieListFromCursor);
     }
@@ -104,12 +102,13 @@ public class ThreadingUtils {
     public static void deleteFromFavourites(Context context, Movie movie, DeleteQueryResponse deleteHandler){
         ContentResolver cr = context.getContentResolver();
         Observable.just(cr.delete(
-                movie.getFavouriteUri(),
-                null,
+                FavouritesEntry.FAVOURITES_CONTENT_URI,
+                FavouritesEntry.COLUMN_MOVIE_ID + " = " + Integer.toString(movie.getMovieId()),
                 null))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(deleteHandler::deleteResponse);
+                .subscribe(deleteHandler::deleteResponse,
+                        throwable -> Log.d(TAG, "deleteFromFavourites: " + throwable.getMessage()));
     }
 
     public static ContentValues makeContentVals(Movie movie){
@@ -120,9 +119,8 @@ public class ThreadingUtils {
         cv.put(FavouritesEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
         cv.put(FavouritesEntry.COLUMN_MOVIE_ID, movie.getMovieId());
         cv.put(FavouritesEntry.COLUMN_TITLE, movie.getTitle());
-        cv.put(FavouritesEntry.COLUMN_BACKDROP_PATH, movie.getBackdropPath());
         cv.put(FavouritesEntry.COLUMN_VOTE_AVERAGE, movie.getVoteAverage());
-        cv.put(FavouritesEntry.COLUMN_VOTE_COUNT, movie.getVoteCount());
+        cv.put(FavouritesEntry.COLUMN_COLOR_PATH, movie.getShadowInt());
         return cv;
     }
 

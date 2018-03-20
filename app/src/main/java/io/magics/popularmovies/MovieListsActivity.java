@@ -19,6 +19,8 @@ import io.magics.popularmovies.networkutils.TMDBApi.SortingMethod;
 import io.magics.popularmovies.utils.ThreadingUtils;
 import io.reactivex.disposables.Disposable;
 
+import static io.magics.popularmovies.networkutils.ApiUtils.isConnected;
+
 public class MovieListsActivity extends AppCompatActivity {
 
     List<ReviewResult> mReviews = new ArrayList<>();
@@ -26,7 +28,6 @@ public class MovieListsActivity extends AppCompatActivity {
     List<Movie> mFavMovieList = new ArrayList<>();
     List<Movie> mTopMovieList = new ArrayList<>();
     List<Movie> mPopMovieList = new ArrayList<>();
-    List<Integer> mFavMovieIds = new ArrayList<>();
 
     int mTopPageNum = 1;
     int mTopLastPage = -1;
@@ -45,18 +46,24 @@ public class MovieListsActivity extends AppCompatActivity {
     TrailersAndReviewsListener mTrailersAndReviewsListener;
     AddOrRemoveFavHandler mAddOrRemoveHandler;
 
+    boolean mConnected = true;
+
+
     public interface MovieResultsListener {
         void resultDelivery(List<Movie> movies, MovieResultType type);
     }
 
     public interface TrailersAndReviewsListener {
         void trailersResult(List<TrailerResult> trailers);
+
         void reviewsResult(List<ReviewResult> reviews);
+
         void moreReviewsResult(List<ReviewResult> reviews);
     }
 
     public interface AddOrRemoveFavHandler {
         void onAdded();
+
         void onRemoved();
     }
 
@@ -67,17 +74,33 @@ public class MovieListsActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         Stetho.initializeWithDefaults(this);
 
-        getTopRatedList();
-        getPopularList();
-        getFavouritesList();
-
         if (savedInstanceState == null) {
             FragmentListTabLayout frag = FragmentListTabLayout.instantiateFragment();
             getSupportFragmentManager().beginTransaction().add(R.id.container_main, frag).commit();
         }
+
+        mConnected = isConnected(this);
+        if (mConnected) {
+            getTopRatedList();
+            getPopularList();
+        }
     }
 
-    private void getTopRatedList(){
+    @Override
+    protected void onDestroy() {
+        if (mTopDisposable != null && !mTopDisposable.isDisposed()) mTopDisposable.dispose();
+        if (mPopDisposable != null && !mPopDisposable.isDisposed()) mPopDisposable.dispose();
+        if (mFavDisposable != null && !mFavDisposable.isDisposed()) mFavDisposable.dispose();
+        if (mTAndRDisposable != null && !mTAndRDisposable.isDisposed()) mTAndRDisposable.dispose();
+        if (mMoreRevDisposable != null && !mMoreRevDisposable.isDisposed()) mMoreRevDisposable.dispose();
+        super.onDestroy();
+    }
+
+    public boolean hasRequestedFromNetwork(){
+        return mConnected;
+    }
+
+    private void getTopRatedList() {
         if (mTopLastPage != -1 && mTopPageNum + 1 < mTopLastPage) mTopLastPage += 1;
         if (mTopLastPage != -1 && mTopPageNum >= mTopLastPage) return;
         mTopDisposable = ApiUtils.callApiForMovieList(SortingMethod.TOP_RATED, mTopPageNum,
@@ -91,9 +114,15 @@ public class MovieListsActivity extends AppCompatActivity {
                         }
                     }
                 });
+
     }
 
-    private void getPopularList(){
+    public void getMoreTopRated(){
+        mConnected = isConnected(this);
+        if (mConnected) getTopRatedList();
+    }
+
+    private void getPopularList() {
         if (mPopLastPage != -1 && mPopPageNum + 1 < mPopLastPage) mPopPageNum += 1;
         if (mPopLastPage != -1 && mPopPageNum >= mPopLastPage) return;
         mPopDisposable = ApiUtils.callApiForMovieList(SortingMethod.POPULAR, mPopPageNum,
@@ -109,36 +138,39 @@ public class MovieListsActivity extends AppCompatActivity {
                 });
     }
 
-    private void getFavouritesList(){
+    public void getMorePopular(){
+        mConnected = isConnected(this);
+        if (mConnected) getPopularList();
+    }
+
+    public void getFavouritesList() {
         mFavDisposable = ThreadingUtils.queryForFavouriteMovies(this,
                 movies -> {
                     mFavMovieList = movies;
-                    for (Movie movie : movies){
-                        mFavMovieIds.add(movie.getMovieId());
-                    }
                     if (!mMovieResultListeners.isEmpty()) {
                         for (MovieResultsListener l : mMovieResultListeners) {
-                            l.resultDelivery(mFavMovieList, MovieResultType.FAVOURITES);
+                            l.resultDelivery(movies, MovieResultType.FAVOURITES);
                         }
                     }
                 });
     }
 
-    public void getTrailersAndReviews(int movieId){
+    public void getTrailersAndReviews(int movieId) {
         mTAndRDisposable = ApiUtils.callApiForTrailersAndReviews(movieId,
                 results -> {
                     mReviews.addAll(results.getReviews().getReviewResults());
                     mTrailers.addAll(results.getTrailers().getTrailerResults());
                     mReviewPageNum = results.getReviews().getPage();
-                    if (mReviewLastPage == -1) mReviewLastPage = results.getReviews().getTotalPages();
+                    if (mReviewLastPage == -1)
+                        mReviewLastPage = results.getReviews().getTotalPages();
                     if (mTrailersAndReviewsListener != null) {
                         mTrailersAndReviewsListener.trailersResult(mTrailers);
                         mTrailersAndReviewsListener.reviewsResult(mReviews);
                     }
-        });
+                });
     }
 
-    public void getMoreReviews(int movieId){
+    public void getMoreReviews(int movieId) {
         if (mReviewLastPage != -1 && mReviewPageNum + 1 < mReviewLastPage) mReviewPageNum += 1;
         if (mReviewLastPage != -1 && mReviewPageNum >= mReviewLastPage) return;
         mMoreRevDisposable = ApiUtils.callForMoreReviews(movieId, mReviewPageNum,
@@ -148,27 +180,26 @@ public class MovieListsActivity extends AppCompatActivity {
                     if (mTrailersAndReviewsListener != null) {
                         mTrailersAndReviewsListener.moreReviewsResult(result.getReviewResults());
                     }
-        });
+                });
     }
 
-    private void addToFavourites(Movie movie){
+    public void addToFavourites(Movie movie) {
         ThreadingUtils.addToFavourites(this, movie, (success, favUri) -> {
             if (success) {
                 movie.setFavouriteUri(favUri);
-                mFavMovieIds.add(movie.getMovieId());
                 mFavMovieList.add(movie);
                 if (mAddOrRemoveHandler != null) {
                     mAddOrRemoveHandler.onAdded();
                 }
                 Toast.makeText(this, "Movie added to favourites", Toast.LENGTH_SHORT).show();
-            } else Toast.makeText(this, "Failed adding movie to favourites", Toast.LENGTH_SHORT).show();
+            } else
+                Toast.makeText(this, "Failed adding movie to favourites", Toast.LENGTH_SHORT).show();
         });
     }
 
-    private void deleteFromFavourites(Movie movie){
+    public void deleteFromFavourites(Movie movie) {
         ThreadingUtils.deleteFromFavourites(this, movie, success -> {
-            if (success >= 1){
-                mFavMovieIds.remove(movie.getMovieId());
+            if (success >= 1) {
                 mFavMovieList.remove(movie);
                 if (mAddOrRemoveHandler != null) {
                     mAddOrRemoveHandler.onRemoved();
@@ -178,19 +209,11 @@ public class MovieListsActivity extends AppCompatActivity {
         });
     }
 
-    public void showMovieDetailsFrag(Movie movie){
-        boolean favCheck = false;
-        int movieId = movie.getMovieId();
-        for (int id : mFavMovieIds){
-            if (id == movieId){
-                favCheck = true;
-                break;
-            }
-        }
+    public void showMovieDetailsFrag(Movie movie) {
 
-        getTrailersAndReviews(movieId);
+        getTrailersAndReviews(movie.getMovieId());
 
-        MovieDetailsFragment frag = MovieDetailsFragment.newInstance(movie, favCheck);
+        MovieDetailsFragment frag = MovieDetailsFragment.newInstance(movie, mFavMovieList.contains(movie));
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
         ft.replace(R.id.container_main, frag);
@@ -198,25 +221,41 @@ public class MovieListsActivity extends AppCompatActivity {
         ft.commit();
     }
 
-    public void registerListListeners(MovieResultsListener listener){
+    public void registerListListeners(MovieResultsListener listener) {
         mMovieResultListeners.add(listener);
     }
 
-    public void unRegisterListListeners(MovieResultsListener listener){
+    public void unRegisterListListeners(MovieResultsListener listener) {
         mMovieResultListeners.remove(listener);
     }
 
-    public void registerDetailsListeners(TrailersAndReviewsListener tListener, AddOrRemoveFavHandler aListener){
+    public void registerDetailsListeners(TrailersAndReviewsListener tListener, AddOrRemoveFavHandler aListener) {
         mTrailersAndReviewsListener = tListener;
         mAddOrRemoveHandler = aListener;
     }
 
-    public void unRegisterDetailsListeners(){
+    public void unRegisterDetailsListeners() {
         mTrailersAndReviewsListener = null;
         mAddOrRemoveHandler = null;
     }
 
-    enum MovieResultType{
+    public void notifyMovieListChange(Movie movie) {
+        int i;
+        if (mFavMovieList.contains(movie)) {
+            i = mFavMovieList.indexOf(movie);
+            mFavMovieList.set(i, movie);
+        }
+        if (mPopMovieList.contains(movie)) {
+            i = mPopMovieList.indexOf(movie);
+            mPopMovieList.set(i, movie);
+        }
+        if (mTopMovieList.contains(movie)) {
+            i = mTopMovieList.indexOf(movie);
+            mTopMovieList.set(i, movie);
+        }
+    }
+
+    enum MovieResultType {
         TOP_RATED,
         POPULAR,
         FAVOURITES

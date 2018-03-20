@@ -25,6 +25,7 @@ import butterknife.Unbinder;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.networkutils.ApiUtils;
 import io.magics.popularmovies.utils.GlideApp;
+import io.magics.popularmovies.utils.ThreadingUtils;
 
 import static io.magics.popularmovies.utils.MovieUtils.*;
 
@@ -79,18 +80,30 @@ public class MovieDetailsFragment extends DialogFragment {
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_detail_movie_details, container, false);
         mUnbinder = ButterKnife.bind(this, root);
+
         Context context = root.getContext();
+        ImageSize imageSize = getOptimalImgSize(context);
+        String posterUrl = ApiUtils.posterUrlConverter(imageSize, mMovie.getPosterUrl());
         Long voteCalcLong = Math.round(mMovie.getVoteAverage() * 10);
         mVoteTextAnim = ValueAnimator.ofFloat(0.0f, mMovie.getVoteAverage().floatValue());
         mVoteProgressAnim = ObjectAnimator.ofInt(mVoteBar, "progress", voteCalcLong.intValue());
-        ImageSize imageSize = getOptimalImgSize(context);
-        String posterUrl = ApiUtils.posterUrlConverter(imageSize, mMovie.getPosterUrl());
 
-        if (mIsFavourite){
-            mFavFab.setBackgroundColor(ResourcesCompat.getColor(context.getResources(),
-                    R.color.colorSecondaryAccent,
-                    context.getTheme()));
-        }
+        int tempColor1 = ResourcesCompat.getColor(context.getResources(),
+                R.color.colorSecondaryAccent,
+                context.getTheme());
+        int tempColor2 = ResourcesCompat.getColor(
+                context.getResources(),
+                R.color.colorPrimaryDark,
+                context.getTheme());
+
+        mFavFab.setColorFilter(mIsFavourite ? tempColor1 : tempColor2);
+
+        mFavFab.setOnClickListener(v -> {
+            if (mIsFavourite) ((MovieListsActivity)context).deleteFromFavourites(mMovie);
+            else if (!mIsFavourite) ((MovieListsActivity)context).addToFavourites(mMovie);
+            mIsFavourite = !mIsFavourite;
+            mFavFab.setColorFilter(mIsFavourite ? tempColor1 : tempColor2);
+        });
 
         mTitle.setText(mMovie.getTitle());
         mRealeaseDate.setText(formatDate(mMovie.getReleaseDate()));

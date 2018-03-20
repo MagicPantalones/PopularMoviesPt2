@@ -48,7 +48,7 @@ public class Movie implements Parcelable {
     private Double voteAverage;
 
     private Uri favouriteUri;
-    private int shadowInt;
+    private int shadowInt = -1;
 
     public static final Parcelable.Creator<Movie> CREATOR = new Creator<Movie>() {
 

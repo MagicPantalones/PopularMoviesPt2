@@ -26,6 +26,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.target.ImageViewTarget;
 import com.bumptech.glide.request.transition.Transition;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -42,13 +43,14 @@ import io.magics.popularmovies.utils.MovieUtils;
 
 public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterViewHolder> {
 
-    private List<Movie> mMovieData;
+    private List<Movie> mMovieData = new ArrayList<>();
     private int mViewWidth;
     private int mViewHeight;
     private final PosterClickHandler mClickHandler;
     private ReachedEndHandler mReachedEndHandler;
     private MovieUtils.ImageSize mImageSize;
     private int mDefaultColor;
+    private Context mContext;
 
     public interface PosterClickHandler {
         void onClick(Movie movie, int position);
@@ -70,17 +72,17 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
     @NonNull
     @Override
     public PosterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Context context = parent.getContext();
-        Boolean orientation = context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
-        mDefaultColor = ResourcesCompat.getColor(context.getResources(), R.color.colorSecondary, context.getTheme());
-        mImageSize = MovieUtils.getOptimalImgSize(context);
+        mContext = parent.getContext();
+        Boolean orientation = mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+        mDefaultColor = ResourcesCompat.getColor(mContext.getResources(), R.color.colorSecondary, mContext.getTheme());
+        mImageSize = MovieUtils.getOptimalImgSize(mContext);
 
 
         //Sets the ViewHolder sizes based on the devise's orientation.
         mViewHeight = orientation ? parent.getMeasuredHeight() / 2 : parent.getMeasuredHeight();
         mViewWidth = orientation ? parent.getMeasuredWidth() / 2 : parent.getMeasuredWidth() / 3;
 
-        View v = LayoutInflater.from(context).inflate(R.layout.fragment_list_view_holder, parent, false);
+        View v = LayoutInflater.from(mContext).inflate(R.layout.fragment_list_view_holder, parent, false);
 
         return new PosterViewHolder(v);
     }
@@ -122,15 +124,21 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
                     @Override
                     public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
                         iv.setImageDrawable(resource.getCurrent());
-                        Bitmap b = ((BitmapDrawable) resource).getBitmap();
 
-                        Palette.from(b).generate(palette -> {
-                            int solid =
-                                    palette.getVibrantColor(
-                                            palette.getDarkVibrantColor(
-                                                    palette.getDominantColor(mDefaultColor)));
-                            shadow.setColorFilter(solid, PorterDuff.Mode.SRC_IN);
-                        });
+                        if (mfg.getShadowInt() == -1) {
+                            Bitmap b = ((BitmapDrawable) resource).getBitmap();
+
+                            Palette.from(b).generate(palette -> {
+                                int solid =
+                                        palette.getVibrantColor(
+                                                palette.getDarkVibrantColor(
+                                                        palette.getDominantColor(mDefaultColor)));
+                                shadow.setColorFilter(solid, PorterDuff.Mode.SRC_IN);
+                                mMovieData.get(position).setShadowInt(solid);
+                                mfg.setShadowInt(solid);
+                                ((MovieListsActivity)mContext).notifyMovieListChange(mfg);
+                            });
+                        } else shadow.setColorFilter(mfg.getShadowInt(), PorterDuff.Mode.SRC_IN);
 
                         super.onResourceReady(resource, transition);
                     }
@@ -149,12 +157,9 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
     }
 
 
-    public void setMovieData(List<Movie> movies, int position, Boolean listFromCursor) {
+    public void setMovieData(List<Movie> movies, int position) {
         if (movies == null) {
             return;
-        } else if (mMovieData == null || listFromCursor) {
-            mMovieData = null;
-            mMovieData = movies;
         } else {
             mMovieData.addAll(movies);
         }

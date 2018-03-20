@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
+@SuppressWarnings("WeakerAccess")
 public class FavouritesDBHelper extends SQLiteOpenHelper {
 
 
@@ -14,7 +15,7 @@ public class FavouritesDBHelper extends SQLiteOpenHelper {
     public static final Uri BASE_URI = Uri.parse("content://" + AUTHORITY);
     public static final String PATH_FAVOURITES = "favourites";
 
-    private static final int DB_VERSION = 4;
+    private static final int DB_VERSION = 5;
 
     private static final String DB_HELP_TEXT_MIDDLE = " TEXT, ";
     private static final String DB_HELP_INT_MIDDLE = " INTEGER NOT NULL, ";
@@ -34,9 +35,8 @@ public class FavouritesDBHelper extends SQLiteOpenHelper {
                         FavouritesEntry.COLUMN_RELEASE_DATE + DB_HELP_TEXT_MIDDLE +
                         FavouritesEntry.COLUMN_MOVIE_ID + DB_HELP_INT_MIDDLE +
                         FavouritesEntry.COLUMN_TITLE + DB_HELP_TEXT_MIDDLE +
-                        FavouritesEntry.COLUMN_BACKDROP_PATH + DB_HELP_TEXT_MIDDLE +
                         FavouritesEntry.COLUMN_VOTE_AVERAGE + " REAL NOT NULL, " +
-                        FavouritesEntry.COLUMN_VOTE_COUNT + DB_HELP_INT_MIDDLE +
+                        FavouritesEntry.COLUMN_COLOR_PATH + DB_HELP_INT_MIDDLE +
 
                         " UNIQUE (" + FavouritesEntry.COLUMN_MOVIE_ID + ") ON CONFLICT REPLACE);";
 
@@ -67,13 +67,11 @@ public class FavouritesDBHelper extends SQLiteOpenHelper {
 
         public static final String COLUMN_VOTE_AVERAGE = "vote_average";
 
-        public static final String COLUMN_VOTE_COUNT = "vote_count";
-
         public static final String COLUMN_OVERVIEW = "overview";
 
         public static final String COLUMN_POSTER_PATH = "poster_url";
 
-        public static final String COLUMN_BACKDROP_PATH = "backdrop_url";
+        public static final String COLUMN_COLOR_PATH = "shadow_color";
 
     }
 }

@@ -9,6 +9,9 @@ import android.net.Uri;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.magics.popularmovies.BuildConfig;
 import io.magics.popularmovies.models.ApiResult;
 import io.magics.popularmovies.models.Reviews;
@@ -29,6 +32,7 @@ public class ApiUtils {
 
 
     private ApiUtils(){}
+
 
     public interface ApiCallResult {
         void onSuccess(ApiResult apiResult);
