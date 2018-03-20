@@ -149,10 +149,16 @@ public class MovieListsActivity extends AppCompatActivity {
 
     private void getInitFavouritesList() {
         mFavDisposable = ThreadingUtils.queryForFavouriteMovies(this,
-                movies -> mFavMovieList = movies);
+                movies -> {
+                    mFavMovieList = movies;
+                    if (mFavListener != null) mFavListener.favouritesResultDelivery(movies);
+                });
     }
 
     public void notifyReadyForFav(){
+        if (mFavMovieList.isEmpty()){
+            getInitFavouritesList();
+        }
         mFavListener.favouritesResultDelivery(mFavMovieList);
     }
 

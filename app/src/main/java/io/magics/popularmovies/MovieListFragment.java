@@ -86,9 +86,10 @@ public class MovieListFragment extends Fragment
             if (mTabPage == 3){
                 MovieUtils.hideAndShowView(mTvNoFav, mRvPoster);
                 parentActivity.registerFavListener(this);
-                parentActivity.notifyReadyForFav();
             }
         }
+
+        if (mTabPage == 3) parentActivity.notifyReadyForFav();
 
         rootView.setPaddingRelative(16, 16, 16, 16);
 
@@ -188,7 +189,8 @@ public class MovieListFragment extends Fragment
         if (mTabPage == 3) {
             mAdapter = new PosterAdapter(this);
             mRvPoster.setAdapter(mAdapter);
-            MovieUtils.hideAndShowView(mRvPoster, mTvNoFav);
+            if (movies.isEmpty()) MovieUtils.hideAndShowView(mTvNoFav, mRvPoster);
+            else MovieUtils.hideAndShowView(mRvPoster, mTvNoFav);
             mAdapter.setMovieData(movies, 0);
         }
     }

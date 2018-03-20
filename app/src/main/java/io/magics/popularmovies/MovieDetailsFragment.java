@@ -26,7 +26,6 @@ import butterknife.Unbinder;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.networkutils.ApiUtils;
 import io.magics.popularmovies.utils.GlideApp;
-import io.magics.popularmovies.utils.ThreadingUtils;
 
 import static io.magics.popularmovies.utils.MovieUtils.*;
 
@@ -79,7 +78,7 @@ public class MovieDetailsFragment extends DialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_detail_movie_details, container, false);
+        View root = inflater.inflate(R.layout.fragment_detail_movie, container, false);
         mUnbinder = ButterKnife.bind(this, root);
 
         Context context = root.getContext();
