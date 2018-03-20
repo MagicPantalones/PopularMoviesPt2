@@ -1,19 +1,32 @@
 package io.magics.popularmovies;
 
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.graphics.Path;
+import android.graphics.drawable.Animatable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.graphics.drawable.Animatable2Compat;
+import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.graphics.PathParser;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.view.ViewPropertyAnimatorCompat;
+import android.support.v4.view.animation.PathInterpolatorCompat;
+import android.support.v7.view.ViewPropertyAnimatorCompatSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.BounceInterpolator;
+import android.view.animation.Interpolator;
+import android.view.animation.PathInterpolator;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -48,10 +61,14 @@ public class MovieDetailsFragment extends DialogFragment {
     @BindView(R.id.pb_vote_count_detail) ProgressBar mVoteBar;
     @BindView(R.id.tv_vote_average_detail) TextView mVoteNumber;
     @BindView(R.id.fav_fab) FloatingActionButton mFavFab;
+    @BindView(R.id.fav_fab_anim) ImageView mFavFabAnim;
 
     private Unbinder mUnbinder;
     private ValueAnimator mVoteTextAnim;
     private ObjectAnimator mVoteProgressAnim;
+
+    int tempColor1;
+    int tempColor2;
 
     public MovieDetailsFragment() {
         // Required empty public constructor
@@ -88,10 +105,10 @@ public class MovieDetailsFragment extends DialogFragment {
         mVoteTextAnim = ValueAnimator.ofFloat(0.0f, mMovie.getVoteAverage().floatValue());
         mVoteProgressAnim = ObjectAnimator.ofInt(mVoteBar, "progress", voteCalcLong.intValue());
 
-        int tempColor1 = ResourcesCompat.getColor(context.getResources(),
+        tempColor1 = ResourcesCompat.getColor(context.getResources(),
                 R.color.colorSecondaryAccent,
                 context.getTheme());
-        int tempColor2 = ResourcesCompat.getColor(
+        tempColor2 = ResourcesCompat.getColor(
                 context.getResources(),
                 R.color.colorPrimaryDark,
                 context.getTheme());
@@ -102,7 +119,7 @@ public class MovieDetailsFragment extends DialogFragment {
             if (mIsFavourite) ((MovieListsActivity)context).deleteFromFavourites(mMovie);
             else if (!mIsFavourite) ((MovieListsActivity)context).addToFavourites(mMovie);
             mIsFavourite = !mIsFavourite;
-            mFavFab.setBackgroundTintList(ColorStateList.valueOf(mIsFavourite ? tempColor1 : tempColor2));
+            fabAnim();
         });
 
         mTitle.setText(mMovie.getTitle());
@@ -137,5 +154,25 @@ public class MovieDetailsFragment extends DialogFragment {
         if (mVoteTextAnim != null && mVoteTextAnim.isStarted())mVoteTextAnim.cancel();
         mUnbinder.unbind();
         super.onDestroy();
+    }
+
+    private void fabAnim(){
+
+        AnimatedVectorDrawableCompat drawableCompat = AnimatedVectorDrawableCompat.create(getContext(), R.drawable.ic_anim_favourite_heart);
+        mFavFabAnim.setImageDrawable(drawableCompat);
+
+        drawableCompat.registerAnimationCallback(new Animatable2Compat.AnimationCallback() {
+            @Override
+            public void onAnimationEnd(Drawable drawable) {
+                mFavFab.setBackgroundTintList(ColorStateList.valueOf(mIsFavourite ? tempColor1 : tempColor2));
+                mFavFab.setVisibility(View.VISIBLE);
+                super.onAnimationEnd(drawable);
+            }
+        });
+
+        mFavFab.setVisibility(View.INVISIBLE);
+        mFavFabAnim.setVisibility(View.VISIBLE);
+        drawableCompat.start();
+
     }
 }

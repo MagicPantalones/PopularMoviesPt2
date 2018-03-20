@@ -143,19 +143,27 @@
 
     </android.support.v4.widget.NestedScrollView>
 
+    <ImageView
+        android:id="@+id/fav_fab_anim"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_anchor="@+id/fav_fab"
+        app:layout_anchorGravity="center"
+        android:visibility="gone"
+        tools:ignore="ContentDescription" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fav_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-
         android:theme="@style/Fab"
         android:scaleType="fitXY"
         app:layout_anchorGravity="end|top"
         app:fabSize="mini"
         app:layout_anchor="@id/detail_widget"
         app:srcCompat="@drawable/ic_favourite_heart_gray" />
+
 
 
     <android.support.design.widget.BottomNavigationView
