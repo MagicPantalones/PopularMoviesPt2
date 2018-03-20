@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import io.magics.popularmovies.database.FavouritesDBHelper.FavouritesEntry;
+
 public class FavouritesProvider extends ContentProvider {
 
     private static final int FAVOURITE_ID = 100;
@@ -40,7 +42,7 @@ public class FavouritesProvider extends ContentProvider {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         switch (sUriMatcher.match(uri)){
             case FAVOURITE_ID:
-                cursor = db.query(FavouritesDBHelper.FavouritesEntry.TABLE_NAME_FAVOURITES,
+                cursor = db.query(FavouritesEntry.TABLE_NAME_FAVOURITES,
                         projection,
                         selection,
                         selectionArgs,
@@ -49,7 +51,7 @@ public class FavouritesProvider extends ContentProvider {
                         sortOrder);
                 break;
             case FAVOURITE_DIR:
-                cursor = db.query(FavouritesDBHelper.FavouritesEntry.TABLE_NAME_FAVOURITES,
+                cursor = db.query(FavouritesEntry.TABLE_NAME_FAVOURITES,
                         projection,
                         selection,
                         selectionArgs,
@@ -77,7 +79,7 @@ public class FavouritesProvider extends ContentProvider {
         Long id;
         switch (sUriMatcher.match(uri)){
             case FAVOURITE_DIR:
-                id = mDbHelper.getWritableDatabase().insert(FavouritesDBHelper.FavouritesEntry.TABLE_NAME_FAVOURITES, null, values);
+                id = mDbHelper.getWritableDatabase().insert(FavouritesEntry.TABLE_NAME_FAVOURITES, null, values);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown URI " + uri);
@@ -97,13 +99,13 @@ public class FavouritesProvider extends ContentProvider {
         switch (sUriMatcher.match(uri)){
             case FAVOURITE_ID:
                 del = mDbHelper.getWritableDatabase().delete(
-                        FavouritesDBHelper.NAME,
+                        FavouritesEntry.TABLE_NAME_FAVOURITES,
                         selection,
                         selectionArgs);
                 break;
             case FAVOURITE_DIR:
                 del = mDbHelper.getWritableDatabase().delete(
-                        FavouritesDBHelper.NAME,
+                        FavouritesEntry.TABLE_NAME_FAVOURITES,
                         selection,
                         selectionArgs
                 );

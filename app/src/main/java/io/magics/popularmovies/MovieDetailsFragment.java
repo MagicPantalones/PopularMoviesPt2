@@ -3,6 +3,7 @@ package io.magics.popularmovies;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -96,13 +97,13 @@ public class MovieDetailsFragment extends DialogFragment {
                 R.color.colorPrimaryDark,
                 context.getTheme());
 
-        mFavFab.setColorFilter(mIsFavourite ? tempColor1 : tempColor2);
+        mFavFab.setBackgroundTintList(ColorStateList.valueOf(mIsFavourite ? tempColor1 : tempColor2));
 
         mFavFab.setOnClickListener(v -> {
             if (mIsFavourite) ((MovieListsActivity)context).deleteFromFavourites(mMovie);
             else if (!mIsFavourite) ((MovieListsActivity)context).addToFavourites(mMovie);
             mIsFavourite = !mIsFavourite;
-            mFavFab.setColorFilter(mIsFavourite ? tempColor1 : tempColor2);
+            mFavFab.setBackgroundTintList(ColorStateList.valueOf(mIsFavourite ? tempColor1 : tempColor2));
         });
 
         mTitle.setText(mMovie.getTitle());

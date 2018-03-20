@@ -15,7 +15,7 @@ public class FavouritesDBHelper extends SQLiteOpenHelper {
     public static final Uri BASE_URI = Uri.parse("content://" + AUTHORITY);
     public static final String PATH_FAVOURITES = "favourites";
 
-    private static final int DB_VERSION = 5;
+    private static final int DB_VERSION = 6;
 
     private static final String DB_HELP_TEXT_MIDDLE = " TEXT, ";
     private static final String DB_HELP_INT_MIDDLE = " INTEGER NOT NULL, ";
@@ -36,7 +36,7 @@ public class FavouritesDBHelper extends SQLiteOpenHelper {
                         FavouritesEntry.COLUMN_MOVIE_ID + DB_HELP_INT_MIDDLE +
                         FavouritesEntry.COLUMN_TITLE + DB_HELP_TEXT_MIDDLE +
                         FavouritesEntry.COLUMN_VOTE_AVERAGE + " REAL NOT NULL, " +
-                        FavouritesEntry.COLUMN_COLOR_PATH + DB_HELP_INT_MIDDLE +
+                        FavouritesEntry.COLUMN_COLOR_PATH + DB_HELP_TEXT_MIDDLE +
 
                         " UNIQUE (" + FavouritesEntry.COLUMN_MOVIE_ID + ") ON CONFLICT REPLACE);";
 

@@ -55,13 +55,6 @@ public class ThreadingUtils {
         void insertResponse(Boolean success, Uri favUri);
     }
 
-    public static boolean checkIfFav(int movieId, List<Integer> idList){
-        if (idList == null) return false;
-        for (int i : idList){
-            if (i == movieId) return true;
-        }
-        return false;
-    }
 
     public static Disposable queryForFavouriteMovies(Context context, final CursorResponseHandler responseHandler){
         ContentResolver cr = context.getContentResolver();
@@ -103,7 +96,7 @@ public class ThreadingUtils {
         ContentResolver cr = context.getContentResolver();
         Observable.just(cr.delete(
                 FavouritesEntry.FAVOURITES_CONTENT_URI,
-                FavouritesEntry.COLUMN_MOVIE_ID + " = " + Integer.toString(movie.getMovieId()),
+                FavouritesEntry.COLUMN_MOVIE_ID + "= " + Integer.toString(movie.getMovieId()),
                 null))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -120,7 +113,7 @@ public class ThreadingUtils {
         cv.put(FavouritesEntry.COLUMN_MOVIE_ID, movie.getMovieId());
         cv.put(FavouritesEntry.COLUMN_TITLE, movie.getTitle());
         cv.put(FavouritesEntry.COLUMN_VOTE_AVERAGE, movie.getVoteAverage());
-        cv.put(FavouritesEntry.COLUMN_COLOR_PATH, movie.getShadowInt());
+        cv.put(FavouritesEntry.COLUMN_COLOR_PATH, Integer.toString(movie.getShadowInt()));
         return cv;
     }
 

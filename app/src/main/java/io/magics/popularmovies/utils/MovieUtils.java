@@ -50,7 +50,7 @@ public class MovieUtils {
         retMovie.setMovieId(cursor.getInt(ThreadingUtils.MOVIE_ID_I));
         retMovie.setTitle(cursor.getString(ThreadingUtils.TITLE_I));
         retMovie.setVoteAverage(cursor.getDouble(ThreadingUtils.VOTE_AV_I));
-        retMovie.setShadowInt(cursor.getInt(ThreadingUtils.COLOR_I));
+        retMovie.setShadowInt(Integer.valueOf(cursor.getString(ThreadingUtils.COLOR_I)));
 
         return retMovie;
     }

@@ -19,8 +19,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import io.magics.popularmovies.MovieListsActivity.MovieResultType;
 import io.magics.popularmovies.models.Movie;
+import io.magics.popularmovies.utils.MovieUtils;
 
 import static io.magics.popularmovies.utils.MovieUtils.hideAndShowView;
 
@@ -35,7 +35,8 @@ import static io.magics.popularmovies.utils.MovieUtils.hideAndShowView;
  */
 public class MovieListFragment extends Fragment
         implements PosterAdapter.PosterClickHandler, FragmentListTabLayout.UpFabListener,
-        MovieListsActivity.MovieResultsListener {
+        MovieListsActivity.TopRatedResultsListener, MovieListsActivity.PopularResultsListener,
+        MovieListsActivity.FavouriteResultsListener{
     private static final String ARG_TAB_PAGE = "ARG_TAB_PAGE";
 
     private int mTabPage = 1;
@@ -66,6 +67,7 @@ public class MovieListFragment extends Fragment
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -75,8 +77,17 @@ public class MovieListFragment extends Fragment
         GridLayoutManager layoutManager = new GridLayoutManager(context, 2);
         //noinspection ConstantConditions
         FloatingActionButton mainUpFab = ((FragmentListTabLayout) this.getParentFragment()).mUpFab;
+        MovieListsActivity parentActivity = (MovieListsActivity) getContext();
+
         if (mAdapter == null) {
             mAdapter = new PosterAdapter(this);
+            if (mTabPage == 1) parentActivity.registerTopListener(this);
+            if (mTabPage == 2) parentActivity.registerPopListener(this);
+            if (mTabPage == 3){
+                MovieUtils.hideAndShowView(mTvNoFav, mRvPoster);
+                parentActivity.registerFavListener(this);
+                parentActivity.notifyReadyForFav();
+            }
         }
 
         rootView.setPaddingRelative(16, 16, 16, 16);
@@ -85,9 +96,6 @@ public class MovieListFragment extends Fragment
         paintTextView(context, mTvError);
         paintTextView(context, mTvNoFav);
 
-        if (mTabPage == 3) {
-            ((MovieListsActivity) getContext()).getFavouritesList();
-        }
         //noinspection ConstantConditions
         if (!((MovieListsActivity) getContext()).hasRequestedFromNetwork() && (mTabPage != 3)) {
             hideAndShowView(mTvError, mRvPoster);
@@ -95,12 +103,12 @@ public class MovieListFragment extends Fragment
 
         if (mTabPage == 1) {
             mAdapter.setEndListener(handler ->
-                    ((MovieListsActivity) getContext()).getMoreTopRated());
+                    parentActivity.getMoreTopRated());
         }
 
         if (mTabPage == 2) {
             mAdapter.setEndListener(handler ->
-                    ((MovieListsActivity) getContext()).getMorePopular());
+                    parentActivity.getMorePopular());
         }
 
         mRvPoster.setAdapter(mAdapter);
@@ -121,15 +129,20 @@ public class MovieListFragment extends Fragment
     @Override
     public void onAttach(Context context) {
         ((FragmentListTabLayout) this.getParentFragment()).registerUpFab(this);
-        ((MovieListsActivity) getContext()).registerListListeners(this);
         super.onAttach(context);
     }
 
     @SuppressWarnings("ConstantConditions")
     @Override
     public void onDetach() {
+        MovieListsActivity parentActivity = (MovieListsActivity) getContext();
         ((FragmentListTabLayout) this.getParentFragment()).unRegisterUpFab(this);
-        ((MovieListsActivity) getContext()).unRegisterListListeners(this);
+        if (mTabPage == 1) parentActivity.unRegisterTopListener();
+
+        if (mTabPage == 2) parentActivity.unRegisterPopListener();
+
+        if (mTabPage == 3) parentActivity.unRegisterFavListener();
+
         super.onDetach();
     }
 
@@ -150,9 +163,9 @@ public class MovieListFragment extends Fragment
         int colorOne = context.getResources().getColor(R.color.colorSecondaryLight);
         int colorTwo = context.getResources().getColor(R.color.colorSecondaryAccent);
 
-        Shader shader = new LinearGradient(0, 0, 0, 45,
+        Shader shader = new LinearGradient(90, 0, 0, 0,
                 new int[]{colorOne, colorTwo},
-                new float[]{0, 1}, Shader.TileMode.REPEAT);
+                new float[]{0, 1}, Shader.TileMode.MIRROR);
         textView.getPaint().setShader(shader);
     }
 
@@ -160,23 +173,23 @@ public class MovieListFragment extends Fragment
     public void upFabUp() { mRvPoster.smoothScrollToPosition(0); }
 
     @Override
-    public void resultDelivery(List<Movie> movies, MovieResultType type) {
-        if (movies.isEmpty() && type == MovieResultType.FAVOURITES) {
-            //Implement add favourites textview
-            return;
-        }
-        if (mTabPage == 1 && type == MovieResultType.TOP_RATED) {
-            mAdapter.setMovieData(movies, mAdapter.getItemCount());
-        }
-        if (mTabPage == 2 && type == MovieResultType.POPULAR) {
-            mAdapter.setMovieData(movies, mAdapter.getItemCount());
-        }
-        if (mTabPage == 3 && type == MovieResultType.FAVOURITES) {
-            if (movies.isEmpty()){
-                hideAndShowView(mTvNoFav, mRvPoster);
-            }
-            mAdapter.setMovieData(movies, mAdapter.getItemCount());
-        }
+    public void topMoviesResultDelivery(List<Movie> movies) {
+        if (mTabPage == 1) mAdapter.setMovieData(movies, mAdapter.getItemCount());
 
+    }
+
+    @Override
+    public void popularMoviesDelivery(List<Movie> movies) {
+        if (mTabPage == 2) mAdapter.setMovieData(movies, mAdapter.getItemCount());
+    }
+
+    @Override
+    public void favouritesResultDelivery(List<Movie> movies) {
+        if (mTabPage == 3) {
+            mAdapter = new PosterAdapter(this);
+            mRvPoster.setAdapter(mAdapter);
+            MovieUtils.hideAndShowView(mRvPoster, mTvNoFav);
+            mAdapter.setMovieData(movies, 0);
+        }
     }
 }
