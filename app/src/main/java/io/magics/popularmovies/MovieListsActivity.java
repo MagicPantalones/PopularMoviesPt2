@@ -1,9 +1,9 @@
 package io.magics.popularmovies;
 
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import com.facebook.stetho.Stetho;
 
@@ -13,7 +13,9 @@ import java.util.List;
 import butterknife.ButterKnife;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.models.ReviewResult;
+import io.magics.popularmovies.models.Reviews;
 import io.magics.popularmovies.models.TrailerResult;
+import io.magics.popularmovies.models.Trailers;
 import io.magics.popularmovies.networkutils.ApiUtils;
 import io.magics.popularmovies.networkutils.TMDBApi.SortingMethod;
 import io.magics.popularmovies.utils.ThreadingUtils;
@@ -22,6 +24,10 @@ import io.reactivex.disposables.Disposable;
 import static io.magics.popularmovies.networkutils.ApiUtils.isConnected;
 
 public class MovieListsActivity extends AppCompatActivity {
+
+    private static final String TAB_FRAG_TAG = "tabFragTag";
+
+    FragmentListTabLayout mTabFrag;
 
     List<ReviewResult> mReviews = new ArrayList<>();
     List<TrailerResult> mTrailers = new ArrayList<>();
@@ -45,7 +51,7 @@ public class MovieListsActivity extends AppCompatActivity {
     TopRatedResultsListener mTopListener;
     PopularResultsListener mPopListener;
     FavouriteResultsListener mFavListener;
-    TrailersAndReviewsListener mTrailersAndReviewsListener;
+    DetailsListeners mDetailsListeners;
 
     boolean mConnected = true;
 
@@ -62,14 +68,12 @@ public class MovieListsActivity extends AppCompatActivity {
         void favouritesResultDelivery(List<Movie> movies);
     }
 
-
-    public interface TrailersAndReviewsListener {
-        void trailersResult(List<TrailerResult> trailers);
-
-        void reviewsResult(List<ReviewResult> reviews);
-
-        void moreReviewsResult(List<ReviewResult> reviews);
+    public interface DetailsListeners{
+        void onTrailerFetchFinished(Trailers trailers);
+        void onReviewFetchFinished(Reviews reviews);
     }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,9 +81,12 @@ public class MovieListsActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         Stetho.initializeWithDefaults(this);
 
-        if (savedInstanceState == null) {
-            FragmentListTabLayout frag = FragmentListTabLayout.instantiateFragment();
-            getSupportFragmentManager().beginTransaction().add(R.id.container_main, frag).commit();
+        FragmentManager fm = getSupportFragmentManager();
+        mTabFrag = (FragmentListTabLayout) fm.findFragmentByTag(TAB_FRAG_TAG);
+
+        if (mTabFrag == null) {
+            mTabFrag = FragmentListTabLayout.instantiateFragment();
+            getSupportFragmentManager().beginTransaction().add(R.id.container_main, mTabFrag, TAB_FRAG_TAG).commit();
         }
 
         getInitFavouritesList();
@@ -126,6 +133,14 @@ public class MovieListsActivity extends AppCompatActivity {
         }
     }
 
+    public List<Movie> getMovieLists(int tabPage){
+        switch (tabPage){
+            case 1: return mTopMovieList;
+            case 2: return mPopMovieList;
+            default: return new ArrayList<>();
+        }
+    }
+
     private void getPopularList() {
         if (mPopLastPage != -1 && mPopPageNum >= mPopLastPage) return;
         mPopDisposable = ApiUtils.callApiForMovieList(SortingMethod.POPULAR, mPopPageNum,
@@ -158,11 +173,12 @@ public class MovieListsActivity extends AppCompatActivity {
     public void notifyReadyForFav(){
         if (mFavMovieList.isEmpty()){
             getInitFavouritesList();
+            return;
         }
         mFavListener.favouritesResultDelivery(mFavMovieList);
     }
 
-    public void getTrailersAndReviews(int movieId) {
+    private void getTrailersAndReviews(int movieId) {
         mTAndRDisposable = ApiUtils.callApiForTrailersAndReviews(movieId,
                 results -> {
                     mReviews.addAll(results.getReviews().getReviewResults());
@@ -171,19 +187,21 @@ public class MovieListsActivity extends AppCompatActivity {
 
                     if (mReviewLastPage == -1) mReviewLastPage = results.getReviews().getTotalPages();
 
-                    //mTrailersAndReviewsListener.trailersResult(mTrailers);
-                    //mTrailersAndReviewsListener.reviewsResult(mReviews);
+                    if (mDetailsListeners != null){
+                        mDetailsListeners.onReviewFetchFinished(results.getReviews());
+                        mDetailsListeners.onTrailerFetchFinished(results.getTrailers());
+                    }
+
                 });
     }
 
-    public void getMoreReviews(int movieId) {
+    private void getMoreReviews(int movieId) {
         mReviewPageNum += 1;
         if (mReviewLastPage != -1 && mReviewPageNum >= mReviewLastPage) return;
         mMoreRevDisposable = ApiUtils.callForMoreReviews(movieId, mReviewPageNum,
                 result -> {
                     mReviews.addAll(result.getReviewResults());
                     mReviewPageNum = result.getPage();
-                    //mTrailersAndReviewsListener.moreReviewsResult(result.getReviewResults());
                 });
     }
 
@@ -249,13 +267,9 @@ public class MovieListsActivity extends AppCompatActivity {
         mFavListener = null;
     }
 
-    public void registerDetailsListeners(TrailersAndReviewsListener tListener) {
-        mTrailersAndReviewsListener = tListener;
-    }
+    public void registerDetailListeners(DetailsListeners listeners){ mDetailsListeners = listeners; }
 
-    public void unRegisterDetailsListeners() {
-        mTrailersAndReviewsListener = null;
-    }
+    public void unRegisterDetailListeners() { mDetailsListeners = null; }
 
     public void notifyMovieListChange(Movie movie) {
         int i;

@@ -1,32 +1,25 @@
 package io.magics.popularmovies;
 
-import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.ColorStateList;
-import android.graphics.Path;
-import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.graphics.drawable.Animatable2Compat;
 import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.res.ResourcesCompat;
-import android.support.v4.graphics.PathParser;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewPropertyAnimatorCompat;
-import android.support.v4.view.animation.PathInterpolatorCompat;
-import android.support.v7.view.ViewPropertyAnimatorCompatSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.BounceInterpolator;
-import android.view.animation.Interpolator;
-import android.view.animation.PathInterpolator;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -36,7 +29,11 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.magics.popularmovies.fragments.MovieDetailsOverview;
+import io.magics.popularmovies.fragments.MovieDetailsTrailers;
 import io.magics.popularmovies.models.Movie;
+import io.magics.popularmovies.models.Reviews;
+import io.magics.popularmovies.models.Trailers;
 import io.magics.popularmovies.networkutils.ApiUtils;
 import io.magics.popularmovies.utils.GlideApp;
 
@@ -48,12 +45,16 @@ import static io.magics.popularmovies.utils.MovieUtils.*;
  * Use the {@link MovieDetailsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MovieDetailsFragment extends DialogFragment {
+public class MovieDetailsFragment extends DialogFragment
+    implements MovieListsActivity.DetailsListeners{
+
     public static final String ARG_MOVIE = "movie";
     public static final String ARG_IS_FAVOURITE = "isFavourite";
 
     private Movie mMovie;
     private boolean mIsFavourite;
+    private Trailers mTrailers;
+    private Reviews mReviews;
 
     @BindView(R.id.iv_poster_detail) ImageView mPoster;
     @BindView(R.id.tv_movie_title_detail) TextView mTitle;
@@ -62,10 +63,12 @@ public class MovieDetailsFragment extends DialogFragment {
     @BindView(R.id.tv_vote_average_detail) TextView mVoteNumber;
     @BindView(R.id.fav_fab) FloatingActionButton mFavFab;
     @BindView(R.id.fav_fab_anim) ImageView mFavFabAnim;
+    @BindView(R.id.bottom_nav_details) BottomNavigationView mBotNav;
 
     private Unbinder mUnbinder;
     private ValueAnimator mVoteTextAnim;
     private ObjectAnimator mVoteProgressAnim;
+    private AnimatedVectorDrawableCompat mFabAnim;
 
     int tempColor1;
     int tempColor2;
@@ -98,10 +101,13 @@ public class MovieDetailsFragment extends DialogFragment {
         View root = inflater.inflate(R.layout.fragment_detail_movie, container, false);
         mUnbinder = ButterKnife.bind(this, root);
 
+        FragmentManager fragManager = getChildFragmentManager();
         Context context = root.getContext();
+
         ImageSize imageSize = getOptimalImgSize(context);
         String posterUrl = ApiUtils.posterUrlConverter(imageSize, mMovie.getPosterUrl());
         Long voteCalcLong = Math.round(mMovie.getVoteAverage() * 10);
+
         mVoteTextAnim = ValueAnimator.ofFloat(0.0f, mMovie.getVoteAverage().floatValue());
         mVoteProgressAnim = ObjectAnimator.ofInt(mVoteBar, "progress", voteCalcLong.intValue());
 
@@ -145,23 +151,57 @@ public class MovieDetailsFragment extends DialogFragment {
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(mPoster);
 
+        mBotNav.setOnNavigationItemSelectedListener(item -> {
+            Fragment frag = null;
+            switch (item.getItemId()){
+                case R.id.action_overview:
+                    frag = MovieDetailsOverview.newInstance(mMovie);
+                    break;
+                case R.id.action_trailers:
+                    frag = MovieDetailsTrailers.newInstance(mTrailers);
+                    break;
+            }
+            FragmentTransaction ft = fragManager.beginTransaction();
+            ft.replace(R.id.frame_trailers_and_reviews, frag);
+            ft.commit();
+            return true;
+        });
+
+        FragmentTransaction ft = fragManager.beginTransaction();
+        ft.add(R.id.frame_trailers_and_reviews, MovieDetailsOverview.newInstance(mMovie));
+        ft.commit();
+
         return root;
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        ((MovieListsActivity) context).registerDetailListeners(this);
+    }
+
+    @Override
     public void onDestroy() {
-        if (mVoteProgressAnim != null && mVoteProgressAnim.isStarted())mVoteProgressAnim.cancel();
-        if (mVoteTextAnim != null && mVoteTextAnim.isStarted())mVoteTextAnim.cancel();
+        if (mVoteProgressAnim != null && mVoteProgressAnim.isStarted()) mVoteProgressAnim.cancel();
+        if (mVoteTextAnim != null && mVoteTextAnim.isStarted()) mVoteTextAnim.cancel();
+        if (mFabAnim != null && mFabAnim.isRunning()) mFabAnim.stop();
         mUnbinder.unbind();
         super.onDestroy();
     }
 
+    @Override
+    public void onDetach() {
+        ((MovieListsActivity) getContext()).unRegisterDetailListeners();
+        super.onDetach();
+    }
+
     private void fabAnim(){
 
-        AnimatedVectorDrawableCompat drawableCompat = AnimatedVectorDrawableCompat.create(getContext(), R.drawable.ic_anim_favourite_heart);
-        mFavFabAnim.setImageDrawable(drawableCompat);
+        mFabAnim = AnimatedVectorDrawableCompat.create(getContext(),
+                mIsFavourite ? R.drawable.ic_anim_heart_to_fav : R.drawable.ic_anim_heart_from_fav);
+        mFavFabAnim.setImageDrawable(mFabAnim);
 
-        drawableCompat.registerAnimationCallback(new Animatable2Compat.AnimationCallback() {
+        mFabAnim.registerAnimationCallback(new Animatable2Compat.AnimationCallback() {
             @Override
             public void onAnimationEnd(Drawable drawable) {
                 mFavFab.setBackgroundTintList(ColorStateList.valueOf(mIsFavourite ? tempColor1 : tempColor2));
@@ -172,7 +212,17 @@ public class MovieDetailsFragment extends DialogFragment {
 
         mFavFab.setVisibility(View.INVISIBLE);
         mFavFabAnim.setVisibility(View.VISIBLE);
-        drawableCompat.start();
+        mFabAnim.start();
 
+    }
+
+    @Override
+    public void onTrailerFetchFinished(Trailers trailers) {
+        mTrailers = trailers;
+    }
+
+    @Override
+    public void onReviewFetchFinished(Reviews reviews) {
+        mReviews = reviews;
     }
 }

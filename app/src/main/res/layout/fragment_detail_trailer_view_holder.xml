@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginStart="4dp"
+    android:layout_marginEnd="4dp">
+
+    <ImageView
+        android:id="@+id/iv_trailer_img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/trailerplacehodler"
+        tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:id="@+id/iv_play_icon"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/icon_guide"
+        app:layout_constraintEnd_toEndOf="@+id/iv_trailer_img"
+        app:layout_constraintStart_toStartOf="@+id/iv_trailer_img"
+        app:layout_constraintTop_toTopOf="@+id/icon_guide"
+        app:srcCompat="@drawable/ic_play_circle_outline_white_24dp"
+        android:contentDescription="@string/trailer_icon_play" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/icon_guide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5"
+        />
+</android.support.constraint.ConstraintLayout>

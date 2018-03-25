@@ -2,6 +2,7 @@ package io.magics.popularmovies;
 
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -47,12 +48,13 @@ public class FragmentListTabLayout extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_list_adapter_tablayout, container, false);
         mUnbinder = ButterKnife.bind(this, root);
 
         mViewPager.setOffscreenPageLimit(3);
+
         mViewPager.setAdapter(new MovieListsPagerAdapter(getChildFragmentManager()));
 
         mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){

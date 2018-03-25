@@ -17,13 +17,11 @@
         >
 
         <android.support.constraint.ConstraintLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fitsSystemWindows="true"
             android:layout_gravity="center_horizontal"
             >
-
-
             <android.support.v7.widget.CardView
                 android:id="@+id/cv_backdrop"
                 style="@style/MovieCardStyle.PosterCard"
@@ -42,7 +40,6 @@
                     tools:ignore="ContentDescription"
                     tools:src="@drawable/minions_poster_placehodler" />
             </android.support.v7.widget.CardView>
-
 
             <TextView
                 android:id="@+id/tv_movie_title_detail"
@@ -63,8 +60,8 @@
             android:layout_gravity="bottom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             app:cardElevation="5dp"
+            android:layout_marginTop="8dp"
             android:layout_marginBottom="-10dp"
             >
 
@@ -120,7 +117,6 @@
 
         </android.support.v7.widget.CardView>
 
-
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v4.widget.NestedScrollView
@@ -131,15 +127,11 @@
         android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_trailer_and_review"
-            android:layout_width="wrap_content"
+        <FrameLayout
+            android:id="@+id/frame_trailers_and_reviews"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:paddingTop="10dp"
-            android:layout_marginTop="16dp"
-            android:background="@color/colorSecondary"
-            />
+            android:layout_marginTop="10dp"/>
 
     </android.support.v4.widget.NestedScrollView>
 
@@ -158,10 +150,10 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:theme="@style/Fab"
-        android:scaleType="centerCrop"
+        android:scaleType="fitCenter"
         app:layout_anchorGravity="end|top"
         app:layout_anchor="@id/detail_widget"
-        app:srcCompat="@drawable/ic_favourite_heart_gray" />
+        app:srcCompat="@drawable/ic_heart_fab_static" />
 
 
 
@@ -170,7 +162,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:id="@+id/bottom_nav_details_wrapper"
+        android:id="@+id/bottom_nav_details"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"

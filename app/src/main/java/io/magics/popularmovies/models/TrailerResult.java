@@ -13,12 +13,6 @@ public class TrailerResult implements Parcelable
     @SerializedName("id")
     @Expose
     private String id;
-    @SerializedName("iso_639_1")
-    @Expose
-    private String iso6391;
-    @SerializedName("iso_3166_1")
-    @Expose
-    private String iso31661;
     @SerializedName("key")
     @Expose
     private String key;
@@ -35,8 +29,6 @@ public class TrailerResult implements Parcelable
     @Expose
     private String type;
     public final static Parcelable.Creator<TrailerResult> CREATOR = new Creator<TrailerResult>() {
-
-
         @SuppressWarnings({
             "unchecked"
         })
@@ -48,13 +40,10 @@ public class TrailerResult implements Parcelable
             return (new TrailerResult[size]);
         }
 
-    }
-    ;
+    };
 
     protected TrailerResult(Parcel in) {
         this.id = ((String) in.readValue((String.class.getClassLoader())));
-        this.iso6391 = ((String) in.readValue((String.class.getClassLoader())));
-        this.iso31661 = ((String) in.readValue((String.class.getClassLoader())));
         this.key = ((String) in.readValue((String.class.getClassLoader())));
         this.name = ((String) in.readValue((String.class.getClassLoader())));
         this.site = ((String) in.readValue((String.class.getClassLoader())));
@@ -71,22 +60,6 @@ public class TrailerResult implements Parcelable
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getIso6391() {
-        return iso6391;
-    }
-
-    public void setIso6391(String iso6391) {
-        this.iso6391 = iso6391;
-    }
-
-    public String getIso31661() {
-        return iso31661;
-    }
-
-    public void setIso31661(String iso31661) {
-        this.iso31661 = iso31661;
     }
 
     public String getKey() {
@@ -131,8 +104,6 @@ public class TrailerResult implements Parcelable
 
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(id);
-        dest.writeValue(iso6391);
-        dest.writeValue(iso31661);
         dest.writeValue(key);
         dest.writeValue(name);
         dest.writeValue(site);

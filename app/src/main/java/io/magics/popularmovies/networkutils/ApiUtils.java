@@ -9,8 +9,6 @@ import android.net.Uri;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import io.magics.popularmovies.BuildConfig;
 import io.magics.popularmovies.models.ApiResult;
@@ -29,7 +27,8 @@ public class ApiUtils {
     private static final String BASE_QUERY_API_URL = "https://api.themoviedb.org/3/";
     private static final String BASE_QUERY_IMG_URL = "https://image.tmdb.org/t/p/";
     private static final String TMDB_API_KEY = BuildConfig.TMDB_API_KEY;
-
+    private static final String YOUTUBE_THUMB_BASE_URL = "http://img.youtube.com/vi/";
+    private static final String LOCALE = "en-US";
 
     private ApiUtils(){}
 
@@ -48,7 +47,7 @@ public class ApiUtils {
 
     public static Disposable callApiForMovieList(SortingMethod sortingMethod, int pageNumber, final ApiCallResult callback){
         return getClientForMovieList().create(TMDBApi.class)
-                .getMovieList(sortingMethod, TMDB_API_KEY, "en-US", pageNumber)
+                .getMovieList(sortingMethod, TMDB_API_KEY, LOCALE, pageNumber)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(callback::onSuccess);
@@ -56,7 +55,7 @@ public class ApiUtils {
 
     public static Disposable callApiForTrailersAndReviews(int movieId, final TrailersAndReviewsResult result){
         return getClientForMovieList().create(TMDBApi.class)
-                .getTrailersAndReviews(movieId, TMDB_API_KEY, "en-US", "videos,reviews")
+                .getTrailersAndReviews(movieId, TMDB_API_KEY, LOCALE, "videos,reviews")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(result::onCompleted);
@@ -64,7 +63,7 @@ public class ApiUtils {
 
     public static Disposable callForMoreReviews(int movieId, int pageNumber, final MoreReviewsResult result){
         return getClientForMovieList().create(TMDBApi.class)
-                .getMoreReviews(movieId, TMDB_API_KEY, "en-US", pageNumber)
+                .getMoreReviews(movieId, TMDB_API_KEY, LOCALE, pageNumber)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(result::onCompleted);
@@ -83,6 +82,13 @@ public class ApiUtils {
         return Uri.parse(BASE_QUERY_IMG_URL).buildUpon()
                 .appendEncodedPath(imageSize.toString())
                 .appendEncodedPath(posterPath)
+                .build().toString();
+    }
+
+    public static String youtubeStillUrlConverter(String youtubeKey){
+        return Uri.parse(YOUTUBE_THUMB_BASE_URL).buildUpon()
+                .appendEncodedPath(youtubeKey)
+                .appendPath("0.jpg")
                 .build().toString();
     }
 
