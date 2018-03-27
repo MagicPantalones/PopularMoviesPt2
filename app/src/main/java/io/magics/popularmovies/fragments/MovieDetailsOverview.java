@@ -48,7 +48,7 @@ public class MovieDetailsOverview extends Fragment {
         View root = inflater.inflate(R.layout.fragment_detail_overview, container, false);
         TextView tvOverview = root.findViewById(R.id.tv_overview_frag);
         tvOverview.setText(mMovie.getOverview());
+
         return root;
     }
-
 }

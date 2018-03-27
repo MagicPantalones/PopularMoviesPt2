@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<LinearLayout android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:padding="8dp"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@drawable/bg_card_details">
 
-</android.support.constraint.ConstraintLayout>
+    <TextView
+        style="@style/MovieCardStyle.Text"
+        android:id="@+id/tv_author"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        tools:text="Magics!" />
+
+    <us.feras.mdv.MarkdownView
+        android:id="@+id/mdv_review_text"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_width="wrap_content" />
+</LinearLayout>

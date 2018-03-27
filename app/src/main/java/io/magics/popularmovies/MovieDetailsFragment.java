@@ -7,7 +7,10 @@ import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.graphics.drawable.Animatable2Compat;
 import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
@@ -16,8 +19,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.view.NestedScrollingParentHelper;
+import android.support.v4.widget.NestedScrollView;
+import android.support.v7.widget.ViewUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.BounceInterpolator;
 import android.widget.ImageView;
@@ -64,6 +71,7 @@ public class MovieDetailsFragment extends DialogFragment
     @BindView(R.id.fav_fab) FloatingActionButton mFavFab;
     @BindView(R.id.fav_fab_anim) ImageView mFavFabAnim;
     @BindView(R.id.bottom_nav_details) BottomNavigationView mBotNav;
+    @BindView(R.id.nsv_contentNsv) NestedScrollView mNestedScrollView;
 
     private Unbinder mUnbinder;
     private ValueAnimator mVoteTextAnim;
@@ -193,6 +201,11 @@ public class MovieDetailsFragment extends DialogFragment
     public void onDetach() {
         ((MovieListsActivity) getContext()).unRegisterDetailListeners();
         super.onDetach();
+    }
+
+    private int dpToPx(int dp){
+        float scale = getResources().getDisplayMetrics().density;
+        return Math.round(scale * dp);
     }
 
     private void fabAnim(){
