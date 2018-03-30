@@ -1,7 +1,8 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="io.magics.popularmovies.fragments.MovieDetailsTrailers"
     android:paddingEnd="4dp"
     android:paddingStart="4dp">
@@ -9,6 +10,16 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_trailers"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-</FrameLayout>
+        android:layout_height="match_parent"
+        android:paddingTop="16dp"
+        />
+    <TextView
+        style="@style/MovieCardStyle.Text.Header"
+        android:id="@+id/tv_no_trailers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/details_no_trailers"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        />
+</RelativeLayout>

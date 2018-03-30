@@ -23,17 +23,13 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
 
     private List<TrailerResult> mTrailerList = new ArrayList<>();
     private OnTrailerSelect mTrailerClickListener;
-    private int mThumbHeight;
-    private int mThumbWidth;
 
     public interface OnTrailerSelect{
         void onTrailerSelect(TrailerResult trailerResult);
     }
 
-    public TrailerAdapter(OnTrailerSelect listener, int thumbWidth, int thumbHeight){
+    public TrailerAdapter(OnTrailerSelect listener){
         this.mTrailerClickListener = listener;
-        this.mThumbHeight = thumbHeight;
-        this.mThumbWidth = thumbWidth / 2;
     }
 
     @NonNull
@@ -52,8 +48,7 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
         trailerIv.setContentDescription(trailer.getName());
         GlideApp.with(trailerIv)
                 .load(trailerImgUrl)
-                .override(mThumbWidth, mThumbHeight)
-                .centerInside()
+                .centerCrop()
                 .into(trailerIv);
 
     }

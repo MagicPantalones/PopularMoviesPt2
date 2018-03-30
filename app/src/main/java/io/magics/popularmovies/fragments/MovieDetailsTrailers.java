@@ -12,21 +12,20 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import io.magics.popularmovies.R;
 import io.magics.popularmovies.models.TrailerResult;
 import io.magics.popularmovies.models.Trailers;
+import io.magics.popularmovies.utils.MovieUtils;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link MovieDetailsTrailers#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class MovieDetailsTrailers extends Fragment
     implements TrailerAdapter.OnTrailerSelect{
 
@@ -34,6 +33,10 @@ public class MovieDetailsTrailers extends Fragment
 
     private List<TrailerResult> mTrailers = new ArrayList<>();
 
+    @BindView(R.id.rv_trailers) RecyclerView mTrailerRecycler;
+    @BindView(R.id.tv_no_trailers) TextView mTvNoTrailers;
+
+    private Unbinder mUnbinder;
 
     public MovieDetailsTrailers() {
         // Required empty public constructor
@@ -52,6 +55,7 @@ public class MovieDetailsTrailers extends Fragment
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             Trailers trailers = getArguments().getParcelable(ARG_TRAILER_LIST);
+            //noinspection ConstantConditions
             mTrailers.addAll(trailers.getTrailerResults());
         }
     }
@@ -60,24 +64,30 @@ public class MovieDetailsTrailers extends Fragment
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_detail_trailers, container, false);
-        ButterKnife.bind(this, root);
+        mUnbinder = ButterKnife.bind(this, root);
 
-        RecyclerView trailerRecycler = root.findViewById(R.id.rv_trailers);
-        LinearLayoutManager manager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        TrailerAdapter adapter = new TrailerAdapter(this, container.getWidth(), container.getHeight());
-
-        trailerRecycler.setAdapter(adapter);
-        trailerRecycler.setLayoutManager(manager);
-
-        adapter.setTrailerList(mTrailers);
-
+        if (mTrailers.isEmpty()){
+            MovieUtils.hideAndShowView(mTvNoTrailers, mTrailerRecycler);
+        } else {
+            LinearLayoutManager manager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+            TrailerAdapter adapter = new TrailerAdapter(this);
+            mTrailerRecycler.setAdapter(adapter);
+            mTrailerRecycler.setLayoutManager(manager);
+            adapter.setTrailerList(mTrailers);
+        }
         return root;
     }
 
     @Override
+    public void onDestroy() {
+        if (mUnbinder != null) mUnbinder.unbind();
+        super.onDestroy();
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Override
     public void onTrailerSelect(TrailerResult trailerResult) {
         Intent ytAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + trailerResult.getKey()));
-
         try {
             getContext().startActivity(ytAppIntent);
         } catch (ActivityNotFoundException e){

@@ -26,6 +26,7 @@
 
     <string name="list_no_network_available" translatable="true">No Network Available!</string>
     <string name="list_no_favourites_added" translatable="true">No Favourites Added!</string>
-
+    <string name="details_no_trailers" translatable="true">No Trailers Available!</string>
+    <string name="details_no_reviews" translatable="true">No Reviews Available!</string>
 
 </resources>

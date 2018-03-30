@@ -7,10 +7,7 @@ import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.graphics.drawable.Animatable2Compat;
 import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
@@ -19,12 +16,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.res.ResourcesCompat;
-import android.support.v4.view.NestedScrollingParentHelper;
 import android.support.v4.widget.NestedScrollView;
-import android.support.v7.widget.ViewUtils;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.BounceInterpolator;
 import android.widget.ImageView;
@@ -37,6 +31,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import io.magics.popularmovies.fragments.MovieDetailsOverview;
+import io.magics.popularmovies.fragments.MovieDetailsReviews;
 import io.magics.popularmovies.fragments.MovieDetailsTrailers;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.models.Reviews;
@@ -168,6 +163,9 @@ public class MovieDetailsFragment extends DialogFragment
                 case R.id.action_trailers:
                     frag = MovieDetailsTrailers.newInstance(mTrailers);
                     break;
+                case R.id.action_reviews:
+                    frag = MovieDetailsReviews.newInstance(mReviews);
+                    break;
             }
             FragmentTransaction ft = fragManager.beginTransaction();
             ft.replace(R.id.frame_trailers_and_reviews, frag);
@@ -175,10 +173,11 @@ public class MovieDetailsFragment extends DialogFragment
             return true;
         });
 
-        FragmentTransaction ft = fragManager.beginTransaction();
-        ft.add(R.id.frame_trailers_and_reviews, MovieDetailsOverview.newInstance(mMovie));
-        ft.commit();
-
+        if (fragManager.getFragments() == null || fragManager.getFragments().isEmpty()) {
+            FragmentTransaction ft = fragManager.beginTransaction();
+            ft.add(R.id.frame_trailers_and_reviews, MovieDetailsOverview.newInstance(mMovie));
+            ft.commit();
+        }
         return root;
     }
 
