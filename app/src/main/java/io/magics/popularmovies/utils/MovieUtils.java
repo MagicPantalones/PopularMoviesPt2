@@ -13,7 +13,6 @@ import android.view.View;
 
 import com.google.gson.annotations.SerializedName;
 
-import io.magics.popularmovies.database.FavouritesDBHelper.FavouritesEntry;
 import io.magics.popularmovies.models.Movie;
 
 import static io.magics.popularmovies.utils.MovieUtils.ImageSize.SIZE_DEFAULT;
@@ -31,6 +30,14 @@ public class MovieUtils {
     private static final String YOUTUBE_THUMB_BASE_URL = "http://img.youtube.com/vi/";
     private static final String BASE_QUERY_IMG_URL = "https://image.tmdb.org/t/p/";
 
+    private static final int POSTER_I = 1;
+    private static final int OVERVIEW_I = 2;
+    private static final int REL_DATE_I = 3;
+    private static final int MOVIE_ID_I = 4;
+    private static final int TITLE_I = 5;
+    private static final int VOTE_AV_I = 6;
+    private static final int COLOR_I = 7;
+
     private MovieUtils(){}
 
     public static void hideAndShowView(View viewToShow, View viewToHide){
@@ -41,17 +48,14 @@ public class MovieUtils {
     public static Movie createMovieFromCursor(Cursor cursor, int position){
         Movie retMovie = new Movie();
         cursor.moveToPosition(position);
-        Uri itemUri = FavouritesEntry.FAVOURITES_CONTENT_URI.buildUpon()
-                .appendEncodedPath(cursor.getString(ThreadingUtils.ITEM_ID))
-                .build();
-        retMovie.setFavouriteUri(itemUri);
-        retMovie.setPosterUrl(cursor.getString(ThreadingUtils.POSTER_I));
-        retMovie.setOverview(cursor.getString(ThreadingUtils.OVERVIEW_I));
-        retMovie.setReleaseDate(cursor.getString(ThreadingUtils.REL_DATE_I));
-        retMovie.setMovieId(cursor.getInt(ThreadingUtils.MOVIE_ID_I));
-        retMovie.setTitle(cursor.getString(ThreadingUtils.TITLE_I));
-        retMovie.setVoteAverage(cursor.getDouble(ThreadingUtils.VOTE_AV_I));
-        retMovie.setShadowInt(Integer.valueOf(cursor.getString(ThreadingUtils.COLOR_I)));
+
+        retMovie.setPosterUrl(cursor.getString(POSTER_I));
+        retMovie.setOverview(cursor.getString(OVERVIEW_I));
+        retMovie.setReleaseDate(cursor.getString(REL_DATE_I));
+        retMovie.setMovieId(cursor.getInt(MOVIE_ID_I));
+        retMovie.setTitle(cursor.getString(TITLE_I));
+        retMovie.setVoteAverage(cursor.getDouble(VOTE_AV_I));
+        retMovie.setShadowInt(Integer.valueOf(cursor.getString(COLOR_I)));
 
         return retMovie;
     }

@@ -6,7 +6,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -16,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.magics.popularmovies.BuildConfig;
-import io.magics.popularmovies.database.FavouritesDBHelper;
 import io.magics.popularmovies.database.FavouritesDBHelper.FavouritesEntry;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.networkutils.TMDBApi;
@@ -37,7 +35,7 @@ import static io.magics.popularmovies.utils.MovieUtils.createMovieFromCursor;
 
 public class DataSoureProvider {
 
-    public static final String[] FAVOURITES_COLUMNS = {
+    private static final String[] FAVOURITES_COLUMNS = {
             FavouritesEntry._ID,
             FavouritesEntry.COLUMN_POSTER_PATH,
             FavouritesEntry.COLUMN_OVERVIEW,
@@ -47,15 +45,6 @@ public class DataSoureProvider {
             FavouritesEntry.COLUMN_VOTE_AVERAGE,
             FavouritesEntry.COLUMN_COLOR_PATH
     };
-
-    public static final int ITEM_ID = 0;
-    public static final int POSTER_I = 1;
-    public static final int OVERVIEW_I = 2;
-    public static final int REL_DATE_I = 3;
-    public static final int MOVIE_ID_I = 4;
-    public static final int TITLE_I = 5;
-    public static final int VOTE_AV_I = 6;
-    public static final int COLOR_I = 7;
 
 
     private static final String SORT_TOP = "top_rated";
@@ -94,6 +83,12 @@ public class DataSoureProvider {
         mFavDisposable = getFavList();
     }
 
+    public void dispose() {
+        if (mTopDisposable != null && !mTopDisposable.isDisposed()) mTopDisposable.dispose();
+        if (mPopDisposable != null && !mPopDisposable.isDisposed()) mPopDisposable.dispose();
+        if (mFavDisposable != null && !mFavDisposable.isDisposed()) mFavDisposable.dispose();
+    }
+
     public void getMoreForTop(){
         if (mTopVm.isLastPageLoaded()) return;
         mTopDisposable = getTopList(mTopVm.getCurrentPage() + 1);
@@ -103,6 +98,12 @@ public class DataSoureProvider {
         if (mPopVm.isLastPageLoaded()) return;
         mPopDisposable = getPopList(mPopVm.getCurrentPage() + 1);
     }
+
+    public void registerTrailerViewModel(TrailersViewModel viewModel) { mTrailerVm = viewModel; }
+    public void unregisterTrailerViewModel() { mTrailerVm = null; }
+
+    public void registerReviewViewModel(ReviewsViewModel viewModel) { mReviewVm = viewModel; }
+    public void unregisterReviewViewModel() { mReviewVm = null; }
 
     private Disposable getTopList(int pageNumber){
         return getClientForMovieList().create(TMDBApi.class)
