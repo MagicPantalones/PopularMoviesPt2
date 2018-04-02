@@ -16,9 +16,6 @@ public class ApiResult implements Parcelable
     @SerializedName("results")
     @Expose
     private List<Movie> movies = null;
-    @SerializedName("total_results")
-    @Expose
-    private Integer totalResults;
     @SerializedName("total_pages")
     @Expose
     private Integer totalPages;
@@ -40,7 +37,6 @@ public class ApiResult implements Parcelable
     protected ApiResult(Parcel in) {
         this.page = ((Integer) in.readValue((Integer.class.getClassLoader())));
         in.readList(this.movies, (Movie.class.getClassLoader()));
-        this.totalResults = ((Integer) in.readValue((Integer.class.getClassLoader())));
         this.totalPages = ((Integer) in.readValue((Integer.class.getClassLoader())));
     }
 
@@ -52,14 +48,11 @@ public class ApiResult implements Parcelable
 
     public Movie getSingleMovie(int i) { return movies.get(i); }
 
-    public Integer getTotalResults() { return totalResults; }
-
     public Integer getTotalPages() { return totalPages; }
 
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(page);
         dest.writeList(movies);
-        dest.writeValue(totalResults);
         dest.writeValue(totalPages);
     }
 

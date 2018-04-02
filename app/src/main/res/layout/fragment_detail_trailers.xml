@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="io.magics.popularmovies.fragments.MovieDetailsTrailers"
+    tools:context="io.magics.popularmovies.fragments.detailfragments.MovieDetailsTrailers"
     android:paddingEnd="4dp"
     android:paddingStart="4dp">
 

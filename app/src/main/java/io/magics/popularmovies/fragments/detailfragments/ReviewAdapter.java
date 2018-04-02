@@ -1,4 +1,4 @@
-package io.magics.popularmovies.fragments;
+package io.magics.popularmovies.fragments.detailfragments;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;

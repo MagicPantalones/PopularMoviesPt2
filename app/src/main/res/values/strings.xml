@@ -29,4 +29,7 @@
     <string name="details_no_trailers" translatable="true">No Trailers Available!</string>
     <string name="details_no_reviews" translatable="true">No Reviews Available!</string>
 
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

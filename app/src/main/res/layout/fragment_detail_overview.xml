@@ -5,7 +5,7 @@
     android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:behavior_overlapTop="56dp"
-    tools:context="io.magics.popularmovies.fragments.MovieDetailsOverview">
+    tools:context="io.magics.popularmovies.fragments.detailfragments.MovieDetailsOverview">
 
     <TextView
         android:id="@+id/tv_overview_title_frag"

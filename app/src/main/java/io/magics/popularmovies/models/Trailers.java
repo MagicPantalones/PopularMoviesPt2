@@ -42,10 +42,6 @@ public class Trailers implements Parcelable
         return trailerResults;
     }
 
-    public void setTrailerResults(List<TrailerResult> trailerResults) {
-        this.trailerResults = trailerResults;
-    }
-
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeList(trailerResults);
     }

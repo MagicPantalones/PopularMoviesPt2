@@ -13,7 +13,6 @@ import android.view.View;
 
 import com.google.gson.annotations.SerializedName;
 
-import io.magics.popularmovies.database.FavouritesDBHelper;
 import io.magics.popularmovies.database.FavouritesDBHelper.FavouritesEntry;
 import io.magics.popularmovies.models.Movie;
 
@@ -29,6 +28,8 @@ import static io.magics.popularmovies.utils.MovieUtils.ImageSize.SIZE_MEDIUM;
 public class MovieUtils {
 
     private static final String TAG = MovieUtils.class.getSimpleName();
+    private static final String YOUTUBE_THUMB_BASE_URL = "http://img.youtube.com/vi/";
+    private static final String BASE_QUERY_IMG_URL = "https://image.tmdb.org/t/p/";
 
     private MovieUtils(){}
 
@@ -95,6 +96,22 @@ public class MovieUtils {
         float density = context.getResources().getDisplayMetrics().density;
         return density >= 3.0 ? SIZE_MEDIUM : SIZE_DEFAULT;
     }
+
+    public static String posterUrlConverter(ImageSize imageSize, String posterPath) {
+        return Uri.parse(BASE_QUERY_IMG_URL).buildUpon()
+                .appendEncodedPath(imageSize.toString())
+                .appendEncodedPath(posterPath)
+                .build().toString();
+    }
+
+    public static String youtubeStillUrlConverter(String youtubeKey){
+        return Uri.parse(YOUTUBE_THUMB_BASE_URL).buildUpon()
+                .appendEncodedPath(youtubeKey)
+                .appendPath("0.jpg")
+                .build().toString();
+    }
+
+
 
     public enum ImageSize{
         @SerializedName("w500")

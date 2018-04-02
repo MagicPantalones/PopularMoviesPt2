@@ -54,30 +54,16 @@ public class Reviews implements Parcelable
         return page;
     }
 
-    public void setPage(Integer page) {
-        this.page = page;
-    }
-
     public List<ReviewResult> getReviewResults() {
         return reviewResults;
     }
-
-    public void setReviewResults(List<ReviewResult> reviewResults) {this.reviewResults = reviewResults;}
 
     public Integer getTotalPages() {
         return totalPages;
     }
 
-    public void setTotalPages(Integer totalPages) {
-        this.totalPages = totalPages;
-    }
-
     public Integer getTotalResults() {
         return totalResults;
-    }
-
-    public void setTotalResults(Integer totalResults) {
-        this.totalResults = totalResults;
     }
 
     public void writeToParcel(Parcel dest, int flags) {

@@ -1,4 +1,4 @@
-package io.magics.popularmovies;
+package io.magics.popularmovies.tobedeleted;
 
 import android.content.Context;
 import android.graphics.LinearGradient;
@@ -19,6 +19,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.magics.popularmovies.MovieListsActivity;
+import io.magics.popularmovies.R;
+import io.magics.popularmovies.fragments.listfragments.ListAdapter;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.utils.MovieUtils;
 
@@ -34,9 +37,7 @@ import static io.magics.popularmovies.utils.MovieUtils.hideAndShowView;
  * create an instance of this fragment.
  */
 public class MovieListFragment extends Fragment
-        implements PosterAdapter.PosterClickHandler, FragmentListTabLayout.UpFabListener,
-        MovieListsActivity.TopRatedResultsListener, MovieListsActivity.PopularResultsListener,
-        MovieListsActivity.FavouriteResultsListener{
+        implements ListAdapter.PosterClickHandler, FragmentListTabLayout.UpFabListener {
     private static final String ARG_TAB_PAGE = "ARG_TAB_PAGE";
 
     private int mTabPage = 1;
@@ -48,7 +49,7 @@ public class MovieListFragment extends Fragment
     @BindView(R.id.tv_no_fav)
     TextView mTvNoFav;
     private Unbinder unbinder;
-    private PosterAdapter mAdapter;
+    private ListAdapter mAdapter;
 
 
     public static MovieListFragment newInstance(int page) {
@@ -80,7 +81,7 @@ public class MovieListFragment extends Fragment
         MovieListsActivity parentActivity = (MovieListsActivity) getContext();
 
         if (mAdapter == null) {
-            mAdapter = new PosterAdapter(this);
+            mAdapter = new ListAdapter(this);
             if (mTabPage == 1) parentActivity.registerTopListener(this);
             if (mTabPage == 2) parentActivity.registerPopListener(this);
             if (mTabPage == 3){
@@ -138,11 +139,6 @@ public class MovieListFragment extends Fragment
     public void onDetach() {
         MovieListsActivity parentActivity = (MovieListsActivity) getContext();
         ((FragmentListTabLayout) this.getParentFragment()).unRegisterUpFab(this);
-        if (mTabPage == 1) parentActivity.unRegisterTopListener();
-
-        if (mTabPage == 2) parentActivity.unRegisterPopListener();
-
-        if (mTabPage == 3) parentActivity.unRegisterFavListener();
 
         super.onDetach();
     }
@@ -187,7 +183,7 @@ public class MovieListFragment extends Fragment
     @Override
     public void favouritesResultDelivery(List<Movie> movies) {
         if (mTabPage == 3) {
-            mAdapter = new PosterAdapter(this);
+            mAdapter = new ListAdapter(this);
             mRvPoster.setAdapter(mAdapter);
             if (movies.isEmpty()) MovieUtils.hideAndShowView(mTvNoFav, mRvPoster);
             else MovieUtils.hideAndShowView(mRvPoster, mTvNoFav);

@@ -1,4 +1,4 @@
-package io.magics.popularmovies.fragments;
+package io.magics.popularmovies.fragments.detailfragments;
 
 
 import android.content.ActivityNotFoundException;

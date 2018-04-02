@@ -1,4 +1,4 @@
-package io.magics.popularmovies;
+package io.magics.popularmovies.fragments.detailfragments;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
@@ -30,13 +30,11 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import io.magics.popularmovies.fragments.MovieDetailsOverview;
-import io.magics.popularmovies.fragments.MovieDetailsReviews;
-import io.magics.popularmovies.fragments.MovieDetailsTrailers;
+import io.magics.popularmovies.MovieListsActivity;
+import io.magics.popularmovies.R;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.models.Reviews;
 import io.magics.popularmovies.models.Trailers;
-import io.magics.popularmovies.networkutils.ApiUtils;
 import io.magics.popularmovies.utils.GlideApp;
 
 import static io.magics.popularmovies.utils.MovieUtils.*;
@@ -108,7 +106,7 @@ public class MovieDetailsFragment extends DialogFragment
         Context context = root.getContext();
 
         ImageSize imageSize = getOptimalImgSize(context);
-        String posterUrl = ApiUtils.posterUrlConverter(imageSize, mMovie.getPosterUrl());
+        String posterUrl = posterUrlConverter(imageSize, mMovie.getPosterUrl());
         Long voteCalcLong = Math.round(mMovie.getVoteAverage() * 10);
 
         mVoteTextAnim = ValueAnimator.ofFloat(0.0f, mMovie.getVoteAverage().floatValue());

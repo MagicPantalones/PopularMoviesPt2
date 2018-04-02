@@ -10,8 +10,9 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface TMDBApi {
+
     @GET("movie/{sortingMethod}")
-    Observable<ApiResult> getMovieList(@Path("sortingMethod") SortingMethod sort,
+    Observable<ApiResult> getMovieList(@Path("sortingMethod") String sort,
                                                    @Query("api_key") String api,
                                                    @Query("language") String locale,
                                                    @Query("page") int page);

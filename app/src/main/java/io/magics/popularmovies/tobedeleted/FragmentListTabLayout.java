@@ -1,4 +1,4 @@
-package io.magics.popularmovies;
+package io.magics.popularmovies.tobedeleted;
 
 
 import android.os.Bundle;
@@ -17,6 +17,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.magics.popularmovies.R;
+import io.magics.popularmovies.fragments.MovieListsPagerAdapter;
 
 
 /**

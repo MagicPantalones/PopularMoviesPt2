@@ -1,6 +1,7 @@
-package io.magics.popularmovies;
+package io.magics.popularmovies.fragments.listfragments;
 
 import android.annotation.SuppressLint;
+import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -31,8 +32,9 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.magics.popularmovies.MovieListsActivity;
+import io.magics.popularmovies.R;
 import io.magics.popularmovies.models.Movie;
-import io.magics.popularmovies.networkutils.ApiUtils;
 import io.magics.popularmovies.utils.GlideApp;
 import io.magics.popularmovies.utils.MovieUtils;
 
@@ -41,7 +43,7 @@ import io.magics.popularmovies.utils.MovieUtils;
  * Created by Erik on 18.02.2018.
  */
 
-public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterViewHolder> {
+public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHolder> {
 
     private List<Movie> mMovieData = new ArrayList<>();
     private int mViewWidth;
@@ -61,8 +63,11 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         void endReached(int position);
     }
 
-    public PosterAdapter(PosterClickHandler posterClickHandler) {
+    public ListAdapter(PosterClickHandler posterClickHandler, ViewModel viewModel) {
         this.mClickHandler = posterClickHandler;
+        mReachedEndHandler = position -> {
+
+        };
     }
 
     public void setEndListener(ReachedEndHandler reachedEndHandler) {
@@ -99,7 +104,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         TextView tvVotes = holder.mTvVote;
         ImageView shadow = holder.mShadowLayer;
 
-        posterUrl = ApiUtils.posterUrlConverter(mImageSize, mfg.getPosterUrl());
+        posterUrl = MovieUtils.posterUrlConverter(mImageSize, mfg.getPosterUrl());
         if (position == mMovieData.size() - 5 && mReachedEndHandler != null) {
             mReachedEndHandler.endReached(position);
         }

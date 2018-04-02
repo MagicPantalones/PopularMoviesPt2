@@ -1,4 +1,4 @@
-package io.magics.popularmovies.fragments;
+package io.magics.popularmovies.fragments.detailfragments;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -15,8 +15,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.magics.popularmovies.R;
 import io.magics.popularmovies.models.TrailerResult;
-import io.magics.popularmovies.networkutils.ApiUtils;
 import io.magics.popularmovies.utils.GlideApp;
+import io.magics.popularmovies.utils.MovieUtils;
 
 
 public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerViewHolder> {
@@ -43,7 +43,7 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
     public void onBindViewHolder(@NonNull TrailerViewHolder holder, int position) {
         ImageView trailerIv = holder.ivTrailerImg;
         TrailerResult trailer = mTrailerList.get(position);
-        String trailerImgUrl = ApiUtils.youtubeStillUrlConverter(trailer.getKey());
+        String trailerImgUrl = MovieUtils.youtubeStillUrlConverter(trailer.getKey());
 
         trailerIv.setContentDescription(trailer.getName());
         GlideApp.with(trailerIv)

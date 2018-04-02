@@ -45,16 +45,8 @@ public class TrailersAndReviews implements Parcelable
         return trailers;
     }
 
-    public void setTrailers(Trailers trailers) {
-        this.trailers = trailers;
-    }
-
     public Reviews getReviews() {
         return reviews;
-    }
-
-    public void setReviews(Reviews reviews) {
-        this.reviews = reviews;
     }
 
     public void writeToParcel(Parcel dest, int flags) {
