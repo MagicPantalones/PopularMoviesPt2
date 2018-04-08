@@ -5,8 +5,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import io.magics.popularmovies.tobedeleted.MovieListFragment;
-
 
 public class MovieListsPagerAdapter extends FragmentPagerAdapter {
 

@@ -11,4 +11,10 @@ public class ReviewsViewModel extends ViewModel {
 
     private MutableLiveData<List<ReviewResult>> mReviews = new MutableLiveData<>();
 
+    public void setReviews(List<ReviewResult> reviews){
+        if (mReviews.getValue() == null) {
+            mReviews.setValue(reviews);
+        }
+    }
+
 }

@@ -10,7 +10,13 @@ import io.magics.popularmovies.models.Movie;
 
 public class PopListViewModel extends ViewModel {
 
-    private MutableLiveData<List<Movie>> mPopList = new MutableLiveData<>();
+    public interface GetMorePopPagesListener{
+        void getPopPages();
+    }
+
+    public MutableLiveData<List<Movie>> mPopList = new MutableLiveData<>();
+
+    private GetMorePopPagesListener mNotifyListener;
 
     private int mLastPage = 1;
     private int mCurrentPage = 1;
@@ -30,8 +36,6 @@ public class PopListViewModel extends ViewModel {
 
     public boolean isLastPageLoaded(){ return mIsLastPageLoaded; }
 
-    public boolean isLastPageSet(){ return mIsLastPageSet; }
-
     public void setPopList(List<Movie> movies){
         if (mPopList.getValue() == null || mPopList.getValue().isEmpty()){
             mPopList.setValue(movies);
@@ -40,6 +44,18 @@ public class PopListViewModel extends ViewModel {
             movieList.addAll(movies);
             mPopList.setValue(movieList);
         }
+    }
+
+    public void notifyGetMorePopPages(){
+        if (mNotifyListener != null) mNotifyListener.getPopPages();
+    }
+
+    public void addGetMorePopPagesListener(GetMorePopPagesListener listener){
+        mNotifyListener = listener;
+    }
+
+    public void unregisterPopPagesListener(){
+        mNotifyListener = null;
     }
 
 }

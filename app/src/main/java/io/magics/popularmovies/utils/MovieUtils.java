@@ -7,13 +7,20 @@ import java.util.Locale;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.util.Log;
 import android.view.View;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 
 import io.magics.popularmovies.models.Movie;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import static io.magics.popularmovies.utils.MovieUtils.ImageSize.SIZE_DEFAULT;
 import static io.magics.popularmovies.utils.MovieUtils.ImageSize.SIZE_MEDIUM;
@@ -29,6 +36,7 @@ public class MovieUtils {
     private static final String TAG = MovieUtils.class.getSimpleName();
     private static final String YOUTUBE_THUMB_BASE_URL = "http://img.youtube.com/vi/";
     private static final String BASE_QUERY_IMG_URL = "https://image.tmdb.org/t/p/";
+    private static final String BASE_QUERY_API_URL = "https://api.themoviedb.org/3/";
 
     private static final int POSTER_I = 1;
     private static final int OVERVIEW_I = 2;
@@ -37,6 +45,7 @@ public class MovieUtils {
     private static final int TITLE_I = 5;
     private static final int VOTE_AV_I = 6;
     private static final int COLOR_I = 7;
+
 
     private MovieUtils(){}
 
@@ -96,6 +105,15 @@ public class MovieUtils {
         }
     }
 
+
+
+    @SuppressWarnings("ConstantConditions")
+    public static boolean isConnected(Context context){
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo ni = cm.getActiveNetworkInfo();
+        return ni != null && ni.isConnectedOrConnecting();
+    }
+
     public static ImageSize getOptimalImgSize(Context context){
         float density = context.getResources().getDisplayMetrics().density;
         return density >= 3.0 ? SIZE_MEDIUM : SIZE_DEFAULT;
@@ -115,6 +133,14 @@ public class MovieUtils {
                 .build().toString();
     }
 
+    public static Retrofit getClientForMovieList() {
+        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+        return new Retrofit.Builder()
+                .baseUrl(BASE_QUERY_API_URL)
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+    }
 
 
     public enum ImageSize{
@@ -131,5 +157,10 @@ public class MovieUtils {
 
         @Override
         public String toString() { return retText; }
+    }
+
+    public enum ScrollDirection{
+        SCROLL_UP,
+        SCROLL_DOWN
     }
 }

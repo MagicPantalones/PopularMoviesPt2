@@ -10,7 +10,12 @@ import io.magics.popularmovies.models.Movie;
 
 public class TopListViewModel extends ViewModel {
 
-    private MutableLiveData<List<Movie>> mTopList = new MutableLiveData<>();
+    public interface GetMoreTopPagesListener {
+        void getTopPages();
+    }
+
+    public MutableLiveData<List<Movie>> mTopList = new MutableLiveData<>();
+    private GetMoreTopPagesListener mNotifyListener;
 
     private int mLastPage = 1;
     private int mCurrentPage = 1;
@@ -38,6 +43,18 @@ public class TopListViewModel extends ViewModel {
             movieList.addAll(movies);
             mTopList.setValue(movieList);
         }
+    }
+
+    public void notifyGetMoreTopPages(){
+        if (mNotifyListener != null) mNotifyListener.getTopPages();
+    }
+
+    public void addGetMoreTopPagesListener(GetMoreTopPagesListener listener){
+        mNotifyListener = listener;
+    }
+
+    public void unregisterTopPagesListener(){
+        mNotifyListener = null;
     }
 
 }

@@ -35,7 +35,9 @@ dependencies {
     //Android
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-    implementation 'com.android.support:support-v4:27.1.0'
+    implementation "com.android.support:support-v4:${supportLibVer}"
+    implementation "android.arch.lifecycle:extensions:1.1.1"
+    annotationProcessor "android.arch.lifecycle:compiler:1.1.1"
     testImplementation 'junit:junit:4.12'
     //Android support libs
     implementation "com.android.support:design:${supportLibVer}"

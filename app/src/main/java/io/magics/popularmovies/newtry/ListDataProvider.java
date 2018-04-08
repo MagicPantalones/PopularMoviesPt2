@@ -4,12 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.util.Log;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,22 +13,20 @@ import io.magics.popularmovies.BuildConfig;
 import io.magics.popularmovies.database.FavouritesDBHelper.FavouritesEntry;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.networkutils.TMDBApi;
+import io.magics.popularmovies.utils.MovieUtils;
 import io.magics.popularmovies.viewmodels.FavListViewModel;
 import io.magics.popularmovies.viewmodels.PopListViewModel;
-import io.magics.popularmovies.viewmodels.ReviewsViewModel;
 import io.magics.popularmovies.viewmodels.TopListViewModel;
-import io.magics.popularmovies.viewmodels.TrailersViewModel;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import static io.magics.popularmovies.utils.MovieUtils.createMovieFromCursor;
+import static io.magics.popularmovies.utils.MovieUtils.getClientForMovieList;
 
-public class DataSoureProvider {
+public class ListDataProvider
+        implements TopListViewModel.GetMoreTopPagesListener, PopListViewModel.GetMorePopPagesListener{
 
     private static final String[] FAVOURITES_COLUMNS = {
             FavouritesEntry._ID,
@@ -50,7 +43,6 @@ public class DataSoureProvider {
     private static final String SORT_TOP = "top_rated";
     private static final String SORT_POP = "popular";
     private static final int INIT_PAGE_NUM = 1;
-    private static final String BASE_QUERY_API_URL = "https://api.themoviedb.org/3/";
     private static final String TMDB_API_KEY = BuildConfig.TMDB_API_KEY;
     private static final String LOCALE = "en-US";
 
@@ -62,15 +54,13 @@ public class DataSoureProvider {
     private final TopListViewModel mTopVm;
     private final PopListViewModel mPopVm;
     private final FavListViewModel mFavVm;
-    private TrailersViewModel mTrailerVm;
-    private ReviewsViewModel mReviewVm;
 
 
 
-    public DataSoureProvider(Context context,
-                             TopListViewModel topVm,
-                             PopListViewModel popVm,
-                             FavListViewModel favVm){
+    public ListDataProvider(Context context,
+                            TopListViewModel topVm,
+                            PopListViewModel popVm,
+                            FavListViewModel favVm){
         this.mContext = context;
         this.mTopVm = topVm;
         this.mPopVm = popVm;
@@ -78,6 +68,8 @@ public class DataSoureProvider {
     }
 
     public void initialiseApp(){
+        mTopVm.addGetMoreTopPagesListener(this);
+        mPopVm.addGetMorePopPagesListener(this);
         mTopDisposable = getTopList(INIT_PAGE_NUM);
         mPopDisposable = getPopList(INIT_PAGE_NUM);
         mFavDisposable = getFavList();
@@ -87,23 +79,21 @@ public class DataSoureProvider {
         if (mTopDisposable != null && !mTopDisposable.isDisposed()) mTopDisposable.dispose();
         if (mPopDisposable != null && !mPopDisposable.isDisposed()) mPopDisposable.dispose();
         if (mFavDisposable != null && !mFavDisposable.isDisposed()) mFavDisposable.dispose();
+        mTopVm.unregisterTopPagesListener();
+        mPopVm.unregisterPopPagesListener();
     }
 
-    public void getMoreForTop(){
+    @Override
+    public void getTopPages() {
         if (mTopVm.isLastPageLoaded()) return;
         mTopDisposable = getTopList(mTopVm.getCurrentPage() + 1);
     }
 
-    public void getMoreForPop(){
+    @Override
+    public void getPopPages() {
         if (mPopVm.isLastPageLoaded()) return;
         mPopDisposable = getPopList(mPopVm.getCurrentPage() + 1);
     }
-
-    public void registerTrailerViewModel(TrailersViewModel viewModel) { mTrailerVm = viewModel; }
-    public void unregisterTrailerViewModel() { mTrailerVm = null; }
-
-    public void registerReviewViewModel(ReviewsViewModel viewModel) { mReviewVm = viewModel; }
-    public void unregisterReviewViewModel() { mReviewVm = null; }
 
     private Disposable getTopList(int pageNumber){
         return getClientForMovieList().create(TMDBApi.class)
@@ -125,22 +115,6 @@ public class DataSoureProvider {
                     mPopVm.setPages(callback);
                     mPopVm.setPopList(callback.getMovies());
                 });
-    }
-
-    private Retrofit getClientForMovieList() {
-        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-        return new Retrofit.Builder()
-                .baseUrl(BASE_QUERY_API_URL)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    public static boolean isConnected(Context context){
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo ni = cm.getActiveNetworkInfo();
-        return ni != null && ni.isConnectedOrConnecting();
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -205,5 +179,8 @@ public class DataSoureProvider {
 
         return cv;
     }
+
+
+
 
 }

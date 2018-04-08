@@ -1,109 +1,104 @@
 package io.magics.popularmovies.fragments.listfragments;
 
-import android.content.Context;
-import android.net.Uri;
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import io.magics.popularmovies.R;
+import io.magics.popularmovies.models.Movie;
+import io.magics.popularmovies.utils.MovieUtils;
+import io.magics.popularmovies.utils.MovieUtils.ScrollDirection;
+import io.magics.popularmovies.viewmodels.TopListViewModel;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ListTopRatedFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ListTopRatedFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class ListTopRatedFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+@SuppressWarnings("ConstantConditions")
+public class ListTopRatedFragment extends Fragment
+    implements ListAdapter.PosterClickHandler{
 
-    private OnFragmentInteractionListener mListener;
+    @BindView(R.id.rv_top_rated_list)
+    RecyclerView mRvTopRated;
+    @BindView(R.id.tv_error_top_rated)
+    TextView mTvTopRated;
+
+    ListAdapter mAdapter;
+    GridLayoutManager mGridManager;
+    TopListViewModel mViewModel;
+
+    TopRatedFragmentListener mFragmentListener;
+    Unbinder mUnbinder;
+
+
+    public interface TopRatedFragmentListener{
+        void showClickedTopMovie(Movie movie);
+        void topRatedRvScrolled(ScrollDirection scrollDirection);
+    }
 
     public ListTopRatedFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ListTopRatedFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ListTopRatedFragment newInstance(String param1, String param2) {
-        ListTopRatedFragment fragment = new ListTopRatedFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+
+    public static ListTopRatedFragment newInstance() {
+        return new ListTopRatedFragment();
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_list_top_rated, container, false);
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
+        View root = inflater.inflate(R.layout.fragment_list_top_rated, container, false);
+        mUnbinder = ButterKnife.bind(this, root);
+        mViewModel = ViewModelProviders.of(getActivity()).get(TopListViewModel.class);
+        return root;
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        mAdapter = new ListAdapter(this, mViewModel);
+        mGridManager = new GridLayoutManager(getContext(), 2);
+
+        mRvTopRated.setLayoutManager(mGridManager);
+        mRvTopRated.setAdapter(mAdapter);
+
+        mRvTopRated.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if (mFragmentListener != null) {
+                    if (dy > 0) mFragmentListener.topRatedRvScrolled(ScrollDirection.SCROLL_DOWN);
+                    if (dy <= 0) mFragmentListener.topRatedRvScrolled(ScrollDirection.SCROLL_UP);
+                }
+                super.onScrolled(recyclerView, dx, dy);
+            }
+        });
+
+        mViewModel.mTopList.observe(getActivity(), movies -> {
+            if (movies == null || movies.isEmpty()) MovieUtils.hideAndShowView(mTvTopRated, mRvTopRated);
+            else mAdapter.setMovieData(movies, mAdapter.getItemCount());
+        });
     }
 
     @Override
     public void onDetach() {
+        if (mUnbinder != null) mUnbinder.unbind();
         super.onDetach();
-        mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+    @Override
+    public void onClick(Movie movie) {
+        if (mFragmentListener != null) mFragmentListener.showClickedTopMovie(movie);
     }
+
+    public void scrollTopListToZero(){ mRvTopRated.smoothScrollToPosition(0); }
 }

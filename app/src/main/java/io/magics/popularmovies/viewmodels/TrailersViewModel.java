@@ -9,6 +9,10 @@ import io.magics.popularmovies.models.TrailerResult;
 
 public class TrailersViewModel extends ViewModel {
 
-    private MutableLiveData<List<TrailerResult>> mTrailers = new MutableLiveData<>();
+    public MutableLiveData<List<TrailerResult>> mTrailers = new MutableLiveData<>();
+
+    public void setTrailers(List<TrailerResult> trailers){
+        if (mTrailers.getValue() == null) mTrailers.setValue(trailers);
+    }
 
 }

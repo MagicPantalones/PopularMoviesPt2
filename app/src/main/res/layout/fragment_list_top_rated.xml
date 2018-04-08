@@ -1,14 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".fragments.listfragments.ListTopRatedFragment">
+    android:layout_height="wrap_content"
+    tools:context="io.magics.popularmovies.tobedeleted.MovieListFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_top_rated_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
-
+        tools:listitem="@layout/fragment_list_view_holder"
+        android:visibility="visible"
+        />
+    <TextView
+        android:id="@+id/tv_error_top_rated"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/list_no_network_available"
+        android:textSize="48sp"
+        android:rotation="-45"
+        android:fontFamily="@font/asap_medium"
+        android:gravity="center"
+        android:visibility="gone"
+        />
 </FrameLayout>

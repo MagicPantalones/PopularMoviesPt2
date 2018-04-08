@@ -11,15 +11,23 @@ import io.magics.popularmovies.models.Movie;
 
 public class FavListViewModel extends ViewModel {
 
-    private MutableLiveData<List<Movie>> mFavList = new MutableLiveData<>();
+    public MutableLiveData<List<Movie>> mFavList = new MutableLiveData<>();
+    private List<Integer> mMoviesId = new ArrayList<>();
 
     public void setFavList(List<Movie> favList) {
+        mMoviesId.clear();
+
+        for (Movie m : favList) {
+            mMoviesId.add(m.getMovieId());
+        }
+
         mFavList.setValue(favList);
     }
 
     public void addToList(Movie movie){
         List<Movie> mL = mFavList.getValue() != null ? mFavList.getValue() : new ArrayList<>();
         mL.add(movie);
+        mMoviesId.add(movie.getMovieId());
         mFavList.setValue(mL);
     }
 
@@ -32,9 +40,15 @@ public class FavListViewModel extends ViewModel {
         }
         List<Movie> mL = mFavList.getValue();
         mL.remove(movie);
+        mMoviesId.remove(movie.getMovieId());
         mFavList.setValue(mL);
     }
 
-
+    public boolean checkIfFavourite(int movieId){
+        for (int i : mMoviesId){
+            if (movieId == i) return true;
+        }
+        return false;
+    }
 
 }

@@ -37,6 +37,8 @@ import io.magics.popularmovies.R;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.utils.GlideApp;
 import io.magics.popularmovies.utils.MovieUtils;
+import io.magics.popularmovies.viewmodels.PopListViewModel;
+import io.magics.popularmovies.viewmodels.TopListViewModel;
 
 /**
  * Adapter for my recycler
@@ -55,18 +57,23 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
     private Context mContext;
 
     public interface PosterClickHandler {
-        void onClick(Movie movie, int position);
+        void onClick(Movie movie);
     }
 
     //Help from https://medium.com/@ayhamorfali/android-detect-when-the-recyclerview-reaches-the-bottom-43f810430e1e
     public interface ReachedEndHandler {
-        void endReached(int position);
+        void endReached();
+    }
+
+    public ListAdapter(PosterClickHandler posterClickHandler) {
+        this.mClickHandler = posterClickHandler;
     }
 
     public ListAdapter(PosterClickHandler posterClickHandler, ViewModel viewModel) {
         this.mClickHandler = posterClickHandler;
-        mReachedEndHandler = position -> {
-
+        mReachedEndHandler = () -> {
+            if (viewModel instanceof TopListViewModel) ((TopListViewModel) viewModel).notifyGetMoreTopPages();
+            else if (viewModel instanceof PopListViewModel) ((PopListViewModel) viewModel).notifyGetMorePopPages();
         };
     }
 
@@ -106,7 +113,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
 
         posterUrl = MovieUtils.posterUrlConverter(mImageSize, mfg.getPosterUrl());
         if (position == mMovieData.size() - 5 && mReachedEndHandler != null) {
-            mReachedEndHandler.endReached(position);
+            mReachedEndHandler.endReached();
         }
 
         cvWrapper.setMinimumWidth(mViewWidth);
@@ -139,7 +146,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
                                                 palette.getDarkVibrantColor(
                                                         palette.getDominantColor(mDefaultColor)));
                                 shadow.setColorFilter(solid, PorterDuff.Mode.SRC_IN);
-                                mMovieData.get(position).setShadowInt(solid);
+                                mMovieData.get(holder.getAdapterPosition()).setShadowInt(solid);
                                 mfg.setShadowInt(solid);
                                 ((MovieListsActivity)mContext).notifyMovieListChange(mfg);
                             });
@@ -201,7 +208,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
 
         @Override
         public void onClick(View v) {
-            mClickHandler.onClick(mMovieData.get(getAdapterPosition()), getAdapterPosition());
+            mClickHandler.onClick(mMovieData.get(getAdapterPosition()));
         }
 
     }
