@@ -2,7 +2,6 @@ package io.magics.popularmovies.networkutils;
 
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.util.Log;
 
@@ -12,11 +11,14 @@ import java.util.List;
 import io.magics.popularmovies.BuildConfig;
 import io.magics.popularmovies.database.FavouritesDBHelper.FavouritesEntry;
 import io.magics.popularmovies.models.Movie;
-import io.magics.popularmovies.networkutils.TMDBApi;
-import io.magics.popularmovies.utils.MovieUtils;
+import io.magics.popularmovies.models.ReviewResult;
+import io.magics.popularmovies.models.Reviews;
+import io.magics.popularmovies.models.Trailers;
 import io.magics.popularmovies.viewmodels.FavListViewModel;
 import io.magics.popularmovies.viewmodels.PopListViewModel;
+import io.magics.popularmovies.viewmodels.ReviewsViewModel;
 import io.magics.popularmovies.viewmodels.TopListViewModel;
+import io.magics.popularmovies.viewmodels.TrailersViewModel;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -24,6 +26,7 @@ import io.reactivex.schedulers.Schedulers;
 
 import static io.magics.popularmovies.utils.MovieUtils.createMovieFromCursor;
 import static io.magics.popularmovies.utils.MovieUtils.getClientForMovieList;
+import static io.magics.popularmovies.utils.MovieUtils.makeContentVals;
 
 public class ListDataProvider
         implements TopListViewModel.GetMoreTopPagesListener, PopListViewModel.GetMorePopPagesListener{
@@ -51,10 +54,17 @@ public class ListDataProvider
     private Disposable mPopDisposable;
     private Disposable mFavDisposable;
 
+    private Disposable mTAndRDisposable;
+    private Disposable mMoreReviewsDisposable;
+
     private final TopListViewModel mTopVm;
     private final PopListViewModel mPopVm;
     private final FavListViewModel mFavVm;
 
+    private TrailersViewModel mTrailerVm;
+    private ReviewsViewModel mReviewVm;
+    private Movie mDetailMovie;
+    private List<ReviewResult> mReviewsToViewModel = new ArrayList<>();
 
 
     public ListDataProvider(Context context,
@@ -75,12 +85,28 @@ public class ListDataProvider
         mFavDisposable = getFavList();
     }
 
+    public void attachDetailsProvider(Movie movie, TrailersViewModel trailerVm, ReviewsViewModel reviewVm){
+        mDetailMovie = movie;
+        mTrailerVm = trailerVm;
+        mReviewVm = reviewVm;
+        mTAndRDisposable = getTrailersAndReviews();
+    }
+
     public void dispose() {
         if (mTopDisposable != null && !mTopDisposable.isDisposed()) mTopDisposable.dispose();
         if (mPopDisposable != null && !mPopDisposable.isDisposed()) mPopDisposable.dispose();
         if (mFavDisposable != null && !mFavDisposable.isDisposed()) mFavDisposable.dispose();
+        if (mTAndRDisposable != null && mTAndRDisposable.isDisposed()) mTAndRDisposable.dispose();
+        if (mMoreReviewsDisposable != null && mMoreReviewsDisposable.isDisposed()) mMoreReviewsDisposable.dispose();
         mTopVm.unregisterTopPagesListener();
         mPopVm.unregisterPopPagesListener();
+    }
+
+    public void disposeDetailsProvider(){
+        if (mTAndRDisposable != null && mTAndRDisposable.isDisposed()) mTAndRDisposable.dispose();
+        if (mMoreReviewsDisposable != null && mMoreReviewsDisposable.isDisposed()) mMoreReviewsDisposable.dispose();
+        mTrailerVm = null;
+        mReviewVm = null;
     }
 
     @Override
@@ -166,18 +192,39 @@ public class ListDataProvider
                         throwable -> Log.d("DataProvider", "deleteFromFavourites: " + throwable.getMessage()));
     }
 
-    private ContentValues makeContentVals(Movie movie){
-        ContentValues cv = new ContentValues();
 
-        cv.put(FavouritesEntry.COLUMN_POSTER_PATH, movie.getPosterUrl());
-        cv.put(FavouritesEntry.COLUMN_OVERVIEW, movie.getOverview());
-        cv.put(FavouritesEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
-        cv.put(FavouritesEntry.COLUMN_MOVIE_ID, movie.getMovieId());
-        cv.put(FavouritesEntry.COLUMN_TITLE, movie.getTitle());
-        cv.put(FavouritesEntry.COLUMN_VOTE_AVERAGE, movie.getVoteAverage());
-        cv.put(FavouritesEntry.COLUMN_COLOR_PATH, Integer.toString(movie.getShadowInt()));
 
-        return cv;
+    private Disposable getTrailersAndReviews(){
+        return getClientForMovieList().create(TMDBApi.class)
+                .getTrailersAndReviews(mDetailMovie.getMovieId(), TMDB_API_KEY, LOCALE, "videos,reviews")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(trailersAndReviews -> {
+
+                    Reviews reviews = trailersAndReviews.getReviews();
+                    Trailers trailers = trailersAndReviews.getTrailers();
+
+                    mReviewsToViewModel.addAll(reviews.getReviewResults());
+                    mTrailerVm.setTrailers(trailers.getTrailerResults());
+
+                    if (reviews.getTotalPages() > 1){
+                        mMoreReviewsDisposable = getMoreReviewPages();
+                    } else {
+                        mReviewVm.setReviews(mReviewsToViewModel);
+                    }
+
+                });
+    }
+
+    private Disposable getMoreReviewPages(){
+        return getClientForMovieList().create(TMDBApi.class)
+                .getMoreReviews(mDetailMovie.getMovieId(), TMDB_API_KEY, LOCALE, 2)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(reviews -> {
+                    mReviewsToViewModel.addAll(reviews.getReviewResults());
+                    mReviewVm.setReviews(mReviewsToViewModel);
+                });
     }
 
 

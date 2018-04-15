@@ -21,17 +21,16 @@ import io.magics.popularmovies.fragments.listfragments.ListPopularFragment;
 import io.magics.popularmovies.fragments.listfragments.ListTopRatedFragment;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.networkutils.ListDataProvider;
-import io.magics.popularmovies.utils.MovieUtils;
+import io.magics.popularmovies.utils.MovieUtils.ScrollDirection;
 import io.magics.popularmovies.viewmodels.FavListViewModel;
 import io.magics.popularmovies.viewmodels.PopListViewModel;
 import io.magics.popularmovies.viewmodels.ReviewsViewModel;
 import io.magics.popularmovies.viewmodels.TopListViewModel;
 import io.magics.popularmovies.viewmodels.TrailersViewModel;
 
-import static io.magics.popularmovies.utils.MovieUtils.isConnected;
-
 public class MovieListsActivity extends AppCompatActivity implements ListTopRatedFragment.TopRatedFragmentListener,
-        ListPopularFragment.PopularFragmentListener, ListFavouritesFragment.FavouritesFragmentListener{
+        ListPopularFragment.PopularFragmentListener, ListFavouritesFragment.FavouritesFragmentListener,
+        MovieDetailsFragment.DetailFragInteractionHandler {
 
     //TODO Lifecycle Persistance
     //TODO Add horizontal layout support.
@@ -50,6 +49,8 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
     TopListViewModel mTopListVM;
     PopListViewModel mPopListVM;
     FavListViewModel mFavListVM;
+    TrailersViewModel mTrailerVm;
+    ReviewsViewModel mReviewVm;
 
     Unbinder mUnbinder;
 
@@ -98,6 +99,10 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
 
     public void showMovieDetailsFrag(Movie movie) {
 
+        mTrailerVm = ViewModelProviders.of(this).get(TrailersViewModel.class);
+        mReviewVm = ViewModelProviders.of(this).get(ReviewsViewModel.class);
+        mDataProvider.attachDetailsProvider(movie, mTrailerVm, mReviewVm);
+
         MovieDetailsFragment frag = MovieDetailsFragment.newInstance(movie, mFavListVM.checkIfFavourite(movie.getMovieId()));
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
@@ -106,9 +111,9 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
         ft.commit();
     }
 
-    public void hideUpFabOnScroll(MovieUtils.ScrollDirection scrollDirection){
-        if (scrollDirection == MovieUtils.ScrollDirection.SCROLL_DOWN && mUpFab.getVisibility() == View.VISIBLE) mUpFab.hide();
-        else if (scrollDirection == MovieUtils.ScrollDirection.SCROLL_UP && mUpFab.getVisibility() != View.VISIBLE) mUpFab.show();
+    public void hideUpFabOnScroll(ScrollDirection scrollDirection){
+        if (scrollDirection == ScrollDirection.SCROLL_DOWN && mUpFab.getVisibility() == View.VISIBLE) mUpFab.hide();
+        else if (scrollDirection == ScrollDirection.SCROLL_UP && mUpFab.getVisibility() != View.VISIBLE) mUpFab.show();
     }
 
     public void setClickListenerOnUpFab(){
@@ -140,7 +145,7 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
     }
 
     @Override
-    public void topRatedRvScrolled(MovieUtils.ScrollDirection scrollDirection) {
+    public void topRatedRvScrolled(ScrollDirection scrollDirection) {
         hideUpFabOnScroll(scrollDirection);
     }
 
@@ -150,7 +155,7 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
     }
 
     @Override
-    public void popularRvScrolled(MovieUtils.ScrollDirection scrollDirection) {
+    public void popularRvScrolled(ScrollDirection scrollDirection) {
         hideUpFabOnScroll(scrollDirection);
     }
 
@@ -160,8 +165,18 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
     }
 
     @Override
-    public void favouriteRvScrolled(MovieUtils.ScrollDirection scrollDirection) {
+    public void favouriteRvScrolled(ScrollDirection scrollDirection) {
         hideUpFabOnScroll(scrollDirection);
     }
 
+    @Override
+    public void favFabClicked(Movie movie, Boolean isFavourite) {
+        if (isFavourite) mDataProvider.deleteFromFavourites(movie);
+        else mDataProvider.addToFavourites(movie);
+    }
+
+    @Override
+    public void fragmentExited() {
+        mDataProvider.disposeDetailsProvider();
+    }
 }

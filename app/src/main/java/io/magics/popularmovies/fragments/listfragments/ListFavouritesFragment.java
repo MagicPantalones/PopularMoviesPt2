@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.Objects;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -21,7 +23,7 @@ import io.magics.popularmovies.utils.MovieUtils;
 import io.magics.popularmovies.utils.MovieUtils.ScrollDirection;
 import io.magics.popularmovies.viewmodels.FavListViewModel;
 
-@SuppressWarnings("ConstantConditions")
+
 public class ListFavouritesFragment extends Fragment
         implements ListAdapter.PosterClickHandler{
 
@@ -53,9 +55,13 @@ public class ListFavouritesFragment extends Fragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_list_top_rated, container, false);
+        View root = inflater.inflate(R.layout.fragment_list_top_rated, container,
+                false);
         mUnbinder = ButterKnife.bind(this, root);
-        mViewModel = ViewModelProviders.of(getActivity()).get(FavListViewModel.class);
+
+        //noinspection ConstantConditions
+        mViewModel = ViewModelProviders.of(getActivity())
+                .get(FavListViewModel.class);
         return root;
     }
 
@@ -80,8 +86,10 @@ public class ListFavouritesFragment extends Fragment
             }
         });
 
+        //noinspection ConstantConditions
         mViewModel.mFavList.observe(getActivity(), movies -> {
-            if (movies == null || movies.isEmpty()) MovieUtils.hideAndShowView(mTvNoFavourites, mRvFavourites);
+            if (movies == null || movies.isEmpty()) MovieUtils.hideAndShowView(mTvNoFavourites,
+                    mRvFavourites);
             else mAdapter.setMovieData(movies, mAdapter.getItemCount());
         });
     }

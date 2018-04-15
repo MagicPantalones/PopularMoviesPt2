@@ -2,7 +2,6 @@ package io.magics.popularmovies.fragments.detailfragments;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
@@ -18,7 +17,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.res.ResourcesCompat;
-import android.support.v4.widget.NestedScrollView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,14 +32,9 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import io.magics.popularmovies.MovieListsActivity;
 import io.magics.popularmovies.R;
 import io.magics.popularmovies.models.Movie;
-import io.magics.popularmovies.networkutils.DetailDataProvider;
 import io.magics.popularmovies.utils.GlideApp;
-import io.magics.popularmovies.utils.MovieUtils;
-import io.magics.popularmovies.viewmodels.ReviewsViewModel;
-import io.magics.popularmovies.viewmodels.TrailersViewModel;
 
 import static io.magics.popularmovies.utils.MovieUtils.*;
 
@@ -59,10 +52,6 @@ public class MovieDetailsFragment extends DialogFragment {
     private Movie mMovie;
     private boolean mIsFavourite;
 
-    private TrailersViewModel mTrailerVm;
-    private ReviewsViewModel mReviewsVm;
-    private DetailDataProvider mDataProvider;
-
     @BindView(R.id.iv_poster_detail) ImageView mPoster;
     @BindView(R.id.tv_movie_title_detail) TextView mTitle;
     @BindView(R.id.tv_release_date_detail) TextView mReleaseDate;
@@ -74,7 +63,7 @@ public class MovieDetailsFragment extends DialogFragment {
 
     private Unbinder mUnbinder;
     private FragmentManager mFragManager;
-    private FavFabClickHandler mFavFabClickListener;
+    private DetailFragInteractionHandler mFragInteractionHandler;
 
     private ValueAnimator mVoteTextAnim;
     private ObjectAnimator mVoteProgressAnim;
@@ -111,26 +100,7 @@ public class MovieDetailsFragment extends DialogFragment {
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_detail_movie, container, false);
         mUnbinder = ButterKnife.bind(this, root);
-        Context context = root.getContext();
         mFragManager = getChildFragmentManager();
-
-        mTrailerVm = ViewModelProviders.of(this).get(TrailersViewModel.class);
-        mReviewsVm = ViewModelProviders.of(this).get(ReviewsViewModel.class);
-
-        mDataProvider = new DetailDataProvider(mTrailerVm, mReviewsVm, mMovie);
-        mDataProvider.initDetailFragment();
-
-        mImageSize = getOptimalImgSize(context);
-
-        mFavouriteColor = ResourcesCompat.getColor(
-                context.getResources(),
-                R.color.colorSecondaryAccent,
-                context.getTheme());
-
-        mDefaultColor = ResourcesCompat.getColor(
-                context.getResources(),
-                R.color.colorPrimaryDark,
-                context.getTheme());
 
         if (mFragManager.getFragments() == null || mFragManager.getFragments().isEmpty()) {
             FragmentTransaction ft = mFragManager.beginTransaction();
@@ -144,6 +114,19 @@ public class MovieDetailsFragment extends DialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Context context = view.getContext();
+
+        mImageSize = getOptimalImgSize(context);
+
+        mFavouriteColor = ResourcesCompat.getColor(
+                context.getResources(),
+                R.color.colorSecondaryAccent,
+                context.getTheme());
+
+        mDefaultColor = ResourcesCompat.getColor(
+                context.getResources(),
+                R.color.colorPrimaryDark,
+                context.getTheme());
 
         initialAnim();
         mFavFab.setBackgroundTintList(ColorStateList.valueOf(mIsFavourite ? mFavouriteColor : mDefaultColor));
@@ -159,7 +142,7 @@ public class MovieDetailsFragment extends DialogFragment {
                 .into(mPoster);
 
         mFavFab.setOnClickListener(v -> {
-            mFavFabClickListener.favFabClicked(mMovie, mIsFavourite);
+            mFragInteractionHandler.favFabClicked(mMovie, mIsFavourite);
             mIsFavourite = !mIsFavourite;
             fabClickAnim();
         });
@@ -190,23 +173,21 @@ public class MovieDetailsFragment extends DialogFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof FavFabClickHandler) mFavFabClickListener = (FavFabClickHandler) context;
+        if (context instanceof DetailFragInteractionHandler) {
+            mFragInteractionHandler = (DetailFragInteractionHandler) context;
+        }
         else throw new IllegalArgumentException("Not a FavFabClickListener");
     }
 
     @Override
-    public void onDetach() {
-        mDataProvider.disposeDetailsProvider();
-        super.onDetach();
-    }
-
-    @Override
-    public void onDestroy() {
+    public void onDestroyView() {
         if (mVoteProgressAnim != null && mVoteProgressAnim.isStarted()) mVoteProgressAnim.cancel();
         if (mVoteTextAnim != null && mVoteTextAnim.isStarted()) mVoteTextAnim.cancel();
         if (mFabAnim != null && mFabAnim.isRunning()) mFabAnim.stop();
+        mFragInteractionHandler.fragmentExited();
+        mFragInteractionHandler = null;
         mUnbinder.unbind();
-        super.onDestroy();
+        super.onDestroyView();
     }
 
     private void initialAnim(){
@@ -253,8 +234,9 @@ public class MovieDetailsFragment extends DialogFragment {
 
     }
 
-    public interface FavFabClickHandler{
+    public interface DetailFragInteractionHandler {
         void favFabClicked(Movie movie, Boolean isFavourite);
+        void fragmentExited();
     }
 
 }

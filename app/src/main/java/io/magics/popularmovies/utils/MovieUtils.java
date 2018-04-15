@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
@@ -17,6 +18,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 
+import io.magics.popularmovies.database.FavouritesDBHelper;
+import io.magics.popularmovies.database.FavouritesDBHelper.FavouritesEntry;
 import io.magics.popularmovies.models.Movie;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -140,6 +143,20 @@ public class MovieUtils {
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
+    }
+
+    public static ContentValues makeContentVals(Movie movie){
+        ContentValues cv = new ContentValues();
+
+        cv.put(FavouritesEntry.COLUMN_POSTER_PATH, movie.getPosterUrl());
+        cv.put(FavouritesEntry.COLUMN_OVERVIEW, movie.getOverview());
+        cv.put(FavouritesEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
+        cv.put(FavouritesEntry.COLUMN_MOVIE_ID, movie.getMovieId());
+        cv.put(FavouritesEntry.COLUMN_TITLE, movie.getTitle());
+        cv.put(FavouritesEntry.COLUMN_VOTE_AVERAGE, movie.getVoteAverage());
+        cv.put(FavouritesEntry.COLUMN_COLOR_PATH, Integer.toString(movie.getShadowInt()));
+
+        return cv;
     }
 
 

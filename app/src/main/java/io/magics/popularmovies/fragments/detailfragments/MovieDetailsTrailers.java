@@ -1,11 +1,13 @@
 package io.magics.popularmovies.fragments.detailfragments;
 
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,15 +28,18 @@ import io.magics.popularmovies.R;
 import io.magics.popularmovies.models.TrailerResult;
 import io.magics.popularmovies.models.Trailers;
 import io.magics.popularmovies.utils.MovieUtils;
+import io.magics.popularmovies.viewmodels.TrailersViewModel;
+
+import static io.magics.popularmovies.utils.MovieUtils.hideAndShowView;
 
 
 public class MovieDetailsTrailers extends Fragment
     implements TrailerAdapter.OnTrailerSelect{
 
-    private List<TrailerResult> mTrailers = new ArrayList<>();
-
-    @BindView(R.id.rv_trailers) RecyclerView mTrailerRecycler;
+    @BindView(R.id.rv_trailers) RecyclerView mRvTrailerRecycler;
     @BindView(R.id.tv_no_trailers) TextView mTvNoTrailers;
+
+    private TrailersViewModel mViewModel;
 
     private Unbinder mUnbinder;
 
@@ -48,16 +53,32 @@ public class MovieDetailsTrailers extends Fragment
         View root = inflater.inflate(R.layout.fragment_detail_trailers, container, false);
         mUnbinder = ButterKnife.bind(this, root);
 
-        if (mTrailers.isEmpty()){
-            MovieUtils.hideAndShowView(mTvNoTrailers, mTrailerRecycler);
-        } else {
-            LinearLayoutManager manager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-            TrailerAdapter adapter = new TrailerAdapter(this);
-            mTrailerRecycler.setAdapter(adapter);
-            mTrailerRecycler.setLayoutManager(manager);
-            adapter.setTrailerList(mTrailers);
-        }
+        //noinspection ConstantConditions
+        mViewModel = ViewModelProviders.of(getActivity()).get(TrailersViewModel.class);
+
         return root;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        TrailerAdapter adapter = new TrailerAdapter(this);
+
+        mRvTrailerRecycler.setLayoutManager(new LinearLayoutManager(view.getContext(),
+                LinearLayoutManager.HORIZONTAL, false));
+        mRvTrailerRecycler.setAdapter(adapter);
+
+        //noinspection ConstantConditions
+        mViewModel.mTrailers.observe(getActivity(), trailerResults -> {
+            if (trailerResults != null){
+                if (trailerResults.isEmpty()) hideAndShowView(mTvNoTrailers, mRvTrailerRecycler);
+                else {
+                    hideAndShowView(mRvTrailerRecycler, mTvNoTrailers);
+                    adapter.setTrailerList(trailerResults);
+                }
+            } else hideAndShowView(mTvNoTrailers, mRvTrailerRecycler);
+        });
+
     }
 
     @Override

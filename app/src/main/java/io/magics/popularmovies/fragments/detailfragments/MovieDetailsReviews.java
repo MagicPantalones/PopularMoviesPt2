@@ -1,7 +1,9 @@
 package io.magics.popularmovies.fragments.detailfragments;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +14,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -20,14 +23,17 @@ import io.magics.popularmovies.R;
 import io.magics.popularmovies.models.ReviewResult;
 import io.magics.popularmovies.models.Reviews;
 import io.magics.popularmovies.utils.MovieUtils;
+import io.magics.popularmovies.viewmodels.ReviewsViewModel;
+
+import static io.magics.popularmovies.utils.MovieUtils.hideAndShowView;
 
 
 public class MovieDetailsReviews extends Fragment {
 
-    private List<ReviewResult> mReviews = new ArrayList<>();
-
     @BindView(R.id.rv_reviews) RecyclerView mRvReviewRecycler;
     @BindView(R.id.tv_no_reviews) TextView mTvNoReviews;
+
+    private ReviewsViewModel mViewModel;
 
     private Unbinder mUnbinder;
 
@@ -41,17 +47,32 @@ public class MovieDetailsReviews extends Fragment {
         View root = inflater.inflate(R.layout.fragment_detail_reviews, container, false);
         mUnbinder = ButterKnife.bind(this, root);
 
-        if (mReviews.isEmpty()){
-            MovieUtils.hideAndShowView(mTvNoReviews, mRvReviewRecycler);
-        } else {
-            LinearLayoutManager manager = new LinearLayoutManager(root.getContext(), LinearLayoutManager.VERTICAL, false);
-            ReviewAdapter adapter = new ReviewAdapter();
+        //noinspection ConstantConditions
+        mViewModel = ViewModelProviders.of(getActivity()).get(ReviewsViewModel.class);
 
-            mRvReviewRecycler.setLayoutManager(manager);
-            mRvReviewRecycler.setAdapter(adapter);
-            adapter.setReviewData(mReviews);
-        }
         return root;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        ReviewAdapter adapter = new ReviewAdapter();
+
+        mRvReviewRecycler.setLayoutManager(new LinearLayoutManager(view.getContext(),
+                LinearLayoutManager.VERTICAL, false));
+        mRvReviewRecycler.setAdapter(adapter);
+
+        //noinspection ConstantConditions
+        mViewModel.mReviews.observe(getActivity(), reviewResults -> {
+            if (reviewResults != null){
+                if (reviewResults.isEmpty()) hideAndShowView(mTvNoReviews, mRvReviewRecycler);
+                else {
+                    hideAndShowView(mRvReviewRecycler, mTvNoReviews);
+                    adapter.setReviewData(reviewResults);
+                }
+            }
+        });
+
     }
 
     @Override
@@ -59,4 +80,6 @@ public class MovieDetailsReviews extends Fragment {
         mUnbinder.unbind();
         super.onDestroy();
     }
+
+
 }
