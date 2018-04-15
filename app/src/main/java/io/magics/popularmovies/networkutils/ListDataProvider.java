@@ -1,4 +1,4 @@
-package io.magics.popularmovies.newtry;
+package io.magics.popularmovies.networkutils;
 
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
@@ -179,8 +179,6 @@ public class ListDataProvider
 
         return cv;
     }
-
-
 
 
 }

@@ -15,7 +15,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import io.magics.popularmovies.fragments.detailfragments.MovieDetailsFragment;
 import io.magics.popularmovies.models.Movie;
-import io.magics.popularmovies.newtry.ListDataProvider;
+import io.magics.popularmovies.networkutils.ListDataProvider;
 import io.magics.popularmovies.viewmodels.FavListViewModel;
 import io.magics.popularmovies.viewmodels.PopListViewModel;
 import io.magics.popularmovies.viewmodels.ReviewsViewModel;
@@ -42,13 +42,8 @@ public class MovieListsActivity extends AppCompatActivity {
     TopListViewModel mTopListVM;
     PopListViewModel mPopListVM;
     FavListViewModel mFavListVM;
-    TrailersViewModel mTrailersViewModel;
-    ReviewsViewModel mReviewsViewModel;
 
     Unbinder mUnbinder;
-
-    boolean mConnected = true;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +55,8 @@ public class MovieListsActivity extends AppCompatActivity {
         mTopListVM = ViewModelProviders.of(this).get(TopListViewModel.class);
         mPopListVM = ViewModelProviders.of(this).get(PopListViewModel.class);
         mFavListVM = ViewModelProviders.of(this).get(FavListViewModel.class);
+
+        mViewPager.setOffscreenPageLimit(3);
 
         mDataProvider = new ListDataProvider(this, mTopListVM, mPopListVM, mFavListVM);
 
@@ -74,27 +71,6 @@ public class MovieListsActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private void getTrailersAndReviews(int movieId) {
-        mTAndRDisposable = ApiUtils.callApiForTrailersAndReviews(movieId,
-                results -> {
-                    mReviews.addAll(results.getReviews().getReviewResults());
-                    mTrailers.addAll(results.getTrailers().getTrailerResults());
-                    mReviewPageNum = results.getReviews().getPage();
-
-                    if (mReviewLastPage == -1) mReviewLastPage = results.getReviews().getTotalPages();
-
-                });
-    }
-
-    private void getMoreReviews(int movieId) {
-        mReviewPageNum += 1;
-        if (mReviewLastPage != -1 && mReviewPageNum >= mReviewLastPage) return;
-        mMoreRevDisposable = ApiUtils.callForMoreReviews(movieId, mReviewPageNum,
-                result -> {
-                    mReviews.addAll(result.getReviewResults());
-                    mReviewPageNum = result.getPage();
-                });
-    }
 
     public void showMovieDetailsFrag(Movie movie) {
         boolean favCheck = false;

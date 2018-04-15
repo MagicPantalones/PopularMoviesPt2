@@ -1,4 +1,4 @@
-package io.magics.popularmovies.newtry;
+package io.magics.popularmovies.networkutils;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

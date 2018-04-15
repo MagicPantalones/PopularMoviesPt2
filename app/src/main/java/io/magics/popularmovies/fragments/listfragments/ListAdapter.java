@@ -40,10 +40,6 @@ import io.magics.popularmovies.utils.MovieUtils;
 import io.magics.popularmovies.viewmodels.PopListViewModel;
 import io.magics.popularmovies.viewmodels.TopListViewModel;
 
-/**
- * Adapter for my recycler
- * Created by Erik on 18.02.2018.
- */
 
 public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHolder> {
 
@@ -148,7 +144,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
                                 shadow.setColorFilter(solid, PorterDuff.Mode.SRC_IN);
                                 mMovieData.get(holder.getAdapterPosition()).setShadowInt(solid);
                                 mfg.setShadowInt(solid);
-                                ((MovieListsActivity)mContext).notifyMovieListChange(mfg);
                             });
                         } else shadow.setColorFilter(mfg.getShadowInt(), PorterDuff.Mode.SRC_IN);
 
