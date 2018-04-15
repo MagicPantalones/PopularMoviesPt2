@@ -13,9 +13,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -29,8 +31,6 @@ import io.magics.popularmovies.utils.MovieUtils;
 public class MovieDetailsTrailers extends Fragment
     implements TrailerAdapter.OnTrailerSelect{
 
-    private static final String ARG_TRAILER_LIST = "trailers";
-
     private List<TrailerResult> mTrailers = new ArrayList<>();
 
     @BindView(R.id.rv_trailers) RecyclerView mTrailerRecycler;
@@ -40,24 +40,6 @@ public class MovieDetailsTrailers extends Fragment
 
     public MovieDetailsTrailers() {
         // Required empty public constructor
-    }
-
-    public static MovieDetailsTrailers newInstance(Trailers trailers) {
-        MovieDetailsTrailers fragment = new MovieDetailsTrailers();
-        Bundle args = new Bundle();
-        args.putParcelable(ARG_TRAILER_LIST, trailers);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            Trailers trailers = getArguments().getParcelable(ARG_TRAILER_LIST);
-            //noinspection ConstantConditions
-            mTrailers.addAll(trailers.getTrailerResults());
-        }
     }
 
     @Override
@@ -84,15 +66,14 @@ public class MovieDetailsTrailers extends Fragment
         super.onDestroy();
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
     public void onTrailerSelect(TrailerResult trailerResult) {
         Intent ytAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + trailerResult.getKey()));
         try {
-            getContext().startActivity(ytAppIntent);
+            Objects.requireNonNull(getContext()).startActivity(ytAppIntent);
         } catch (ActivityNotFoundException e){
             Intent ytWebIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + trailerResult.getKey()));
-            getContext().startActivity(ytWebIntent);
+            Objects.requireNonNull(getContext()).startActivity(ytWebIntent);
         }
 
     }

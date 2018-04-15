@@ -2,11 +2,13 @@ package io.magics.popularmovies.fragments.detailfragments;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.graphics.drawable.Animatable2Compat;
@@ -27,15 +29,19 @@ import android.widget.TextView;
 
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
+import java.util.Objects;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import io.magics.popularmovies.MovieListsActivity;
 import io.magics.popularmovies.R;
 import io.magics.popularmovies.models.Movie;
-import io.magics.popularmovies.models.Reviews;
-import io.magics.popularmovies.models.Trailers;
+import io.magics.popularmovies.networkutils.DetailDataProvider;
 import io.magics.popularmovies.utils.GlideApp;
+import io.magics.popularmovies.utils.MovieUtils;
+import io.magics.popularmovies.viewmodels.ReviewsViewModel;
+import io.magics.popularmovies.viewmodels.TrailersViewModel;
 
 import static io.magics.popularmovies.utils.MovieUtils.*;
 
@@ -45,34 +51,38 @@ import static io.magics.popularmovies.utils.MovieUtils.*;
  * Use the {@link MovieDetailsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MovieDetailsFragment extends DialogFragment
-    implements MovieListsActivity.DetailsListeners{
+public class MovieDetailsFragment extends DialogFragment {
 
     public static final String ARG_MOVIE = "movie";
     public static final String ARG_IS_FAVOURITE = "isFavourite";
 
     private Movie mMovie;
     private boolean mIsFavourite;
-    private Trailers mTrailers;
-    private Reviews mReviews;
+
+    private TrailersViewModel mTrailerVm;
+    private ReviewsViewModel mReviewsVm;
+    private DetailDataProvider mDataProvider;
 
     @BindView(R.id.iv_poster_detail) ImageView mPoster;
     @BindView(R.id.tv_movie_title_detail) TextView mTitle;
-    @BindView(R.id.tv_release_date_detail) TextView mRealeaseDate;
+    @BindView(R.id.tv_release_date_detail) TextView mReleaseDate;
     @BindView(R.id.pb_vote_count_detail) ProgressBar mVoteBar;
     @BindView(R.id.tv_vote_average_detail) TextView mVoteNumber;
     @BindView(R.id.fav_fab) FloatingActionButton mFavFab;
     @BindView(R.id.fav_fab_anim) ImageView mFavFabAnim;
     @BindView(R.id.bottom_nav_details) BottomNavigationView mBotNav;
-    @BindView(R.id.nsv_contentNsv) NestedScrollView mNestedScrollView;
 
     private Unbinder mUnbinder;
+    private FragmentManager mFragManager;
+    private FavFabClickHandler mFavFabClickListener;
+
     private ValueAnimator mVoteTextAnim;
     private ObjectAnimator mVoteProgressAnim;
     private AnimatedVectorDrawableCompat mFabAnim;
 
-    int tempColor1;
-    int tempColor2;
+    ImageSize mImageSize;
+    int mFavouriteColor;
+    int mDefaultColor;
 
     public MovieDetailsFragment() {
         // Required empty public constructor
@@ -101,56 +111,58 @@ public class MovieDetailsFragment extends DialogFragment
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_detail_movie, container, false);
         mUnbinder = ButterKnife.bind(this, root);
-
-        FragmentManager fragManager = getChildFragmentManager();
         Context context = root.getContext();
+        mFragManager = getChildFragmentManager();
 
-        ImageSize imageSize = getOptimalImgSize(context);
-        String posterUrl = posterUrlConverter(imageSize, mMovie.getPosterUrl());
-        Long voteCalcLong = Math.round(mMovie.getVoteAverage() * 10);
+        mTrailerVm = ViewModelProviders.of(this).get(TrailersViewModel.class);
+        mReviewsVm = ViewModelProviders.of(this).get(ReviewsViewModel.class);
 
-        mVoteTextAnim = ValueAnimator.ofFloat(0.0f, mMovie.getVoteAverage().floatValue());
-        mVoteProgressAnim = ObjectAnimator.ofInt(mVoteBar, "progress", voteCalcLong.intValue());
+        mDataProvider = new DetailDataProvider(mTrailerVm, mReviewsVm, mMovie);
+        mDataProvider.initDetailFragment();
 
-        tempColor1 = ResourcesCompat.getColor(context.getResources(),
+        mImageSize = getOptimalImgSize(context);
+
+        mFavouriteColor = ResourcesCompat.getColor(
+                context.getResources(),
                 R.color.colorSecondaryAccent,
                 context.getTheme());
-        tempColor2 = ResourcesCompat.getColor(
+
+        mDefaultColor = ResourcesCompat.getColor(
                 context.getResources(),
                 R.color.colorPrimaryDark,
                 context.getTheme());
 
-        mFavFab.setBackgroundTintList(ColorStateList.valueOf(mIsFavourite ? tempColor1 : tempColor2));
+        if (mFragManager.getFragments() == null || mFragManager.getFragments().isEmpty()) {
+            FragmentTransaction ft = mFragManager.beginTransaction();
+            ft.add(R.id.frame_trailers_and_reviews, MovieDetailsOverview.newInstance(mMovie));
+            ft.commit();
+        }
 
-        mFavFab.setOnClickListener(v -> {
-            if (mIsFavourite) ((MovieListsActivity)context).deleteFromFavourites(mMovie);
-            else if (!mIsFavourite) ((MovieListsActivity)context).addToFavourites(mMovie);
-            mIsFavourite = !mIsFavourite;
-            fabAnim();
-        });
+        return root;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        initialAnim();
+        mFavFab.setBackgroundTintList(ColorStateList.valueOf(mIsFavourite ? mFavouriteColor : mDefaultColor));
 
         mTitle.setText(mMovie.getTitle());
-        mRealeaseDate.setText(formatDate(mMovie.getReleaseDate()));
-
-        mVoteTextAnim.setDuration(2000);
-        mVoteTextAnim.setInterpolator(new BounceInterpolator());
-        mVoteTextAnim.addUpdateListener(valueAnimator -> {
-            String shownVal = valueAnimator.getAnimatedValue().toString();
-            shownVal = shownVal.substring(0, 3);
-            mVoteNumber.setText(shownVal);
-        });
-        mVoteTextAnim.start();
-
-        mVoteProgressAnim.setDuration(2000);
-        mVoteProgressAnim.setInterpolator(new BounceInterpolator());
-        mVoteProgressAnim.start();
+        mReleaseDate.setText(formatDate(mMovie.getReleaseDate()));
 
         GlideApp.with(mPoster)
-                .load(posterUrl)
+                .load(posterUrlConverter(mImageSize, mMovie.getPosterUrl()))
                 .centerCrop()
                 .placeholder(R.drawable.bg_loading_realydarkgrey)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(mPoster);
+
+        mFavFab.setOnClickListener(v -> {
+            mFavFabClickListener.favFabClicked(mMovie, mIsFavourite);
+            mIsFavourite = !mIsFavourite;
+            fabClickAnim();
+        });
 
         mBotNav.setOnNavigationItemSelectedListener(item -> {
             Fragment frag = null;
@@ -159,30 +171,33 @@ public class MovieDetailsFragment extends DialogFragment
                     frag = MovieDetailsOverview.newInstance(mMovie);
                     break;
                 case R.id.action_trailers:
-                    frag = MovieDetailsTrailers.newInstance(mTrailers);
+                    frag = new MovieDetailsTrailers();
                     break;
                 case R.id.action_reviews:
-                    frag = MovieDetailsReviews.newInstance(mReviews);
+                    frag = new MovieDetailsReviews();
+                    break;
+                default:
                     break;
             }
-            FragmentTransaction ft = fragManager.beginTransaction();
+            FragmentTransaction ft = mFragManager.beginTransaction();
             ft.replace(R.id.frame_trailers_and_reviews, frag);
             ft.commit();
             return true;
         });
 
-        if (fragManager.getFragments() == null || fragManager.getFragments().isEmpty()) {
-            FragmentTransaction ft = fragManager.beginTransaction();
-            ft.add(R.id.frame_trailers_and_reviews, MovieDetailsOverview.newInstance(mMovie));
-            ft.commit();
-        }
-        return root;
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        ((MovieListsActivity) context).registerDetailListeners(this);
+        if (context instanceof FavFabClickHandler) mFavFabClickListener = (FavFabClickHandler) context;
+        else throw new IllegalArgumentException("Not a FavFabClickListener");
+    }
+
+    @Override
+    public void onDetach() {
+        mDataProvider.disposeDetailsProvider();
+        super.onDetach();
     }
 
     @Override
@@ -194,27 +209,39 @@ public class MovieDetailsFragment extends DialogFragment
         super.onDestroy();
     }
 
-    @Override
-    public void onDetach() {
-        ((MovieListsActivity) getContext()).unRegisterDetailListeners();
-        super.onDetach();
+    private void initialAnim(){
+        mVoteTextAnim = ValueAnimator.ofFloat(0.0f, mMovie.getVoteAverage().floatValue());
+
+        mVoteTextAnim.setDuration(2000);
+        mVoteTextAnim.setInterpolator(new BounceInterpolator());
+
+        mVoteTextAnim.addUpdateListener(valueAnimator -> {
+            String shownVal = valueAnimator.getAnimatedValue().toString();
+            shownVal = shownVal.substring(0, 3);
+            mVoteNumber.setText(shownVal);
+        });
+
+        mVoteTextAnim.start();
+
+        mVoteProgressAnim = ObjectAnimator.ofInt(mVoteBar, "progress",
+                ((Long)Math.round(mMovie.getVoteAverage() * 10)).intValue());
+
+        mVoteProgressAnim.setDuration(2000);
+        mVoteProgressAnim.setInterpolator(new BounceInterpolator());
+
+        mVoteProgressAnim.start();
     }
 
-    private int dpToPx(int dp){
-        float scale = getResources().getDisplayMetrics().density;
-        return Math.round(scale * dp);
-    }
+    private void fabClickAnim(){
 
-    private void fabAnim(){
-
-        mFabAnim = AnimatedVectorDrawableCompat.create(getContext(),
+        mFabAnim = AnimatedVectorDrawableCompat.create(Objects.requireNonNull(getContext()),
                 mIsFavourite ? R.drawable.ic_anim_heart_to_fav : R.drawable.ic_anim_heart_from_fav);
         mFavFabAnim.setImageDrawable(mFabAnim);
 
         mFabAnim.registerAnimationCallback(new Animatable2Compat.AnimationCallback() {
             @Override
             public void onAnimationEnd(Drawable drawable) {
-                mFavFab.setBackgroundTintList(ColorStateList.valueOf(mIsFavourite ? tempColor1 : tempColor2));
+                mFavFab.setBackgroundTintList(ColorStateList.valueOf(mIsFavourite ? mFavouriteColor : mDefaultColor));
                 mFavFab.setVisibility(View.VISIBLE);
                 super.onAnimationEnd(drawable);
             }
@@ -226,13 +253,8 @@ public class MovieDetailsFragment extends DialogFragment
 
     }
 
-    @Override
-    public void onTrailerFetchFinished(Trailers trailers) {
-        mTrailers = trailers;
+    public interface FavFabClickHandler{
+        void favFabClicked(Movie movie, Boolean isFavourite);
     }
 
-    @Override
-    public void onReviewFetchFinished(Reviews reviews) {
-        mReviews = reviews;
-    }
 }

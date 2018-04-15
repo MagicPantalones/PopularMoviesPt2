@@ -24,8 +24,6 @@ import io.magics.popularmovies.utils.MovieUtils;
 
 public class MovieDetailsReviews extends Fragment {
 
-    private static final String ARG_REVIEWS = "reviews";
-
     private List<ReviewResult> mReviews = new ArrayList<>();
 
     @BindView(R.id.rv_reviews) RecyclerView mRvReviewRecycler;
@@ -35,24 +33,6 @@ public class MovieDetailsReviews extends Fragment {
 
     public MovieDetailsReviews() {
         // Required empty public constructor
-    }
-
-    public static MovieDetailsReviews newInstance(Reviews reviews) {
-        MovieDetailsReviews fragment = new MovieDetailsReviews();
-        Bundle args = new Bundle();
-        args.putParcelable(ARG_REVIEWS, reviews);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            Reviews reviews = getArguments().getParcelable(ARG_REVIEWS);
-            //noinspection ConstantConditions
-            mReviews.addAll(reviews.getReviewResults());
-        }
     }
 
     @Override
