@@ -1,6 +1,7 @@
 package io.magics.popularmovies.fragments.listfragments;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -84,9 +85,17 @@ public class ListTopRatedFragment extends Fragment
         });
 
         mViewModel.mTopList.observe(getActivity(), movies -> {
-            if (movies == null || movies.isEmpty()) MovieUtils.hideAndShowView(mTvTopRated, mRvTopRated);
+            if (movies == null || movies.isEmpty()) MovieUtils.showAndHideViews(mTvTopRated, mRvTopRated);
             else mAdapter.setMovieData(movies, mAdapter.getItemCount());
         });
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof TopRatedFragmentListener) {
+            mFragmentListener = (TopRatedFragmentListener) context;
+        }
     }
 
     @Override

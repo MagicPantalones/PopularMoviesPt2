@@ -37,13 +37,7 @@ public class PopListViewModel extends ViewModel {
     public boolean isLastPageLoaded(){ return mIsLastPageLoaded; }
 
     public void setPopList(List<Movie> movies){
-        if (mPopList.getValue() == null || mPopList.getValue().isEmpty()){
-            mPopList.setValue(movies);
-        } else {
-            List<Movie> movieList = mPopList.getValue();
-            movieList.addAll(movies);
-            mPopList.setValue(movieList);
-        }
+        mPopList.setValue(movies);
     }
 
     public void notifyGetMorePopPages(){

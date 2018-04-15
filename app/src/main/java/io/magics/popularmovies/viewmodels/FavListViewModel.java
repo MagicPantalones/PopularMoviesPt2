@@ -15,7 +15,6 @@ public class FavListViewModel extends ViewModel {
     private List<Integer> mMoviesId = new ArrayList<>();
 
     public void setFavList(List<Movie> favList) {
-        mMoviesId.clear();
 
         for (Movie m : favList) {
             mMoviesId.add(m.getMovieId());

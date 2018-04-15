@@ -1,6 +1,7 @@
 package io.magics.popularmovies.fragments.listfragments;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -54,7 +55,7 @@ public class ListPopularFragment extends Fragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_list_top_rated, container, false);
+        View root = inflater.inflate(R.layout.fragment_list_popular, container, false);
         mUnbinder = ButterKnife.bind(this, root);
         mViewModel = ViewModelProviders.of(getActivity()).get(PopListViewModel.class);
         return root;
@@ -82,9 +83,17 @@ public class ListPopularFragment extends Fragment
         });
 
         mViewModel.mPopList.observe(getActivity(), movies -> {
-            if (movies == null || movies.isEmpty()) MovieUtils.hideAndShowView(mTvPopularError, mRvPopular);
+            if (movies == null || movies.isEmpty()) MovieUtils.showAndHideViews(mTvPopularError, mRvPopular);
             else mAdapter.setMovieData(movies, mAdapter.getItemCount());
         });
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof PopularFragmentListener){
+            mFragmentListener = (PopularFragmentListener) context;
+        }
     }
 
     @Override

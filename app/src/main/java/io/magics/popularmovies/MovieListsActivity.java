@@ -20,7 +20,7 @@ import io.magics.popularmovies.fragments.listfragments.ListFavouritesFragment;
 import io.magics.popularmovies.fragments.listfragments.ListPopularFragment;
 import io.magics.popularmovies.fragments.listfragments.ListTopRatedFragment;
 import io.magics.popularmovies.models.Movie;
-import io.magics.popularmovies.networkutils.ListDataProvider;
+import io.magics.popularmovies.networkutils.DataProvider;
 import io.magics.popularmovies.utils.MovieUtils.ScrollDirection;
 import io.magics.popularmovies.viewmodels.FavListViewModel;
 import io.magics.popularmovies.viewmodels.PopListViewModel;
@@ -44,7 +44,7 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
     FloatingActionButton mUpFab;
 
     MovieListsPagerAdapter mAdapter;
-    ListDataProvider mDataProvider;
+    DataProvider mDataProvider;
 
     TopListViewModel mTopListVM;
     PopListViewModel mPopListVM;
@@ -64,6 +64,8 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
         mTopListVM = ViewModelProviders.of(this).get(TopListViewModel.class);
         mPopListVM = ViewModelProviders.of(this).get(PopListViewModel.class);
         mFavListVM = ViewModelProviders.of(this).get(FavListViewModel.class);
+        mTrailerVm = ViewModelProviders.of(this).get(TrailersViewModel.class);
+        mReviewVm = ViewModelProviders.of(this).get(ReviewsViewModel.class);
 
         mViewPager.setOffscreenPageLimit(3);
         mAdapter = new MovieListsPagerAdapter(getSupportFragmentManager());
@@ -83,7 +85,8 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
 
         mTabLayout.setupWithViewPager(mViewPager);
 
-        mDataProvider = new ListDataProvider(this, mTopListVM, mPopListVM, mFavListVM);
+        mDataProvider = new DataProvider(this, mTopListVM, mPopListVM, mFavListVM,
+                mTrailerVm, mReviewVm);
 
         mDataProvider.initialiseApp();
 
@@ -99,9 +102,7 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
 
     public void showMovieDetailsFrag(Movie movie) {
 
-        mTrailerVm = ViewModelProviders.of(this).get(TrailersViewModel.class);
-        mReviewVm = ViewModelProviders.of(this).get(ReviewsViewModel.class);
-        mDataProvider.attachDetailsProvider(movie, mTrailerVm, mReviewVm);
+        mDataProvider.setMovieAndFetch(movie);
 
         MovieDetailsFragment frag = MovieDetailsFragment.newInstance(movie, mFavListVM.checkIfFavourite(movie.getMovieId()));
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -173,10 +174,5 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
     public void favFabClicked(Movie movie, Boolean isFavourite) {
         if (isFavourite) mDataProvider.deleteFromFavourites(movie);
         else mDataProvider.addToFavourites(movie);
-    }
-
-    @Override
-    public void fragmentExited() {
-        mDataProvider.disposeDetailsProvider();
     }
 }

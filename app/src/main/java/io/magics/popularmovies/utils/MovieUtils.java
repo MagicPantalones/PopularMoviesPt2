@@ -18,7 +18,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 
-import io.magics.popularmovies.database.FavouritesDBHelper;
 import io.magics.popularmovies.database.FavouritesDBHelper.FavouritesEntry;
 import io.magics.popularmovies.models.Movie;
 import retrofit2.Retrofit;
@@ -52,7 +51,7 @@ public class MovieUtils {
 
     private MovieUtils(){}
 
-    public static void hideAndShowView(View viewToShow, View viewToHide){
+    public static void showAndHideViews(View viewToShow, View viewToHide){
         viewToShow.setVisibility(View.VISIBLE);
         viewToHide.setVisibility(View.GONE);
     }

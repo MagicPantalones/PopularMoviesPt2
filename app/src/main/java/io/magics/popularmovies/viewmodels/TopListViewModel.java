@@ -36,13 +36,7 @@ public class TopListViewModel extends ViewModel {
     public boolean isLastPageLoaded(){ return mIsLastPageLoaded; }
 
     public void setTopList(List<Movie> movies){
-        if (mTopList.getValue() == null || mTopList.getValue().isEmpty()){
-            mTopList.setValue(movies);
-        } else {
-            List<Movie> movieList = mTopList.getValue();
-            movieList.addAll(movies);
-            mTopList.setValue(movieList);
-        }
+        mTopList.setValue(movies);
     }
 
     public void notifyGetMoreTopPages(){

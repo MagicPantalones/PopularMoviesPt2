@@ -32,7 +32,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.magics.popularmovies.MovieListsActivity;
 import io.magics.popularmovies.R;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.utils.GlideApp;
@@ -50,7 +49,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
     private ReachedEndHandler mReachedEndHandler;
     private MovieUtils.ImageSize mImageSize;
     private int mDefaultColor;
-    private Context mContext;
 
     public interface PosterClickHandler {
         void onClick(Movie movie);
@@ -80,17 +78,17 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
     @NonNull
     @Override
     public PosterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        mContext = parent.getContext();
-        Boolean orientation = mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
-        mDefaultColor = ResourcesCompat.getColor(mContext.getResources(), R.color.colorSecondary, mContext.getTheme());
-        mImageSize = MovieUtils.getOptimalImgSize(mContext);
+        Context context = parent.getContext();
+        Boolean orientation = context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+        mDefaultColor = ResourcesCompat.getColor(context.getResources(), R.color.colorSecondary, context.getTheme());
+        mImageSize = MovieUtils.getOptimalImgSize(context);
 
 
         //Sets the ViewHolder sizes based on the devise's orientation.
         mViewHeight = orientation ? parent.getMeasuredHeight() / 2 : parent.getMeasuredHeight();
         mViewWidth = orientation ? parent.getMeasuredWidth() / 2 : parent.getMeasuredWidth() / 3;
 
-        View v = LayoutInflater.from(mContext).inflate(R.layout.fragment_list_view_holder, parent, false);
+        View v = LayoutInflater.from(context).inflate(R.layout.fragment_list_view_holder, parent, false);
 
         return new PosterViewHolder(v);
     }
@@ -142,7 +140,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
                                                 palette.getDarkVibrantColor(
                                                         palette.getDominantColor(mDefaultColor)));
                                 shadow.setColorFilter(solid, PorterDuff.Mode.SRC_IN);
-                                mMovieData.get(holder.getAdapterPosition()).setShadowInt(solid);
+                                mMovieData.get(position).setShadowInt(solid);
                                 mfg.setShadowInt(solid);
                             });
                         } else shadow.setColorFilter(mfg.getShadowInt(), PorterDuff.Mode.SRC_IN);
@@ -167,11 +165,15 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
     public void setMovieData(List<Movie> movies, int position) {
         if (movies == null) {
             return;
+        }
+        if (position == 0){
+            mMovieData.clear();
+            mMovieData.addAll(movies);
+            notifyDataSetChanged();
         } else {
             mMovieData.addAll(movies);
+            notifyItemInserted(position);
         }
-        if (position == 0) notifyDataSetChanged();
-        else notifyItemInserted(position);
     }
 
     public class PosterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

@@ -28,7 +28,7 @@ import static io.magics.popularmovies.utils.MovieUtils.createMovieFromCursor;
 import static io.magics.popularmovies.utils.MovieUtils.getClientForMovieList;
 import static io.magics.popularmovies.utils.MovieUtils.makeContentVals;
 
-public class ListDataProvider
+public class DataProvider
         implements TopListViewModel.GetMoreTopPagesListener, PopListViewModel.GetMorePopPagesListener{
 
     private static final String[] FAVOURITES_COLUMNS = {
@@ -60,21 +60,21 @@ public class ListDataProvider
     private final TopListViewModel mTopVm;
     private final PopListViewModel mPopVm;
     private final FavListViewModel mFavVm;
+    private final TrailersViewModel mTrailerVm;
+    private final ReviewsViewModel mReviewVm;
 
-    private TrailersViewModel mTrailerVm;
-    private ReviewsViewModel mReviewVm;
     private Movie mDetailMovie;
     private List<ReviewResult> mReviewsToViewModel = new ArrayList<>();
 
 
-    public ListDataProvider(Context context,
-                            TopListViewModel topVm,
-                            PopListViewModel popVm,
-                            FavListViewModel favVm){
+    public DataProvider(Context context, TopListViewModel topVm, PopListViewModel popVm,
+                        FavListViewModel favVm, TrailersViewModel trailerVm, ReviewsViewModel reviewVm){
         this.mContext = context;
         this.mTopVm = topVm;
         this.mPopVm = popVm;
         this.mFavVm = favVm;
+        this.mTrailerVm = trailerVm;
+        this.mReviewVm = reviewVm;
     }
 
     public void initialiseApp(){
@@ -83,13 +83,6 @@ public class ListDataProvider
         mTopDisposable = getTopList(INIT_PAGE_NUM);
         mPopDisposable = getPopList(INIT_PAGE_NUM);
         mFavDisposable = getFavList();
-    }
-
-    public void attachDetailsProvider(Movie movie, TrailersViewModel trailerVm, ReviewsViewModel reviewVm){
-        mDetailMovie = movie;
-        mTrailerVm = trailerVm;
-        mReviewVm = reviewVm;
-        mTAndRDisposable = getTrailersAndReviews();
     }
 
     public void dispose() {
@@ -102,11 +95,11 @@ public class ListDataProvider
         mPopVm.unregisterPopPagesListener();
     }
 
-    public void disposeDetailsProvider(){
-        if (mTAndRDisposable != null && mTAndRDisposable.isDisposed()) mTAndRDisposable.dispose();
-        if (mMoreReviewsDisposable != null && mMoreReviewsDisposable.isDisposed()) mMoreReviewsDisposable.dispose();
-        mTrailerVm = null;
-        mReviewVm = null;
+    public void setMovieAndFetch(Movie movie){
+        mTrailerVm.clear();
+        mReviewVm.clear();
+        mDetailMovie = movie;
+        mTAndRDisposable = getTrailersAndReviews();
     }
 
     @Override
@@ -128,7 +121,7 @@ public class ListDataProvider
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(callback -> {
                     mTopVm.setPages(callback);
-                    mTopVm.setTopList(callback.getMovies());
+                    mTopVm.mTopList.setValue(callback.getMovies());
                 });
     }
 
@@ -139,7 +132,7 @@ public class ListDataProvider
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(callback -> {
                     mPopVm.setPages(callback);
-                    mPopVm.setPopList(callback.getMovies());
+                    mPopVm.mPopList.setValue(callback.getMovies());
                 });
     }
 

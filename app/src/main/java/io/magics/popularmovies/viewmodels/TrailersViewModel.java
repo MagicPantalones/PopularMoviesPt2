@@ -15,4 +15,8 @@ public class TrailersViewModel extends ViewModel {
         if (mTrailers.getValue() == null) mTrailers.setValue(trailers);
     }
 
+    public void clear(){
+        mTrailers = new MutableLiveData<>();
+    }
+
 }

@@ -15,10 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -26,11 +23,9 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import io.magics.popularmovies.R;
 import io.magics.popularmovies.models.TrailerResult;
-import io.magics.popularmovies.models.Trailers;
-import io.magics.popularmovies.utils.MovieUtils;
 import io.magics.popularmovies.viewmodels.TrailersViewModel;
 
-import static io.magics.popularmovies.utils.MovieUtils.hideAndShowView;
+import static io.magics.popularmovies.utils.MovieUtils.showAndHideViews;
 
 
 public class MovieDetailsTrailers extends Fragment
@@ -71,12 +66,12 @@ public class MovieDetailsTrailers extends Fragment
         //noinspection ConstantConditions
         mViewModel.mTrailers.observe(getActivity(), trailerResults -> {
             if (trailerResults != null){
-                if (trailerResults.isEmpty()) hideAndShowView(mTvNoTrailers, mRvTrailerRecycler);
+                if (trailerResults.isEmpty()) showAndHideViews(mTvNoTrailers, mRvTrailerRecycler);
                 else {
-                    hideAndShowView(mRvTrailerRecycler, mTvNoTrailers);
+                    showAndHideViews(mRvTrailerRecycler, mTvNoTrailers);
                     adapter.setTrailerList(trailerResults);
                 }
-            } else hideAndShowView(mTvNoTrailers, mRvTrailerRecycler);
+            } else showAndHideViews(mTvNoTrailers, mRvTrailerRecycler);
         });
 
     }

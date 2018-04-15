@@ -184,8 +184,6 @@ public class MovieDetailsFragment extends DialogFragment {
         if (mVoteProgressAnim != null && mVoteProgressAnim.isStarted()) mVoteProgressAnim.cancel();
         if (mVoteTextAnim != null && mVoteTextAnim.isStarted()) mVoteTextAnim.cancel();
         if (mFabAnim != null && mFabAnim.isRunning()) mFabAnim.stop();
-        mFragInteractionHandler.fragmentExited();
-        mFragInteractionHandler = null;
         mUnbinder.unbind();
         super.onDestroyView();
     }
@@ -236,7 +234,6 @@ public class MovieDetailsFragment extends DialogFragment {
 
     public interface DetailFragInteractionHandler {
         void favFabClicked(Movie movie, Boolean isFavourite);
-        void fragmentExited();
     }
 
 }

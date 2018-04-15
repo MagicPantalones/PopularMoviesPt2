@@ -12,20 +12,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import io.magics.popularmovies.R;
-import io.magics.popularmovies.models.ReviewResult;
-import io.magics.popularmovies.models.Reviews;
-import io.magics.popularmovies.utils.MovieUtils;
 import io.magics.popularmovies.viewmodels.ReviewsViewModel;
 
-import static io.magics.popularmovies.utils.MovieUtils.hideAndShowView;
+import static io.magics.popularmovies.utils.MovieUtils.showAndHideViews;
 
 
 public class MovieDetailsReviews extends Fragment {
@@ -65,9 +58,9 @@ public class MovieDetailsReviews extends Fragment {
         //noinspection ConstantConditions
         mViewModel.mReviews.observe(getActivity(), reviewResults -> {
             if (reviewResults != null){
-                if (reviewResults.isEmpty()) hideAndShowView(mTvNoReviews, mRvReviewRecycler);
+                if (reviewResults.isEmpty()) showAndHideViews(mTvNoReviews, mRvReviewRecycler);
                 else {
-                    hideAndShowView(mRvReviewRecycler, mTvNoReviews);
+                    showAndHideViews(mRvReviewRecycler, mTvNoReviews);
                     adapter.setReviewData(reviewResults);
                 }
             }

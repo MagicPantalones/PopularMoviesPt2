@@ -1,6 +1,7 @@
 package io.magics.popularmovies.fragments.listfragments;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,8 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -55,7 +54,7 @@ public class ListFavouritesFragment extends Fragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_list_top_rated, container,
+        View root = inflater.inflate(R.layout.fragment_list_favourites, container,
                 false);
         mUnbinder = ButterKnife.bind(this, root);
 
@@ -88,10 +87,18 @@ public class ListFavouritesFragment extends Fragment
 
         //noinspection ConstantConditions
         mViewModel.mFavList.observe(getActivity(), movies -> {
-            if (movies == null || movies.isEmpty()) MovieUtils.hideAndShowView(mTvNoFavourites,
+            if (movies == null || movies.isEmpty()) MovieUtils.showAndHideViews(mTvNoFavourites,
                     mRvFavourites);
-            else mAdapter.setMovieData(movies, mAdapter.getItemCount());
+            else mAdapter.setMovieData(movies, 0);
         });
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof FavouritesFragmentListener){
+            mFragmentListener = (FavouritesFragmentListener) context;
+        }
     }
 
     @Override
