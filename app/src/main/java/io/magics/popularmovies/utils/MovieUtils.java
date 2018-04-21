@@ -3,6 +3,7 @@ package io.magics.popularmovies.utils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import android.content.ContentValues;
@@ -69,6 +70,11 @@ public class MovieUtils {
         retMovie.setShadowInt(Integer.valueOf(cursor.getString(COLOR_I)));
 
         return retMovie;
+    }
+
+    public static boolean checkForDuplicateList(List<Movie> currentMovies, List<Movie> fetchedList){
+        return !currentMovies.isEmpty() && currentMovies.get(currentMovies.size() - 20).getMovieId()
+                .equals(fetchedList.get(0).getMovieId());
     }
 
     //Formats date to "MMM dd(ordinal number), yyyy

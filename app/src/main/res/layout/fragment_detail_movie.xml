@@ -12,7 +12,7 @@
         android:id="@+id/app_bar_main_details"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_bottom_round"
+        android:background="@drawable/bg_top_round"
         android:fitsSystemWindows="true"
         app:elevation="0dp">
 
@@ -159,6 +159,7 @@
         android:layout_marginTop="8dp"
         android:scaleType="fitCenter"
         android:theme="@style/Fab"
+        app:elevation="0dp"
         app:layout_anchor="@id/detail_widget"
         app:layout_anchorGravity="end|top"
         app:srcCompat="@drawable/ic_heart_fab_static" />

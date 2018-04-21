@@ -1,6 +1,8 @@
 package io.magics.popularmovies;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentTransaction;
@@ -40,8 +42,12 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
     ViewPager mViewPager;
     @BindView(R.id.sliding_tabs)
     TabLayout mTabLayout;
+    @BindView(R.id.app_bar_list)
+    AppBarLayout mAppBar;
     @BindView(R.id.up_fab)
     FloatingActionButton mUpFab;
+
+    private static final String DETAIL_FRAGMENT_TAG = "detailFrag";
 
     MovieListsPagerAdapter mAdapter;
     DataProvider mDataProvider;
@@ -104,10 +110,12 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
 
         mDataProvider.setMovieAndFetch(movie);
 
+        mUpFab.hide();
+
         MovieDetailsFragment frag = MovieDetailsFragment.newInstance(movie, mFavListVM.checkIfFavourite(movie.getMovieId()));
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
-        ft.replace(R.id.container_main, frag);
+        ft.replace(R.id.container_main, frag, DETAIL_FRAGMENT_TAG);
         ft.addToBackStack(null);
         ft.commit();
     }
@@ -174,5 +182,13 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
     public void favFabClicked(Movie movie, Boolean isFavourite) {
         if (isFavourite) mDataProvider.deleteFromFavourites(movie);
         else mDataProvider.addToFavourites(movie);
+    }
+
+    @Override
+    public void onFragmentExit() {
+        if (!isChangingConfigurations() || !isFinishing() && mUpFab != null) {
+            mUpFab.show();
+            mAppBar.setVisibility(View.VISIBLE);
+        }
     }
 }

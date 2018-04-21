@@ -3,10 +3,12 @@ package io.magics.popularmovies.viewmodels;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.magics.popularmovies.models.ApiResult;
 import io.magics.popularmovies.models.Movie;
+import io.magics.popularmovies.utils.MovieUtils;
 
 public class TopListViewModel extends ViewModel {
 
@@ -36,7 +38,12 @@ public class TopListViewModel extends ViewModel {
     public boolean isLastPageLoaded(){ return mIsLastPageLoaded; }
 
     public void setTopList(List<Movie> movies){
-        mTopList.setValue(movies);
+        List<Movie> tempMovies =
+                mTopList.getValue() != null ? mTopList.getValue() : new ArrayList<>();
+        if (!MovieUtils.checkForDuplicateList(tempMovies, movies)) {
+            tempMovies.addAll(movies);
+            mTopList.setValue(tempMovies);
+        }
     }
 
     public void notifyGetMoreTopPages(){

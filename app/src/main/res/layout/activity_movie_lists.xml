@@ -8,6 +8,8 @@
     <!-- From https://guides.codepath.com/android/Google-Play-Style-Tabs-using-TabLayout -->
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar_list"
+        android:animateLayoutChanges="true"
+        android:fitsSystemWindows="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -38,6 +40,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="@dimen/fab_margin"
+        app:elevation="0dp"
         app:layout_anchor="@id/view_pager"
         app:layout_anchorGravity="bottom|end"
         app:srcCompat="@drawable/ic_keyboard_arrow_up_white_24dp"

@@ -101,8 +101,8 @@
                     android:layout_height="wrap_content"
                     android:adjustViewBounds="true"
                     android:layout_gravity="bottom"
+                    android:scaleType="centerCrop"
                     tools:ignore="contentDescription"
-                    tools:scaleType="centerCrop"
                     tools:src="@drawable/minions_poster_placehodler" />
             </android.support.v7.widget.CardView>
 

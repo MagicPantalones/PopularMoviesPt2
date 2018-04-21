@@ -11,6 +11,8 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
@@ -18,6 +20,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -71,10 +74,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         };
     }
 
-    public void setEndListener(ReachedEndHandler reachedEndHandler) {
-        this.mReachedEndHandler = reachedEndHandler;
-    }
-
     @NonNull
     @Override
     public PosterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -110,8 +109,17 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
             mReachedEndHandler.endReached();
         }
 
-        cvWrapper.setMinimumWidth(mViewWidth);
-        cvWrapper.setMinimumHeight(mViewHeight);
+        //How to get compatPadding dimens taken from Janholds answer here:
+        //https://stackoverflow.com/questions/34656252/cardview-cardusecompatpadding
+
+        double cos45 = Math.cos(Math.toRadians(45));
+        float elevation = cvWrapper.getCardElevation();
+        float radius = cvWrapper.getRadius();
+        int compatPad = (int) ((elevation + (1 - cos45) * radius) +
+                (elevation * 1.5 + (1 - cos45) * radius));
+        int centerImg = ((ViewGroup) cvWrapper.getParent()).getPaddingStart() * 2 + compatPad * 2;
+
+        iv.setLayoutParams(new FrameLayout.LayoutParams(mViewWidth - centerImg, mViewHeight - centerImg));
 
         tvTitle.setText(mfg.getTitle());
         pbVotes.setProgress(mfg.getVoteAverage().intValue() * 10);
@@ -122,8 +130,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         GlideApp.with(iv)
                 .load(posterUrl)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                .override(mViewWidth, mViewHeight)
-                .centerCrop()
+                .placeholder(R.drawable.bg_loading_realydarkgrey)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(new ImageViewTarget<Drawable>(iv) {
                     
@@ -162,18 +169,13 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
     }
 
 
-    public void setMovieData(List<Movie> movies, int position) {
+    public void setMovieData(List<Movie> movies) {
         if (movies == null) {
             return;
         }
-        if (position == 0){
-            mMovieData.clear();
-            mMovieData.addAll(movies);
-            notifyDataSetChanged();
-        } else {
-            mMovieData.addAll(movies);
-            notifyItemInserted(position);
-        }
+        mMovieData.clear();
+        mMovieData.addAll(movies);
+        notifyDataSetChanged();
     }
 
     public class PosterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -181,7 +183,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         ImageView mIv;
         @BindView(R.id.v_card_shadow)
         ImageView mShadowLayer;
-        @BindView(R.id.cv_view_holder_wrapper)
+        @BindView(R.id.cv_poster_wrapper)
         CardView mCvWrapper;
         @BindView(R.id.tv_movie_title_list)
         TextView mTvTitle;

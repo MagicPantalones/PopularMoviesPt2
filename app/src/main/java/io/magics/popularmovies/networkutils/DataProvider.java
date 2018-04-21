@@ -45,7 +45,6 @@ public class DataProvider
 
     private static final String SORT_TOP = "top_rated";
     private static final String SORT_POP = "popular";
-    private static final int INIT_PAGE_NUM = 1;
     private static final String TMDB_API_KEY = BuildConfig.TMDB_API_KEY;
     private static final String LOCALE = "en-US";
 
@@ -80,8 +79,8 @@ public class DataProvider
     public void initialiseApp(){
         mTopVm.addGetMoreTopPagesListener(this);
         mPopVm.addGetMorePopPagesListener(this);
-        mTopDisposable = getTopList(INIT_PAGE_NUM);
-        mPopDisposable = getPopList(INIT_PAGE_NUM);
+        mTopDisposable = getTopList(mTopVm.getCurrentPage());
+        mPopDisposable = getPopList(mPopVm.getCurrentPage());
         mFavDisposable = getFavList();
     }
 
@@ -121,7 +120,7 @@ public class DataProvider
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(callback -> {
                     mTopVm.setPages(callback);
-                    mTopVm.mTopList.setValue(callback.getMovies());
+                    mTopVm.setTopList(callback.getMovies());
                 });
     }
 
@@ -132,7 +131,7 @@ public class DataProvider
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(callback -> {
                     mPopVm.setPages(callback);
-                    mPopVm.mPopList.setValue(callback.getMovies());
+                    mPopVm.setPopList(callback.getMovies());
                 });
     }
 

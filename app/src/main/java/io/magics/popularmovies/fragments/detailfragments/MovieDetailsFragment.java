@@ -129,7 +129,7 @@ public class MovieDetailsFragment extends DialogFragment {
                 context.getTheme());
 
         initialAnim();
-        mFavFab.setBackgroundTintList(ColorStateList.valueOf(mIsFavourite ? mFavouriteColor : mDefaultColor));
+        fabAnim(true);
 
         mTitle.setText(mMovie.getTitle());
         mReleaseDate.setText(formatDate(mMovie.getReleaseDate()));
@@ -144,27 +144,30 @@ public class MovieDetailsFragment extends DialogFragment {
         mFavFab.setOnClickListener(v -> {
             mFragInteractionHandler.favFabClicked(mMovie, mIsFavourite);
             mIsFavourite = !mIsFavourite;
-            fabClickAnim();
+            fabAnim(false);
         });
 
         mBotNav.setOnNavigationItemSelectedListener(item -> {
             Fragment frag = null;
-            switch (item.getItemId()){
-                case R.id.action_overview:
-                    frag = MovieDetailsOverview.newInstance(mMovie);
-                    break;
-                case R.id.action_trailers:
-                    frag = new MovieDetailsTrailers();
-                    break;
-                case R.id.action_reviews:
-                    frag = new MovieDetailsReviews();
-                    break;
-                default:
-                    break;
+            if (!item.isChecked()) {
+                switch (item.getItemId()) {
+                    case R.id.action_overview:
+                        frag = MovieDetailsOverview.newInstance(mMovie);
+                        break;
+                    case R.id.action_trailers:
+                        frag = new MovieDetailsTrailers();
+                        break;
+                    case R.id.action_reviews:
+                        frag = new MovieDetailsReviews();
+                        break;
+                    default:
+                        break;
+                }
+                FragmentTransaction ft = mFragManager.beginTransaction();
+                ft.replace(R.id.frame_trailers_and_reviews, frag);
+                ft.commit();
+                return true;
             }
-            FragmentTransaction ft = mFragManager.beginTransaction();
-            ft.replace(R.id.frame_trailers_and_reviews, frag);
-            ft.commit();
             return true;
         });
 
@@ -188,7 +191,14 @@ public class MovieDetailsFragment extends DialogFragment {
         super.onDestroyView();
     }
 
+    @Override
+    public void onDetach() {
+        mFragInteractionHandler.onFragmentExit();
+        super.onDetach();
+    }
+
     private void initialAnim(){
+
         mVoteTextAnim = ValueAnimator.ofFloat(0.0f, mMovie.getVoteAverage().floatValue());
 
         mVoteTextAnim.setDuration(2000);
@@ -211,10 +221,16 @@ public class MovieDetailsFragment extends DialogFragment {
         mVoteProgressAnim.start();
     }
 
-    private void fabClickAnim(){
+    private void fabAnim(boolean enterAnim){
 
-        mFabAnim = AnimatedVectorDrawableCompat.create(Objects.requireNonNull(getContext()),
-                mIsFavourite ? R.drawable.ic_anim_heart_to_fav : R.drawable.ic_anim_heart_from_fav);
+        if (enterAnim){
+            mFabAnim = AnimatedVectorDrawableCompat.create(Objects.requireNonNull(getContext()),
+                    mIsFavourite ? R.drawable.ic_anim_heart_enter_to_fav : R.drawable.ic_anim_heart_enter_to_default);
+        } else {
+            mFabAnim = AnimatedVectorDrawableCompat.create(Objects.requireNonNull(getContext()),
+                    mIsFavourite ? R.drawable.ic_anim_heart_to_fav : R.drawable.ic_anim_heart_from_fav);
+        }
+
         mFavFabAnim.setImageDrawable(mFabAnim);
 
         mFabAnim.registerAnimationCallback(new Animatable2Compat.AnimationCallback() {
@@ -222,6 +238,7 @@ public class MovieDetailsFragment extends DialogFragment {
             public void onAnimationEnd(Drawable drawable) {
                 mFavFab.setBackgroundTintList(ColorStateList.valueOf(mIsFavourite ? mFavouriteColor : mDefaultColor));
                 mFavFab.setVisibility(View.VISIBLE);
+                mFavFabAnim.setVisibility(View.INVISIBLE);
                 super.onAnimationEnd(drawable);
             }
         });
@@ -234,6 +251,7 @@ public class MovieDetailsFragment extends DialogFragment {
 
     public interface DetailFragInteractionHandler {
         void favFabClicked(Movie movie, Boolean isFavourite);
+        void onFragmentExit();
     }
 
 }

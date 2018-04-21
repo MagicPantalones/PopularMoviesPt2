@@ -84,7 +84,7 @@ public class ListPopularFragment extends Fragment
 
         mViewModel.mPopList.observe(getActivity(), movies -> {
             if (movies == null || movies.isEmpty()) MovieUtils.showAndHideViews(mTvPopularError, mRvPopular);
-            else mAdapter.setMovieData(movies, mAdapter.getItemCount());
+            else mAdapter.setMovieData(movies);
         });
     }
 

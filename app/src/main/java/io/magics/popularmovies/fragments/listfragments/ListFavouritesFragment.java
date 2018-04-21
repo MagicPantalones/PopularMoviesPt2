@@ -89,7 +89,7 @@ public class ListFavouritesFragment extends Fragment
         mViewModel.mFavList.observe(getActivity(), movies -> {
             if (movies == null || movies.isEmpty()) MovieUtils.showAndHideViews(mTvNoFavourites,
                     mRvFavourites);
-            else mAdapter.setMovieData(movies, 0);
+            else mAdapter.setMovieData(movies);
         });
     }
 
