@@ -4,6 +4,7 @@
     <string name="calendar_icon_a11y" translatable="true">Released</string>
     <string name="favourite_btn_a11y" translatable="true">Add to favourites</string>
     <string name="trailer_icon_play" translatable="true">Play trailer</string>
+    <string name="detail_fragment_back_ic_a11y" translatable="true">Back to movie list</string>
 
     <string name="details_release_day_title" translatable="true">Release Date:</string>
     <string name="details_vote_average_title" translatable="true">Vote Average:</string>

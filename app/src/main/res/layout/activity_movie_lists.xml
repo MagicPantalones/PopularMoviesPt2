@@ -13,6 +13,17 @@
         android:animateLayoutChanges="true"
         android:fitsSystemWindows="true">
 
+        <ImageView
+            android:id="@+id/iv_app_bar_back"
+            android:contentDescription="@string/detail_fragment_back_ic_a11y"
+            android:layout_height="wrap_content"
+            android:layout_width="24dp"
+            app:srcCompat="@drawable/ic_appbar_back"
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="16dp"
+            android:visibility="gone"
+            />
+
         <android.support.design.widget.TabLayout
             android:id="@+id/sliding_tabs"
             android:layout_width="match_parent"
@@ -22,6 +33,7 @@
             app:tabMode="fixed"
             app:tabSelectedTextColor="@color/colorSecondary"
             app:tabTextColor="@color/colorPrimaryDark" />
+
     </android.support.design.widget.AppBarLayout>
 
 

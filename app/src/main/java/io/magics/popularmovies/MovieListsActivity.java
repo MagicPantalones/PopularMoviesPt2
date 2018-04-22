@@ -4,11 +4,14 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.facebook.stetho.Stetho;
 
@@ -44,6 +47,8 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
     AppBarLayout mAppBar;
     @BindView(R.id.up_fab)
     FloatingActionButton mUpFab;
+    @BindView(R.id.iv_app_bar_back)
+    ImageView mAppBarBack;
 
     private static final String DETAIL_FRAGMENT_TAG = "detailFrag";
 
@@ -73,6 +78,8 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
 
         mViewPager.setOffscreenPageLimit(3);
         mAdapter = new MovieListsPagerAdapter(getSupportFragmentManager());
+
+        mAppBar.setOrientation(AppBarLayout.VERTICAL);
 
         mViewPager.setAdapter(mAdapter);
 
@@ -109,6 +116,18 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
         mDataProvider.setMovieAndFetch(movie);
 
         mUpFab.hide();
+        mAppBarBack.setMinimumHeight(mTabLayout.getHeight());
+        mAppBar.setBackgroundResource(R.drawable.bg_toolbar_list);
+        mTabLayout.setVisibility(View.GONE);
+        mAppBarBack.setVisibility(View.VISIBLE);
+        mAppBarBack.setOnClickListener(v -> {
+            Fragment frag = getSupportFragmentManager().findFragmentByTag(DETAIL_FRAGMENT_TAG);
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            if (frag != null){
+                ft.remove(frag);
+                ft.commit();
+            }
+        });
 
         MovieDetailsFragment frag = MovieDetailsFragment.newInstance(movie, mFavListVM.checkIfFavourite(movie.getMovieId()));
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -185,6 +204,9 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
     public void onFragmentExit() {
         if (!isChangingConfigurations() || !isFinishing() && mUpFab != null) {
             mUpFab.show();
+            mTabLayout.setVisibility(View.VISIBLE);
+            mAppBarBack.setVisibility(View.GONE);
+            mAppBar.setBackground(null);
         }
     }
 }

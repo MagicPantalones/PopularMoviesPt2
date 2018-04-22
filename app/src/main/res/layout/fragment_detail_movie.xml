@@ -63,6 +63,10 @@
         android:id="@+id/nsv_contentNsv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp"
+        android:layout_marginBottom="2dp"
+        android:layout_marginTop="0.4dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <android.support.constraint.ConstraintLayout

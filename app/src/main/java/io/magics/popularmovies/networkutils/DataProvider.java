@@ -121,7 +121,7 @@ public class DataProvider
                 .subscribe(callback -> {
                     mTopVm.setPages(callback);
                     mTopVm.setTopList(callback.getMovies());
-                });
+                }, throwable -> mTopVm.setTopList(new ArrayList<>()));
     }
 
     private Disposable getPopList(int pageNumber){
@@ -132,7 +132,7 @@ public class DataProvider
                 .subscribe(callback -> {
                     mPopVm.setPages(callback);
                     mPopVm.setPopList(callback.getMovies());
-                });
+                }, throwable -> mPopVm.setPopList(new ArrayList<>()));
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -205,6 +205,9 @@ public class DataProvider
                         mReviewVm.setReviews(mReviewsToViewModel);
                     }
 
+                }, throwable -> {
+                    mReviewVm.setReviews(new ArrayList<>());
+                    mTrailerVm.setTrailers(new ArrayList<>());
                 });
     }
 
@@ -216,7 +219,7 @@ public class DataProvider
                 .subscribe(reviews -> {
                     mReviewsToViewModel.addAll(reviews.getReviewResults());
                     mReviewVm.setReviews(mReviewsToViewModel);
-                });
+                }, throwable -> mReviewVm.setReviews(mReviewsToViewModel));
     }
 
 

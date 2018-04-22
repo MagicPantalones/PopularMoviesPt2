@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -19,8 +20,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 
+import io.magics.popularmovies.BuildConfig;
 import io.magics.popularmovies.database.FavouritesDBHelper.FavouritesEntry;
 import io.magics.popularmovies.models.Movie;
+import okhttp3.EventListener;
+import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -40,6 +44,8 @@ public class MovieUtils {
     private static final String YOUTUBE_THUMB_BASE_URL = "http://img.youtube.com/vi/";
     private static final String BASE_QUERY_IMG_URL = "https://image.tmdb.org/t/p/";
     private static final String BASE_QUERY_API_URL = "https://api.themoviedb.org/3/";
+
+    private static final int CONNECTION_TIMEOUT = 5;
 
     private static final int POSTER_I = 1;
     private static final int OVERVIEW_I = 2;
@@ -72,6 +78,7 @@ public class MovieUtils {
         return retMovie;
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean checkForDuplicateList(List<Movie> currentMovies, List<Movie> fetchedList){
         return !currentMovies.isEmpty() && currentMovies.get(currentMovies.size() - 20).getMovieId()
                 .equals(fetchedList.get(0).getMovieId());
@@ -113,15 +120,6 @@ public class MovieUtils {
         }
     }
 
-
-
-    @SuppressWarnings("ConstantConditions")
-    public static boolean isConnected(Context context){
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo ni = cm.getActiveNetworkInfo();
-        return ni != null && ni.isConnectedOrConnecting();
-    }
-
     public static ImageSize getOptimalImgSize(Context context){
         float density = context.getResources().getDisplayMetrics().density;
         return density >= 3.0 ? SIZE_MEDIUM : SIZE_DEFAULT;
@@ -143,10 +141,16 @@ public class MovieUtils {
 
     public static Retrofit getClientForMovieList() {
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .connectTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS)
+                .retryOnConnectionFailure(true)
+                .build();
+
         return new Retrofit.Builder()
                 .baseUrl(BASE_QUERY_API_URL)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
+                .client(okHttpClient)
                 .build();
     }
 
