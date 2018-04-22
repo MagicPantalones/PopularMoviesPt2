@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/container_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:id="@+id/container_main">
+    android:orientation="vertical">
     <!-- From https://guides.codepath.com/android/Google-Play-Style-Tabs-using-TabLayout -->
     <android.support.design.widget.AppBarLayout
-        android:id="@+id/app_bar_list"
-        android:animateLayoutChanges="true"
-        android:fitsSystemWindows="true"
+        android:id="@+id/app_bar_main"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        android:fitsSystemWindows="true">
 
         <android.support.design.widget.TabLayout
             android:id="@+id/sliding_tabs"
@@ -24,15 +24,15 @@
             app:tabTextColor="@color/colorPrimaryDark" />
     </android.support.design.widget.AppBarLayout>
 
+
     <android.support.v4.view.ViewPager
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:layout_marginTop="44dp"
         android:layout_marginBottom="-4dp"
-        android:background="@color/colorPrimaryDark"
-        />
+        android:layout_marginTop="44dp"
+        android:layout_weight="1"
+        android:background="@color/colorPrimaryDark" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/up_fab"
@@ -43,6 +43,5 @@
         app:elevation="0dp"
         app:layout_anchor="@id/view_pager"
         app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@drawable/ic_keyboard_arrow_up_white_24dp"
-        />
+        app:srcCompat="@drawable/ic_keyboard_arrow_up_white_24dp" />
 </android.support.design.widget.CoordinatorLayout>

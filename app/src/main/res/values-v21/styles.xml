@@ -50,7 +50,7 @@
     </style>
 
     <style name="MovieCardStyle.Text.Header" parent="MovieCardStyle.Text">
-        <item name="android:textSize">30sp</item>
+        <item name="android:textSize">24sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textAlignment">center</item>
     </style>

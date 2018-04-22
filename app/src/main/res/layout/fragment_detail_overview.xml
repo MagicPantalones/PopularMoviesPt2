@@ -2,15 +2,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:behavior_overlapTop="56dp"
+    android:orientation="vertical"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="io.magics.popularmovies.fragments.detailfragments.MovieDetailsOverview">
 
     <TextView
         android:id="@+id/tv_overview_title_frag"
         style="@style/MovieCardStyle.Text.Header"
         android:text="@string/bnav_overview_title"
+        android:textSize="30sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         />

@@ -54,6 +54,7 @@ public class MovieDetailsReviews extends Fragment {
         mRvReviewRecycler.setLayoutManager(new LinearLayoutManager(view.getContext(),
                 LinearLayoutManager.VERTICAL, false));
         mRvReviewRecycler.setAdapter(adapter);
+        mRvReviewRecycler.setNestedScrollingEnabled(false);
 
         //noinspection ConstantConditions
         mViewModel.mReviews.observe(getActivity(), reviewResults -> {

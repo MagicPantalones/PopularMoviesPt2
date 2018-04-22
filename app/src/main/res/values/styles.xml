@@ -38,9 +38,13 @@
     </style>
 
     <style name="MovieCardStyle.Text.Header" parent="MovieCardStyle.Text">
-        <item name="android:textSize">30sp</item>
+        <item name="android:textSize">24sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textAlignment">center</item>
+    </style>
+
+    <style name="MovieCardStyle.Text.Tabs" parent="TextAppearance.Design.Tab">
+        <item name="android:fontFamily">@font/asap_medium</item>
     </style>
 
     <style name="Fab">

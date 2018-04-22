@@ -2,7 +2,6 @@ package io.magics.popularmovies;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentTransaction;
@@ -34,7 +33,6 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
         ListPopularFragment.PopularFragmentListener, ListFavouritesFragment.FavouritesFragmentListener,
         MovieDetailsFragment.DetailFragInteractionHandler {
 
-    //TODO Lifecycle Persistance
     //TODO Add horizontal layout support.
     //TODO Inspect for memoryleaks
 
@@ -42,7 +40,7 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
     ViewPager mViewPager;
     @BindView(R.id.sliding_tabs)
     TabLayout mTabLayout;
-    @BindView(R.id.app_bar_list)
+    @BindView(R.id.app_bar_main)
     AppBarLayout mAppBar;
     @BindView(R.id.up_fab)
     FloatingActionButton mUpFab;
@@ -114,7 +112,6 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
 
         MovieDetailsFragment frag = MovieDetailsFragment.newInstance(movie, mFavListVM.checkIfFavourite(movie.getMovieId()));
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-
         ft.replace(R.id.container_main, frag, DETAIL_FRAGMENT_TAG);
         ft.addToBackStack(null);
         ft.commit();
@@ -188,7 +185,6 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
     public void onFragmentExit() {
         if (!isChangingConfigurations() || !isFinishing() && mUpFab != null) {
             mUpFab.show();
-            mAppBar.setVisibility(View.VISIBLE);
         }
     }
 }

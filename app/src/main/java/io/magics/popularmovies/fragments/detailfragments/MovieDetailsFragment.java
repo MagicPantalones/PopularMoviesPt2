@@ -8,19 +8,24 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.graphics.drawable.Animatable2Compat;
 import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.widget.NestedScrollView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.BounceInterpolator;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -44,14 +49,21 @@ import static io.magics.popularmovies.utils.MovieUtils.*;
  * Use the {@link MovieDetailsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MovieDetailsFragment extends DialogFragment {
+public class MovieDetailsFragment extends Fragment implements MovieDetailsOverview.OverviewFragEvent{
 
     public static final String ARG_MOVIE = "movie";
     public static final String ARG_IS_FAVOURITE = "isFavourite";
 
+    private static final String OVERVIEW_FRAG = "overviewFrag";
+    private static final String TRAILER_FRAG = "trailerFrag";
+    private static final String REVIEW_FRAG = "reviewFrag";
+
     private Movie mMovie;
     private boolean mIsFavourite;
 
+    @BindView(R.id.detail_fragment) CoordinatorLayout mCoordinator;
+    @BindView(R.id.detail_wrapper) ConstraintLayout mDetailWrapper;
+    @BindView(R.id.frame_trailers_and_reviews) FrameLayout mFragFrame;
     @BindView(R.id.iv_poster_detail) ImageView mPoster;
     @BindView(R.id.tv_movie_title_detail) TextView mTitle;
     @BindView(R.id.tv_release_date_detail) TextView mReleaseDate;
@@ -60,6 +72,8 @@ public class MovieDetailsFragment extends DialogFragment {
     @BindView(R.id.fav_fab) FloatingActionButton mFavFab;
     @BindView(R.id.fav_fab_anim) ImageView mFavFabAnim;
     @BindView(R.id.bottom_nav_details) BottomNavigationView mBotNav;
+    @BindView(R.id.app_bar_main_details) AppBarLayout mAppBar;
+    @BindView(R.id.nsv_contentNsv) NestedScrollView mScrollView;
 
     private Unbinder mUnbinder;
     private FragmentManager mFragManager;
@@ -68,6 +82,7 @@ public class MovieDetailsFragment extends DialogFragment {
     private ValueAnimator mVoteTextAnim;
     private ObjectAnimator mVoteProgressAnim;
     private AnimatedVectorDrawableCompat mFabAnim;
+    private ValueAnimator mOverviewAnim;
 
     ImageSize mImageSize;
     int mFavouriteColor;
@@ -104,8 +119,14 @@ public class MovieDetailsFragment extends DialogFragment {
 
         if (mFragManager.getFragments() == null || mFragManager.getFragments().isEmpty()) {
             FragmentTransaction ft = mFragManager.beginTransaction();
-            ft.add(R.id.frame_trailers_and_reviews, MovieDetailsOverview.newInstance(mMovie));
+            MovieDetailsOverview frag = MovieDetailsOverview.newInstance(mMovie);
+            ft.add(R.id.frame_trailers_and_reviews, frag);
             ft.commit();
+        } else {
+            Fragment frag = mFragManager.findFragmentById(R.id.frame_trailers_and_reviews);
+            if (frag != null && !(frag instanceof MovieDetailsReviews)) {
+                mScrollView.setNestedScrollingEnabled(false);
+            }
         }
 
         return root;
@@ -149,6 +170,7 @@ public class MovieDetailsFragment extends DialogFragment {
 
         mBotNav.setOnNavigationItemSelectedListener(item -> {
             Fragment frag = null;
+
             if (!item.isChecked()) {
                 switch (item.getItemId()) {
                     case R.id.action_overview:
@@ -156,16 +178,21 @@ public class MovieDetailsFragment extends DialogFragment {
                         break;
                     case R.id.action_trailers:
                         frag = new MovieDetailsTrailers();
+                        mAppBar.setExpanded(true, true);
+                        mScrollView.setNestedScrollingEnabled(false);
                         break;
                     case R.id.action_reviews:
                         frag = new MovieDetailsReviews();
+                        mScrollView.setNestedScrollingEnabled(true);
                         break;
                     default:
                         break;
                 }
+
                 FragmentTransaction ft = mFragManager.beginTransaction();
                 ft.replace(R.id.frame_trailers_and_reviews, frag);
                 ft.commit();
+
                 return true;
             }
             return true;
@@ -179,7 +206,6 @@ public class MovieDetailsFragment extends DialogFragment {
         if (context instanceof DetailFragInteractionHandler) {
             mFragInteractionHandler = (DetailFragInteractionHandler) context;
         }
-        else throw new IllegalArgumentException("Not a FavFabClickListener");
     }
 
     @Override
@@ -187,14 +213,36 @@ public class MovieDetailsFragment extends DialogFragment {
         if (mVoteProgressAnim != null && mVoteProgressAnim.isStarted()) mVoteProgressAnim.cancel();
         if (mVoteTextAnim != null && mVoteTextAnim.isStarted()) mVoteTextAnim.cancel();
         if (mFabAnim != null && mFabAnim.isRunning()) mFabAnim.stop();
+        if (mOverviewAnim != null && mOverviewAnim.isRunning()) mOverviewAnim.cancel();
         mUnbinder.unbind();
+        mFragInteractionHandler.onFragmentExit();
         super.onDestroyView();
     }
 
-    @Override
-    public void onDetach() {
-        mFragInteractionHandler.onFragmentExit();
-        super.onDetach();
+    private void setAppBarOffsetForOverview(int totalTextHeight, int offset){
+        ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) mFragFrame.getLayoutParams();
+        int margin = lp.topMargin * 2;
+        int heightLimit = mScrollView.getTop();
+        int visibleText = totalTextHeight + mDetailWrapper.getHeight();
+
+        if (visibleText > heightLimit) {
+            AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) ((CoordinatorLayout.LayoutParams)
+                    mAppBar.getLayoutParams()).getBehavior();
+            if (behavior != null) {
+                behavior.setTopAndBottomOffset(0);
+                mOverviewAnim = ValueAnimator.ofInt();
+                mOverviewAnim.setInterpolator(new DecelerateInterpolator());
+                mOverviewAnim.addUpdateListener(animation -> {
+                    behavior.setTopAndBottomOffset((int) animation.getAnimatedValue());
+                    mAppBar.requestLayout();
+                });
+                mOverviewAnim.setIntValues(0, -(margin / 2 + offset));
+                mOverviewAnim.setDuration(offset);
+                mOverviewAnim.start();
+                //behavior.onNestedPreScroll(mCoordinator, mAppBar, null, 0, offset, new int[]{0, 0}, ViewCompat.TYPE_NON_TOUCH);
+            }
+        }
+        mScrollView.setNestedScrollingEnabled(false);
     }
 
     private void initialAnim(){
@@ -247,6 +295,11 @@ public class MovieDetailsFragment extends DialogFragment {
         mFavFabAnim.setVisibility(View.VISIBLE);
         mFabAnim.start();
 
+    }
+
+    @Override
+    public void onFragmentDrawn(int totalTextHeight) {
+        setAppBarOffsetForOverview(totalTextHeight, mBotNav.getHeight() / 2);
     }
 
     public interface DetailFragInteractionHandler {

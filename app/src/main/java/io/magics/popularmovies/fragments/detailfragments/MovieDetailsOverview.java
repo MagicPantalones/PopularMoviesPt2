@@ -1,15 +1,21 @@
 package io.magics.popularmovies.fragments.detailfragments;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import io.magics.popularmovies.R;
 import io.magics.popularmovies.models.Movie;
 
@@ -21,6 +27,17 @@ public class MovieDetailsOverview extends Fragment {
     private static final String ARG_MOVIE = "movie";
 
     private Movie mMovie;
+
+    @BindView(R.id.tv_overview_frag) TextView mTvOverViewText;
+    @BindView(R.id.tv_overview_title_frag) TextView mTvOverviewTitle;
+
+    Unbinder mUnbinder;
+    OverviewFragEvent mFragEvent;
+    Boolean mFragExpanded;
+
+    public interface OverviewFragEvent {
+        void onFragmentDrawn(int totalTextHeight);
+    }
 
     public static MovieDetailsOverview newInstance(Movie movie){
         MovieDetailsOverview frag = new MovieDetailsOverview();
@@ -46,9 +63,32 @@ public class MovieDetailsOverview extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_detail_overview, container, false);
-        TextView tvOverview = root.findViewById(R.id.tv_overview_frag);
-        tvOverview.setText(mMovie.getOverview());
+        mUnbinder = ButterKnife.bind(this, root);
+        mTvOverViewText.setText(mMovie.getOverview());
+
+        mTvOverViewText.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                mTvOverViewText.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                mFragEvent.onFragmentDrawn(mTvOverViewText.getHeight() + mTvOverviewTitle.getHeight());
+            }
+        });
 
         return root;
     }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (getParentFragment() instanceof OverviewFragEvent) {
+            mFragEvent = (OverviewFragEvent) getParentFragment();
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        mFragEvent = null;
+        super.onDetach();
+    }
+
 }
