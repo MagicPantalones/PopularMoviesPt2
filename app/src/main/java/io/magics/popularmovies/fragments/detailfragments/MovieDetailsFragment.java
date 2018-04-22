@@ -222,7 +222,7 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
     private void setAppBarOffsetForOverview(int totalTextHeight, int offset){
         ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) mFragFrame.getLayoutParams();
         int margin = lp.topMargin * 2;
-        int heightLimit = mScrollView.getTop();
+        int heightLimit = mScrollView.getTop() - margin;
         int visibleText = totalTextHeight + mDetailWrapper.getHeight();
 
         if (visibleText > heightLimit) {
@@ -239,7 +239,6 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
                 mOverviewAnim.setIntValues(0, -(margin / 2 + offset));
                 mOverviewAnim.setDuration(offset);
                 mOverviewAnim.start();
-                //behavior.onNestedPreScroll(mCoordinator, mAppBar, null, 0, offset, new int[]{0, 0}, ViewCompat.TYPE_NON_TOUCH);
             }
         }
         mScrollView.setNestedScrollingEnabled(false);
