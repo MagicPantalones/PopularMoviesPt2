@@ -18,7 +18,7 @@ import butterknife.Unbinder;
 import io.magics.popularmovies.R;
 import io.magics.popularmovies.viewmodels.ReviewsViewModel;
 
-import static io.magics.popularmovies.utils.MovieUtils.showAndHideViews;
+import static io.magics.popularmovies.utils.MovieUtils.toggleViewVisibility;
 
 
 public class MovieDetailsReviews extends Fragment {
@@ -59,9 +59,9 @@ public class MovieDetailsReviews extends Fragment {
         //noinspection ConstantConditions
         mViewModel.mReviews.observe(getActivity(), reviewResults -> {
             if (reviewResults != null){
-                if (reviewResults.isEmpty()) showAndHideViews(mTvNoReviews, mRvReviewRecycler);
+                if (reviewResults.isEmpty()) toggleViewVisibility(mTvNoReviews, mRvReviewRecycler);
                 else {
-                    showAndHideViews(mRvReviewRecycler, mTvNoReviews);
+                    toggleViewVisibility(mRvReviewRecycler, mTvNoReviews);
                     adapter.setReviewData(reviewResults);
                 }
             }

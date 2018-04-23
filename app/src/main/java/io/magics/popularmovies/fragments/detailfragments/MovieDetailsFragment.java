@@ -39,6 +39,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import io.magics.popularmovies.R;
 import io.magics.popularmovies.models.Movie;
+import io.magics.popularmovies.utils.AnimationHelper;
 import io.magics.popularmovies.utils.GlideApp;
 
 import static io.magics.popularmovies.utils.MovieUtils.*;
@@ -53,10 +54,6 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
 
     public static final String ARG_MOVIE = "movie";
     public static final String ARG_IS_FAVOURITE = "isFavourite";
-
-    private static final String OVERVIEW_FRAG = "overviewFrag";
-    private static final String TRAILER_FRAG = "trailerFrag";
-    private static final String REVIEW_FRAG = "reviewFrag";
 
     private Movie mMovie;
     private boolean mIsFavourite;
@@ -79,10 +76,7 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
     private FragmentManager mFragManager;
     private DetailFragInteractionHandler mFragInteractionHandler;
 
-    private ValueAnimator mVoteTextAnim;
-    private ObjectAnimator mVoteProgressAnim;
-    private AnimatedVectorDrawableCompat mFabAnim;
-    private ValueAnimator mOverviewAnim;
+    private AnimationHelper mAnimator;
 
     ImageSize mImageSize;
     int mFavouriteColor;
@@ -138,6 +132,7 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
         Context context = view.getContext();
 
         mImageSize = getOptimalImgSize(context);
+        mAnimator = new AnimationHelper(context, mMovie, mFavFabAnim, mFavFab);
 
         mFavouriteColor = ResourcesCompat.getColor(
                 context.getResources(),
@@ -149,8 +144,8 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
                 R.color.colorPrimaryDark,
                 context.getTheme());
 
-        initialAnim();
-        fabAnim(true);
+        mAnimator.runInitialDetailAnimation(mVoteBar, mIsFavourite, null, null,
+                updatedValue -> mVoteNumber.setText(updatedValue));
 
         mTitle.setText(mMovie.getTitle());
         mReleaseDate.setText(formatDate(mMovie.getReleaseDate()));
@@ -165,7 +160,7 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
         mFavFab.setOnClickListener(v -> {
             mFragInteractionHandler.favFabClicked(mMovie, mIsFavourite);
             mIsFavourite = !mIsFavourite;
-            fabAnim(false);
+            mAnimator.runFabAnim(mIsFavourite);
         });
 
         mBotNav.setOnNavigationItemSelectedListener(item -> {
@@ -210,10 +205,7 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
 
     @Override
     public void onDestroyView() {
-        if (mVoteProgressAnim != null && mVoteProgressAnim.isStarted()) mVoteProgressAnim.cancel();
-        if (mVoteTextAnim != null && mVoteTextAnim.isStarted()) mVoteTextAnim.cancel();
-        if (mFabAnim != null && mFabAnim.isRunning()) mFabAnim.stop();
-        if (mOverviewAnim != null && mOverviewAnim.isRunning()) mOverviewAnim.cancel();
+        mAnimator.disposeAnimations();
         mUnbinder.unbind();
         mFragInteractionHandler.onFragmentExit();
         super.onDestroyView();
@@ -230,70 +222,13 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
                     mAppBar.getLayoutParams()).getBehavior();
             if (behavior != null) {
                 behavior.setTopAndBottomOffset(0);
-                mOverviewAnim = ValueAnimator.ofInt();
-                mOverviewAnim.setInterpolator(new DecelerateInterpolator());
-                mOverviewAnim.addUpdateListener(animation -> {
-                    behavior.setTopAndBottomOffset((int) animation.getAnimatedValue());
+                mAnimator.runOverviewAnim(margin / 2 + offset, value -> {
+                    behavior.setTopAndBottomOffset(value);
                     mAppBar.requestLayout();
                 });
-                mOverviewAnim.setIntValues(0, -(margin / 2 + offset));
-                mOverviewAnim.setDuration(offset);
-                mOverviewAnim.start();
             }
         }
         mScrollView.setNestedScrollingEnabled(false);
-    }
-
-    private void initialAnim(){
-
-        mVoteTextAnim = ValueAnimator.ofFloat(0.0f, mMovie.getVoteAverage().floatValue());
-
-        mVoteTextAnim.setDuration(2000);
-        mVoteTextAnim.setInterpolator(new BounceInterpolator());
-
-        mVoteTextAnim.addUpdateListener(valueAnimator -> {
-            String shownVal = valueAnimator.getAnimatedValue().toString();
-            shownVal = shownVal.substring(0, 3);
-            mVoteNumber.setText(shownVal);
-        });
-
-        mVoteTextAnim.start();
-
-        mVoteProgressAnim = ObjectAnimator.ofInt(mVoteBar, "progress",
-                ((Long)Math.round(mMovie.getVoteAverage() * 10)).intValue());
-
-        mVoteProgressAnim.setDuration(2000);
-        mVoteProgressAnim.setInterpolator(new BounceInterpolator());
-
-        mVoteProgressAnim.start();
-    }
-
-    private void fabAnim(boolean enterAnim){
-
-        if (enterAnim){
-            mFabAnim = AnimatedVectorDrawableCompat.create(Objects.requireNonNull(getContext()),
-                    mIsFavourite ? R.drawable.ic_anim_heart_enter_to_fav : R.drawable.ic_anim_heart_enter_to_default);
-        } else {
-            mFabAnim = AnimatedVectorDrawableCompat.create(Objects.requireNonNull(getContext()),
-                    mIsFavourite ? R.drawable.ic_anim_heart_to_fav : R.drawable.ic_anim_heart_from_fav);
-        }
-
-        mFavFabAnim.setImageDrawable(mFabAnim);
-
-        mFabAnim.registerAnimationCallback(new Animatable2Compat.AnimationCallback() {
-            @Override
-            public void onAnimationEnd(Drawable drawable) {
-                mFavFab.setBackgroundTintList(ColorStateList.valueOf(mIsFavourite ? mFavouriteColor : mDefaultColor));
-                mFavFab.setVisibility(View.VISIBLE);
-                mFavFabAnim.setVisibility(View.INVISIBLE);
-                super.onAnimationEnd(drawable);
-            }
-        });
-
-        mFavFab.setVisibility(View.INVISIBLE);
-        mFavFabAnim.setVisibility(View.VISIBLE);
-        mFabAnim.start();
-
     }
 
     @Override

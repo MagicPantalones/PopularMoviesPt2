@@ -25,7 +25,7 @@ import io.magics.popularmovies.R;
 import io.magics.popularmovies.models.TrailerResult;
 import io.magics.popularmovies.viewmodels.TrailersViewModel;
 
-import static io.magics.popularmovies.utils.MovieUtils.showAndHideViews;
+import static io.magics.popularmovies.utils.MovieUtils.toggleViewVisibility;
 
 
 public class MovieDetailsTrailers extends Fragment
@@ -66,12 +66,12 @@ public class MovieDetailsTrailers extends Fragment
         //noinspection ConstantConditions
         mViewModel.mTrailers.observe(getActivity(), trailerResults -> {
             if (trailerResults != null){
-                if (trailerResults.isEmpty()) showAndHideViews(mTvNoTrailers, mRvTrailerRecycler);
+                if (trailerResults.isEmpty()) toggleViewVisibility(mTvNoTrailers, mRvTrailerRecycler);
                 else {
-                    showAndHideViews(mRvTrailerRecycler, mTvNoTrailers);
+                    toggleViewVisibility(mRvTrailerRecycler, mTvNoTrailers);
                     adapter.setTrailerList(trailerResults);
                 }
-            } else showAndHideViews(mTvNoTrailers, mRvTrailerRecycler);
+            } else toggleViewVisibility(mTvNoTrailers, mRvTrailerRecycler);
         });
 
     }

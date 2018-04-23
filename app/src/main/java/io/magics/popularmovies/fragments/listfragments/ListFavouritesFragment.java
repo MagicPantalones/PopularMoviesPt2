@@ -87,7 +87,7 @@ public class ListFavouritesFragment extends Fragment
 
         //noinspection ConstantConditions
         mViewModel.mFavList.observe(getActivity(), movies -> {
-            if (movies == null || movies.isEmpty()) MovieUtils.showAndHideViews(mTvNoFavourites,
+            if (movies == null || movies.isEmpty()) MovieUtils.toggleViewVisibility(mTvNoFavourites,
                     mRvFavourites);
             else mAdapter.setMovieData(movies);
         });

@@ -85,7 +85,7 @@ public class ListTopRatedFragment extends Fragment
         });
 
         mViewModel.mTopList.observe(getActivity(), movies -> {
-            if (movies == null || movies.isEmpty()) MovieUtils.showAndHideViews(mTvTopRated, mRvTopRated);
+            if (movies == null || movies.isEmpty()) MovieUtils.toggleViewVisibility(mTvTopRated, mRvTopRated);
             else mAdapter.setMovieData(movies);
         });
     }

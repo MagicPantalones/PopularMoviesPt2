@@ -83,7 +83,7 @@ public class ListPopularFragment extends Fragment
         });
 
         mViewModel.mPopList.observe(getActivity(), movies -> {
-            if (movies == null || movies.isEmpty()) MovieUtils.showAndHideViews(mTvPopularError, mRvPopular);
+            if (movies == null || movies.isEmpty()) MovieUtils.toggleViewVisibility(mTvPopularError, mRvPopular);
             else mAdapter.setMovieData(movies);
         });
     }
