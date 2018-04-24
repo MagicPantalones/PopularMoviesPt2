@@ -1,10 +1,6 @@
 package io.magics.popularmovies.fragments.detailfragments;
 
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,8 +9,6 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.graphics.drawable.Animatable2Compat;
-import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -23,8 +17,6 @@ import android.support.v4.widget.NestedScrollView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.BounceInterpolator;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -32,11 +24,10 @@ import android.widget.TextView;
 
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
-import java.util.Objects;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.magics.popularmovies.MovieListsActivity;
 import io.magics.popularmovies.R;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.utils.AnimationHelper;
@@ -111,6 +102,9 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
         mUnbinder = ButterKnife.bind(this, root);
         mFragManager = getChildFragmentManager();
 
+        //noinspection ConstantConditions
+        mAnimator = ((MovieListsActivity) getActivity()).getAnimationHelper();
+
         if (mFragManager.getFragments() == null || mFragManager.getFragments().isEmpty()) {
             FragmentTransaction ft = mFragManager.beginTransaction();
             MovieDetailsOverview frag = MovieDetailsOverview.newInstance(mMovie);
@@ -132,7 +126,6 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
         Context context = view.getContext();
 
         mImageSize = getOptimalImgSize(context);
-        mAnimator = new AnimationHelper(context, mMovie, mFavFabAnim, mFavFab);
 
         mFavouriteColor = ResourcesCompat.getColor(
                 context.getResources(),
@@ -143,6 +136,8 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
                 context.getResources(),
                 R.color.colorPrimaryDark,
                 context.getTheme());
+
+        mAnimator.prepareDetailAnimations(mFavFabAnim, mFavFab);
 
         mAnimator.runInitialDetailAnimation(mVoteBar, mIsFavourite, null, null,
                 updatedValue -> mVoteNumber.setText(updatedValue));
@@ -201,11 +196,12 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
         if (context instanceof DetailFragInteractionHandler) {
             mFragInteractionHandler = (DetailFragInteractionHandler) context;
         }
+
     }
 
     @Override
     public void onDestroyView() {
-        mAnimator.disposeAnimations();
+        mAnimator.prepareToDisposeDetailFragment();
         mUnbinder.unbind();
         mFragInteractionHandler.onFragmentExit();
         super.onDestroyView();

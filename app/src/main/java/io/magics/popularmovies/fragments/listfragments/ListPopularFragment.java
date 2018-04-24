@@ -2,6 +2,7 @@ package io.magics.popularmovies.fragments.listfragments;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -40,7 +41,7 @@ public class ListPopularFragment extends Fragment
 
 
     public interface PopularFragmentListener{
-        void showClickedPopMovie(Movie movie);
+        void showClickedPopMovie(Movie movie, Drawable drawable, int posX, int posY);
         void popularRvScrolled(ScrollDirection scrollDirection);
     }
 
@@ -102,10 +103,10 @@ public class ListPopularFragment extends Fragment
         super.onDetach();
     }
 
-
     @Override
-    public void onClick(Movie movie) {
-        if (mFragmentListener != null) mFragmentListener.showClickedPopMovie(movie);
+    public void onClick(Movie movie, Drawable drawable, int posX, int posY) {
+        if (mFragmentListener != null) mFragmentListener.showClickedPopMovie(movie, drawable,
+                posX, posY);
     }
 
     public void scrollPopListToZero(){ mRvPopular.smoothScrollToPosition(0); }

@@ -25,7 +25,7 @@ import io.magics.popularmovies.models.Movie;
 public class AnimationHelper {
 
     private final Context mContext;
-    private final Movie mMovie;
+    private Movie mMovie;
 
     private ValueAnimator mVoteTextAnim;
     private ObjectAnimator mVoteProgressAnim;
@@ -34,19 +34,16 @@ public class AnimationHelper {
 
     private int mFavouriteColor;
     private int mDefaultColor;
+    private Drawable mPosterDrawableSmall;
 
     private ImageView mIvFabAnimation;
     private FloatingActionButton mFab;
 
+    private int mViewHolderXPosition;
+    private int mViewHolderYPosition;
 
-    public AnimationHelper(Context context, Movie movie,
-                           ImageView fabAnimation, FloatingActionButton fab){
-
+    public AnimationHelper(Context context){
         this.mContext = context;
-        this.mMovie = movie;
-
-        this.mIvFabAnimation = fabAnimation;
-        this.mFab = fab;
 
         mFavouriteColor = ResourcesCompat.getColor(context.getResources(),
                 R.color.colorSecondaryAccent, context.getTheme());
@@ -55,11 +52,28 @@ public class AnimationHelper {
 
     }
 
+    public void prepareToDetailAnimation(Drawable poster, Movie movie,
+                                         int viewHolderX, int viewHolderY){
+        mPosterDrawableSmall = poster;
+        mMovie = movie;
+        mViewHolderXPosition = viewHolderX;
+        mViewHolderYPosition = viewHolderY;
+
+    }
+
+    public void prepareDetailAnimations(ImageView fabAnimImageView,
+                                        FloatingActionButton fab){
+
+        mIvFabAnimation = fabAnimImageView;
+        mFab = fab;
+
+    }
+
     public void runInitialDetailAnimation(@NonNull ProgressBar progressBar,
                                           @NonNull Boolean isFavourite,
                                           @Nullable Integer duration,
                                           @Nullable Interpolator interpolator,
-                                          @NonNull InitialAnimationUpdateListener listener){
+                                          @NonNull InitialDetailAnimationUpdateListener listener){
 
         mVoteTextAnim = ValueAnimator.ofFloat(0.0f, mMovie.getVoteAverage().floatValue())
                 .setDuration(duration != null ? duration : 2000);
@@ -127,14 +141,14 @@ public class AnimationHelper {
 
     }
 
-    public void disposeAnimations(){
+    public void prepareToDisposeDetailFragment(){
         if (mVoteProgressAnim != null && mVoteProgressAnim.isStarted()) mVoteProgressAnim.cancel();
         if (mVoteTextAnim != null && mVoteTextAnim.isStarted()) mVoteTextAnim.cancel();
         if (mFabAnim != null && mFabAnim.isRunning()) mFabAnim.stop();
         if (mOverviewAnim != null && mOverviewAnim.isRunning()) mOverviewAnim.cancel();
     }
 
-    public interface InitialAnimationUpdateListener{
+    public interface InitialDetailAnimationUpdateListener {
         void updatedValue(String updatedValue);
     }
 

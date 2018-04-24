@@ -2,6 +2,7 @@ package io.magics.popularmovies.fragments.listfragments;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -41,7 +42,7 @@ public class ListTopRatedFragment extends Fragment
 
 
     public interface TopRatedFragmentListener{
-        void showClickedTopMovie(Movie movie);
+        void showClickedTopMovie(Movie movie, Drawable drawable, int posX, int posY);
         void topRatedRvScrolled(ScrollDirection scrollDirection);
     }
 
@@ -105,8 +106,9 @@ public class ListTopRatedFragment extends Fragment
     }
 
     @Override
-    public void onClick(Movie movie) {
-        if (mFragmentListener != null) mFragmentListener.showClickedTopMovie(movie);
+    public void onClick(Movie movie, Drawable drawable, int posX, int posY) {
+        if (mFragmentListener != null) mFragmentListener.showClickedTopMovie(movie, drawable,
+                posX, posY);
     }
 
     public void scrollTopListToZero(){ mRvTopRated.smoothScrollToPosition(0); }

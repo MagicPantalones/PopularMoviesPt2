@@ -71,4 +71,6 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     //MarkdownView
     implementation 'us.feras.mdv:markdownview:1.1.0'
+    //Transition Library
+    implementation 'com.andkulikov:transitionseverywhere:1.7.9'
 }

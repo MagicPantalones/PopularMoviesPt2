@@ -54,7 +54,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
     private int mDefaultColor;
 
     public interface PosterClickHandler {
-        void onClick(Movie movie);
+        void onClick(Movie movie, Drawable drawable, int posX, int posY);
     }
 
     //Help from https://medium.com/@ayhamorfali/android-detect-when-the-recyclerview-reaches-the-bottom-43f810430e1e
@@ -207,7 +207,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
 
         @Override
         public void onClick(View v) {
-            mClickHandler.onClick(mMovieData.get(getAdapterPosition()));
+            mClickHandler.onClick(mMovieData.get(getAdapterPosition()), mIv.getDrawable(),
+                    v.getLeft(), v.getTop());
         }
 
     }

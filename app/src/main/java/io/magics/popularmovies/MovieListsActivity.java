@@ -1,6 +1,7 @@
 package io.magics.popularmovies;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.graphics.drawable.Drawable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -25,6 +26,8 @@ import io.magics.popularmovies.fragments.listfragments.ListPopularFragment;
 import io.magics.popularmovies.fragments.listfragments.ListTopRatedFragment;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.networkutils.DataProvider;
+import io.magics.popularmovies.utils.AnimationHelper;
+import io.magics.popularmovies.utils.MovieUtils;
 import io.magics.popularmovies.utils.MovieUtils.ScrollDirection;
 import io.magics.popularmovies.viewmodels.FavListViewModel;
 import io.magics.popularmovies.viewmodels.PopListViewModel;
@@ -54,6 +57,7 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
 
     MovieListsPagerAdapter mAdapter;
     DataProvider mDataProvider;
+    AnimationHelper mAnimationHelper;
 
     TopListViewModel mTopListVM;
     PopListViewModel mPopListVM;
@@ -101,6 +105,8 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
 
         mDataProvider.initialiseApp();
 
+        if (mAnimationHelper == null) mAnimationHelper = new AnimationHelper(this);
+
     }
 
     @Override
@@ -118,8 +124,8 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
         mUpFab.hide();
         mAppBarBack.setMinimumHeight(mTabLayout.getHeight());
         mAppBar.setBackgroundResource(R.drawable.bg_toolbar_list);
-        mTabLayout.setVisibility(View.GONE);
-        mAppBarBack.setVisibility(View.VISIBLE);
+        MovieUtils.toggleViewVisibility(mTabLayout, mAppBarBack);
+
         mAppBarBack.setOnClickListener(v -> {
             Fragment frag = getSupportFragmentManager().findFragmentByTag(DETAIL_FRAGMENT_TAG);
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -129,11 +135,14 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
             }
         });
 
-        MovieDetailsFragment frag = MovieDetailsFragment.newInstance(movie, mFavListVM.checkIfFavourite(movie.getMovieId()));
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.container_main, frag, DETAIL_FRAGMENT_TAG);
-        ft.addToBackStack(null);
-        ft.commit();
+        MovieDetailsFragment frag = MovieDetailsFragment
+                .newInstance(movie, mFavListVM.checkIfFavourite(movie.getMovieId()));
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container_main, frag, DETAIL_FRAGMENT_TAG)
+                .addToBackStack(null)
+                .commit();
+
     }
 
     public void hideUpFabOnScroll(ScrollDirection scrollDirection){
@@ -164,9 +173,14 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
         });
     }
 
+    public AnimationHelper getAnimationHelper(){
+        if (mAnimationHelper != null) return mAnimationHelper;
+        else return new AnimationHelper(this);
+    }
+
     @Override
-    public void showClickedTopMovie(Movie movie) {
-        showMovieDetailsFrag(movie);
+    public void showClickedTopMovie(Movie movie, Drawable drawable, int posX, int posY) {
+        mAnimationHelper.prepareToDetailAnimation(drawable, movie, posX, posY);
     }
 
     @Override
@@ -175,8 +189,8 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
     }
 
     @Override
-    public void showClickedPopMovie(Movie movie) {
-        showMovieDetailsFrag(movie);
+    public void showClickedPopMovie(Movie movie, Drawable drawable, int posX, int posY) {
+        mAnimationHelper.prepareToDetailAnimation(drawable, movie, posX, posY);
     }
 
     @Override
@@ -185,8 +199,8 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
     }
 
     @Override
-    public void showClickedFavMovie(Movie movie) {
-        showMovieDetailsFrag(movie);
+    public void showClickedFavMovie(Movie movie, Drawable drawable, int posX, int posY) {
+        mAnimationHelper.prepareToDetailAnimation(drawable, movie, posX, posY);
     }
 
     @Override
@@ -204,8 +218,7 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
     public void onFragmentExit() {
         if (!isChangingConfigurations() || !isFinishing() && mUpFab != null) {
             mUpFab.show();
-            mTabLayout.setVisibility(View.VISIBLE);
-            mAppBarBack.setVisibility(View.GONE);
+            MovieUtils.toggleViewVisibility(mAppBarBack, mTabLayout);
             mAppBar.setBackground(null);
         }
     }
