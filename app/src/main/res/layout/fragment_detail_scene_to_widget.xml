@@ -1,0 +1,93 @@
+<android.support.v4.widget.NestedScrollView android:id="@+id/nsv_contentNsv"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingStart="6dp"
+    android:paddingEnd="6dp"
+    android:layout_marginBottom="2dp"
+    android:layout_marginTop="0.4dp"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/detail_widget"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_card_details">
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/detail_wrapper"
+                android:layout_width="match_parent"
+                android:layout_height="115dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+                <TextView
+                    android:id="@+id/tv_movie_title_detail"
+                    style="@style/MovieCardStyle.Text.Header"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="40dp"
+                    android:layout_marginStart="40dp"
+                    android:fitsSystemWindows="true"
+                    android:textAlignment="center"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/widget_guide"
+                    tools:text="One Flew Over The Cuckoo's Nest" />
+
+                <android.support.constraint.Guideline
+                    android:id="@+id/widget_guide"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_percent="0.5" />
+
+                <TextView
+                    android:id="@+id/tv_release_date_detail"
+                    style="@style/MovieCardStyle.Text.Normal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textAllCaps="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_movie_title_detail"
+                    tools:text="September 17th, 2015" />
+
+                <ProgressBar
+                    android:id="@+id/pb_vote_count_detail"
+                    style="@style/MovieCardStyle.VoteBar"
+                    android:layout_width="0dp"
+                    android:layout_height="22dp"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintEnd_toEndOf="@+id/tv_release_date_detail"
+                    app:layout_constraintStart_toStartOf="@+id/tv_release_date_detail"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_release_date_detail" />
+
+                <TextView
+                    android:id="@+id/tv_vote_average_detail"
+                    style="@style/MovieCardStyle.Text.Normal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorPrimary"
+                    app:layout_constraintBottom_toBottomOf="@+id/pb_vote_count_detail"
+                    app:layout_constraintEnd_toEndOf="@+id/pb_vote_count_detail"
+                    app:layout_constraintHorizontal_bias="0.07"
+                    app:layout_constraintStart_toStartOf="@+id/pb_vote_count_detail"
+                    app:layout_constraintTop_toTopOf="@+id/pb_vote_count_detail"
+                    tools:text="7.5" />
+            </android.support.constraint.ConstraintLayout>
+            <FrameLayout
+                android:id="@+id/frame_trailers_and_reviews"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/detail_wrapper" />
+
+        </android.support.constraint.ConstraintLayout>
+    </android.support.v4.widget.NestedScrollView>
