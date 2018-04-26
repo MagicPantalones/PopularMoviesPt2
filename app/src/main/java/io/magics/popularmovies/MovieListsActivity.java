@@ -1,46 +1,50 @@
 package io.magics.popularmovies;
 
 import android.arch.lifecycle.ViewModelProviders;
-import android.graphics.drawable.Drawable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 
 import com.facebook.stetho.Stetho;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import io.magics.popularmovies.fragments.MovieListsPagerAdapter;
 import io.magics.popularmovies.fragments.detailfragments.MovieDetailsFragment;
-import io.magics.popularmovies.fragments.listfragments.ListFavouritesFragment;
-import io.magics.popularmovies.fragments.listfragments.ListPopularFragment;
-import io.magics.popularmovies.fragments.listfragments.ListTopRatedFragment;
+import io.magics.popularmovies.fragments.listfragments.ListFragment;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.networkutils.DataProvider;
 import io.magics.popularmovies.utils.AnimationHelper;
 import io.magics.popularmovies.utils.MovieUtils;
 import io.magics.popularmovies.utils.MovieUtils.ScrollDirection;
+import io.magics.popularmovies.viewmodels.AnimationHelperViewModel;
 import io.magics.popularmovies.viewmodels.FavListViewModel;
 import io.magics.popularmovies.viewmodels.PopListViewModel;
 import io.magics.popularmovies.viewmodels.ReviewsViewModel;
 import io.magics.popularmovies.viewmodels.TopListViewModel;
 import io.magics.popularmovies.viewmodels.TrailersViewModel;
 
-public class MovieListsActivity extends AppCompatActivity implements ListTopRatedFragment.TopRatedFragmentListener,
-        ListPopularFragment.PopularFragmentListener, ListFavouritesFragment.FavouritesFragmentListener,
+public class MovieListsActivity extends AppCompatActivity implements ListFragment.FragmentListener,
         MovieDetailsFragment.DetailFragInteractionHandler {
 
     //TODO Add horizontal layout support.
     //TODO Inspect for memoryleaks
+
+    static final String ADAPTER_DATA = "adapterData";
 
     @BindView(R.id.view_pager)
     ViewPager mViewPager;
@@ -52,6 +56,8 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
     FloatingActionButton mUpFab;
     @BindView(R.id.iv_app_bar_back)
     ImageView mAppBarBack;
+    @BindView(R.id.container_main)
+    ViewGroup mMainContainer;
 
     private static final String DETAIL_FRAGMENT_TAG = "detailFrag";
 
@@ -64,6 +70,7 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
     FavListViewModel mFavListVM;
     TrailersViewModel mTrailerVm;
     ReviewsViewModel mReviewVm;
+    AnimationHelperViewModel mAnimHelperVm;
 
     Unbinder mUnbinder;
 
@@ -79,11 +86,10 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
         mFavListVM = ViewModelProviders.of(this).get(FavListViewModel.class);
         mTrailerVm = ViewModelProviders.of(this).get(TrailersViewModel.class);
         mReviewVm = ViewModelProviders.of(this).get(ReviewsViewModel.class);
+        mAnimHelperVm = ViewModelProviders.of(this).get(AnimationHelperViewModel.class);
 
         mViewPager.setOffscreenPageLimit(3);
         mAdapter = new MovieListsPagerAdapter(getSupportFragmentManager());
-
-        mAppBar.setOrientation(AppBarLayout.VERTICAL);
 
         mViewPager.setAdapter(mAdapter);
 
@@ -96,14 +102,15 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
             }
         });
 
-        setClickListenerOnUpFab();
-
         mTabLayout.setupWithViewPager(mViewPager);
 
         mDataProvider = new DataProvider(this, mTopListVM, mPopListVM, mFavListVM,
                 mTrailerVm, mReviewVm);
 
         mDataProvider.initialiseApp();
+
+        mUpFab.setOnClickListener(v -> mAdapter
+                .getOneListFragment(mTabLayout.getSelectedTabPosition()).scrollRecyclerViewToTop());
 
         if (mAnimationHelper == null) mAnimationHelper = new AnimationHelper(this);
 
@@ -113,9 +120,27 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
     protected void onDestroy() {
         if (mDataProvider != null) mDataProvider.dispose();
         if (mUnbinder != null) mUnbinder.unbind();
+        if (mAnimationHelper != null) mAnimationHelper.dispose();
         super.onDestroy();
     }
 
+    //Solution to fragment backPressed listener by Hw.Master
+    // https://stackoverflow.com/questions/5448653/how-to-implement-onbackpressed-in-fragments
+    @Override
+    public void onBackPressed() {
+        int fragCount = getSupportFragmentManager().getBackStackEntryCount();
+
+        if (fragCount == 0) {
+            super.onBackPressed();
+        } else {
+            mUpFab.show();
+            MovieUtils.toggleViewVisibility(View.GONE, mAppBarBack, mTabLayout);
+            mAppBar.setBackground(null);
+            getSupportFragmentManager().popBackStack();
+            setSavedListAdapterData();
+        }
+
+    }
 
     public void showMovieDetailsFrag(Movie movie) {
 
@@ -124,19 +149,20 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
         mUpFab.hide();
         mAppBarBack.setMinimumHeight(mTabLayout.getHeight());
         mAppBar.setBackgroundResource(R.drawable.bg_toolbar_list);
-        MovieUtils.toggleViewVisibility(mTabLayout, mAppBarBack);
+        MovieUtils.toggleViewVisibility(View.GONE, mTabLayout, mAppBarBack);
 
-        mAppBarBack.setOnClickListener(v -> {
-            Fragment frag = getSupportFragmentManager().findFragmentByTag(DETAIL_FRAGMENT_TAG);
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            if (frag != null){
-                ft.remove(frag);
-                ft.commit();
-            }
-        });
+        mAppBarBack.setOnClickListener(v -> getSupportFragmentManager().popBackStack());
 
         MovieDetailsFragment frag = MovieDetailsFragment
                 .newInstance(movie, mFavListVM.checkIfFavourite(movie.getMovieId()));
+
+        mMainContainer.setOnGenericMotionListener(new View.OnGenericMotionListener() {
+            @Override
+            public boolean onGenericMotion(View v, MotionEvent event) {
+
+                return false;
+            }
+        });
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container_main, frag, DETAIL_FRAGMENT_TAG)
@@ -145,67 +171,35 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
 
     }
 
-    public void hideUpFabOnScroll(ScrollDirection scrollDirection){
-        if (scrollDirection == ScrollDirection.SCROLL_DOWN && mUpFab.getVisibility() == View.VISIBLE) mUpFab.hide();
-        else if (scrollDirection == ScrollDirection.SCROLL_UP && mUpFab.getVisibility() != View.VISIBLE) mUpFab.show();
-    }
-
-    public void setClickListenerOnUpFab(){
-        mUpFab.setOnClickListener(v -> {
-            //Using try catch block instead of checking if fragment is null
-            try {
-                switch (mTabLayout.getSelectedTabPosition()) {
-                    case 0:
-                        mAdapter.getTopFrag().scrollTopListToZero();
-                        break;
-                    case 1:
-                        mAdapter.getPopFrag().scrollPopListToZero();
-                        break;
-                    case 2:
-                        mAdapter.getFavFrag().scrollFavListToZero();
-                        break;
-                    default:
-                        break;
-                }
-            } catch (NullPointerException e){
-                //Does nothing. Fragment not instantiated yet.
-            }
-        });
-    }
-
     public AnimationHelper getAnimationHelper(){
-        if (mAnimationHelper != null) return mAnimationHelper;
-        else return new AnimationHelper(this);
+        return mAnimationHelper != null ? mAnimationHelper : new AnimationHelper(this);
+    }
+
+    private void setSavedListAdapterData(){
+        if (mAnimHelperVm.getMovies().isEmpty()) return;
+        mAdapter.getOneListFragment(mTabLayout.getSelectedTabPosition())
+                .setSavedAdapterData(
+                        mAnimHelperVm.getMovies(),
+                        mAnimHelperVm.getAdapterPosition(),
+                        mAnimHelperVm.getAdapterOffset());
+    }
+
+    public void saveListAdapterData(List<Movie> movies, int adapterPosition, int adapterOffset){
+        mAnimHelperVm.saveAdapterValues(movies, adapterPosition, adapterOffset);
     }
 
     @Override
-    public void showClickedTopMovie(Movie movie, Drawable drawable, int posX, int posY) {
-        mAnimationHelper.prepareToDetailAnimation(drawable, movie, posX, posY);
+    public void onMovieViewHolderClicked(RecyclerView recycler, View v, Movie movie) {
+        mAnimationHelper.prepareToDetailAnimation(recycler, v, movie, () ->
+                showMovieDetailsFrag(movie));
     }
 
     @Override
-    public void topRatedRvScrolled(ScrollDirection scrollDirection) {
-        hideUpFabOnScroll(scrollDirection);
-    }
-
-    @Override
-    public void showClickedPopMovie(Movie movie, Drawable drawable, int posX, int posY) {
-        mAnimationHelper.prepareToDetailAnimation(drawable, movie, posX, posY);
-    }
-
-    @Override
-    public void popularRvScrolled(ScrollDirection scrollDirection) {
-        hideUpFabOnScroll(scrollDirection);
-    }
-
-    @Override
-    public void showClickedFavMovie(Movie movie, Drawable drawable, int posX, int posY) {
-        mAnimationHelper.prepareToDetailAnimation(drawable, movie, posX, posY);
-    }
-
-    @Override
-    public void favouriteRvScrolled(ScrollDirection scrollDirection) {
-        hideUpFabOnScroll(scrollDirection);
+    public void onRecyclerViewScrolled(ScrollDirection scrollDirection) {
+        if (scrollDirection == ScrollDirection.SCROLL_DOWN &&
+                mUpFab.getVisibility() == View.VISIBLE) mUpFab.hide();
+        else if (scrollDirection == ScrollDirection.SCROLL_UP &&
+                mUpFab.getVisibility() != View.VISIBLE) mUpFab.show();
     }
 
     @Override
@@ -217,9 +211,9 @@ public class MovieListsActivity extends AppCompatActivity implements ListTopRate
     @Override
     public void onFragmentExit() {
         if (!isChangingConfigurations() || !isFinishing() && mUpFab != null) {
-            mUpFab.show();
-            MovieUtils.toggleViewVisibility(mAppBarBack, mTabLayout);
-            mAppBar.setBackground(null);
+
         }
     }
 }
+
+

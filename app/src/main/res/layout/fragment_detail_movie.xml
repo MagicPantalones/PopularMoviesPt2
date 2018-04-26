@@ -12,6 +12,9 @@
     android:layout_marginStart="8dp"
     tools:ignore="KeyboardInaccessibleWidget">
 
+    <include layout="@layout/fragment_detail_scene_to_app_bar" />
+
+    <include layout="@layout/fragment_detail_scene_to_widget" />
 
     <ImageView
         android:id="@+id/fav_fab_anim"

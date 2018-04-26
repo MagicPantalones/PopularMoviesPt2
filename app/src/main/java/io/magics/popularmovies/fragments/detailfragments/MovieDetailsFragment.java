@@ -15,6 +15,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -67,7 +68,7 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
     private FragmentManager mFragManager;
     private DetailFragInteractionHandler mFragInteractionHandler;
 
-    private AnimationHelper mAnimator;
+    private AnimationHelper.DetailAnimationsHelper mAnimator;
 
     ImageSize mImageSize;
     int mFavouriteColor;
@@ -103,7 +104,8 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
         mFragManager = getChildFragmentManager();
 
         //noinspection ConstantConditions
-        mAnimator = ((MovieListsActivity) getActivity()).getAnimationHelper();
+        mAnimator = ((MovieListsActivity) getActivity()).getAnimationHelper()
+                .new DetailAnimationsHelper(mFavFabAnim, mFavFab, mMovie);
 
         if (mFragManager.getFragments() == null || mFragManager.getFragments().isEmpty()) {
             FragmentTransaction ft = mFragManager.beginTransaction();
@@ -136,8 +138,6 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
                 context.getResources(),
                 R.color.colorPrimaryDark,
                 context.getTheme());
-
-        mAnimator.prepareDetailAnimations(mFavFabAnim, mFavFab);
 
         mAnimator.runInitialDetailAnimation(mVoteBar, mIsFavourite, null, null,
                 updatedValue -> mVoteNumber.setText(updatedValue));
@@ -201,7 +201,7 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
 
     @Override
     public void onDestroyView() {
-        mAnimator.prepareToDisposeDetailFragment();
+        mAnimator.dispose();
         mUnbinder.unbind();
         mFragInteractionHandler.onFragmentExit();
         super.onDestroyView();

@@ -54,10 +54,14 @@ public class MovieUtils {
 
     private MovieUtils(){}
 
-    public static void toggleViewVisibility(View... views){
+    public static void toggleViewVisibility(int hideType, View... views){
         for (View v : views){
-            v.setVisibility(v.getVisibility() == View.VISIBLE ? View.INVISIBLE : View.VISIBLE);
+            v.setVisibility(v.getVisibility() == View.VISIBLE ? hideType : View.VISIBLE);
         }
+    }
+
+    public static void toggleViewVisibility(View... views){
+        toggleViewVisibility(View.INVISIBLE, views);
     }
 
     public static Movie createMovieFromCursor(Cursor cursor, int position){

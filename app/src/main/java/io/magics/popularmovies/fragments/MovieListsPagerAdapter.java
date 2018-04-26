@@ -6,9 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.view.ViewGroup;
 
-import io.magics.popularmovies.fragments.listfragments.ListFavouritesFragment;
-import io.magics.popularmovies.fragments.listfragments.ListPopularFragment;
-import io.magics.popularmovies.fragments.listfragments.ListTopRatedFragment;
+import io.magics.popularmovies.fragments.listfragments.ListFragment;
 
 
 public class MovieListsPagerAdapter extends FragmentPagerAdapter {
@@ -16,9 +14,9 @@ public class MovieListsPagerAdapter extends FragmentPagerAdapter {
     private static final int PAGE_COUNT = 3;
     private String[] tabTitles = new String[] {"Top Rated", "Popular", "Favourites"};
 
-    private ListTopRatedFragment mTopFrag;
-    private ListPopularFragment mPopFrag;
-    private ListFavouritesFragment mFavFrag;
+    private ListFragment mTopFrag;
+    private ListFragment mPopFrag;
+    private ListFragment mFavFrag;
 
     public MovieListsPagerAdapter(FragmentManager fm) {
         super(fm);
@@ -28,11 +26,11 @@ public class MovieListsPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position){
             case 0:
-                return ListTopRatedFragment.newInstance();
+                return ListFragment.newInstance(ListFragment.TOP_FRAGMENT);
             case 1:
-                return ListPopularFragment.newInstance();
+                return ListFragment.newInstance(ListFragment.POP_FRAGMENT);
             case 2:
-                return ListFavouritesFragment.newInstance();
+                return ListFragment.newInstance(ListFragment.FAV_FRAGMENT);
             default:
                 return null;
         }
@@ -53,17 +51,17 @@ public class MovieListsPagerAdapter extends FragmentPagerAdapter {
     @SuppressWarnings("NullableProblems")
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        Fragment createdFrag = (Fragment) super.instantiateItem(container, position);
+        ListFragment createdFrag = (ListFragment) super.instantiateItem(container, position);
 
         switch (position){
             case 0:
-                mTopFrag = (ListTopRatedFragment) createdFrag;
+                mTopFrag = createdFrag;
                 break;
             case 1:
-                mPopFrag = (ListPopularFragment) createdFrag;
+                mPopFrag = createdFrag;
                 break;
             case 2:
-                mFavFrag = (ListFavouritesFragment) createdFrag;
+                mFavFrag = createdFrag;
                 break;
             default:
                 break;
@@ -71,10 +69,18 @@ public class MovieListsPagerAdapter extends FragmentPagerAdapter {
         return createdFrag;
     }
 
-    public ListTopRatedFragment getTopFrag(){ return mTopFrag; }
-
-    public ListPopularFragment getPopFrag() { return mPopFrag; }
-
-    public ListFavouritesFragment getFavFrag() { return mFavFrag; }
+    public ListFragment getOneListFragment(int fragType){
+        switch (fragType){
+            case ListFragment.TOP_FRAGMENT:
+                return mTopFrag;
+            case ListFragment.POP_FRAGMENT:
+                return mPopFrag;
+            case ListFragment.FAV_FRAGMENT:
+                return mFavFrag;
+            default:
+                //Should never happen.
+                throw new IllegalArgumentException("Wrong Fragment Type");
+        }
+    }
 
 }
