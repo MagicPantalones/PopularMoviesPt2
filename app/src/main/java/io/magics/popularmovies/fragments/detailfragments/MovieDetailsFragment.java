@@ -122,6 +122,7 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
         return root;
     }
 
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
