@@ -169,7 +169,7 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
 
     @Override
     public void onMovieViewHolderClicked(RecyclerView recycler, View v, Movie movie) {
-
+        showMovieDetailsFrag(movie);
     }
 
     @Override
