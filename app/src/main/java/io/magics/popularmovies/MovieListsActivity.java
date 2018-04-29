@@ -112,15 +112,12 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
         mUpFab.setOnClickListener(v -> mAdapter
                 .getOneListFragment(mTabLayout.getSelectedTabPosition()).scrollRecyclerViewToTop());
 
-        if (mAnimationHelper == null) mAnimationHelper = new AnimationHelper(this);
-
     }
 
     @Override
     protected void onDestroy() {
         if (mDataProvider != null) mDataProvider.dispose();
         if (mUnbinder != null) mUnbinder.unbind();
-        if (mAnimationHelper != null) mAnimationHelper.dispose();
         super.onDestroy();
     }
 
@@ -137,7 +134,6 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
             MovieUtils.toggleViewVisibility(View.GONE, mAppBarBack, mTabLayout);
             mAppBar.setBackground(null);
             getSupportFragmentManager().popBackStack();
-            setSavedListAdapterData();
         }
 
     }
@@ -171,27 +167,9 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
 
     }
 
-    public AnimationHelper getAnimationHelper(){
-        return mAnimationHelper != null ? mAnimationHelper : new AnimationHelper(this);
-    }
-
-    private void setSavedListAdapterData(){
-        if (mAnimHelperVm.getMovies().isEmpty()) return;
-        mAdapter.getOneListFragment(mTabLayout.getSelectedTabPosition())
-                .setSavedAdapterData(
-                        mAnimHelperVm.getMovies(),
-                        mAnimHelperVm.getAdapterPosition(),
-                        mAnimHelperVm.getAdapterOffset());
-    }
-
-    public void saveListAdapterData(List<Movie> movies, int adapterPosition, int adapterOffset){
-        mAnimHelperVm.saveAdapterValues(movies, adapterPosition, adapterOffset);
-    }
-
     @Override
     public void onMovieViewHolderClicked(RecyclerView recycler, View v, Movie movie) {
-        mAnimationHelper.prepareToDetailAnimation(recycler, v, movie, () ->
-                showMovieDetailsFrag(movie));
+
     }
 
     @Override
@@ -206,13 +184,6 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
     public void favFabClicked(Movie movie, Boolean isFavourite) {
         if (isFavourite) mDataProvider.deleteFromFavourites(movie);
         else mDataProvider.addToFavourites(movie);
-    }
-
-    @Override
-    public void onFragmentExit() {
-        if (!isChangingConfigurations() || !isFinishing() && mUpFab != null) {
-
-        }
     }
 }
 

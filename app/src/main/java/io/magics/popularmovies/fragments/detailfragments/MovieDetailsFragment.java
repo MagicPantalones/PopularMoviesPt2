@@ -68,7 +68,7 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
     private FragmentManager mFragManager;
     private DetailFragInteractionHandler mFragInteractionHandler;
 
-    private AnimationHelper.DetailAnimationsHelper mAnimator;
+    private AnimationHelper mAnimator;
 
     ImageSize mImageSize;
     int mFavouriteColor;
@@ -104,8 +104,6 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
         mFragManager = getChildFragmentManager();
 
         //noinspection ConstantConditions
-        mAnimator = ((MovieListsActivity) getActivity()).getAnimationHelper()
-                .new DetailAnimationsHelper(mFavFabAnim, mFavFab, mMovie);
 
         if (mFragManager.getFragments() == null || mFragManager.getFragments().isEmpty()) {
             FragmentTransaction ft = mFragManager.beginTransaction();
@@ -127,6 +125,9 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Context context = view.getContext();
+
+        //noinspection ConstantConditions
+        mAnimator = new AnimationHelper(getContext(), mMovie, mFavFabAnim, mFavFab);
 
         mImageSize = getOptimalImgSize(context);
 
@@ -202,9 +203,8 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
 
     @Override
     public void onDestroyView() {
-        mAnimator.dispose();
+        mAnimator.disposeAnimations();
         mUnbinder.unbind();
-        mFragInteractionHandler.onFragmentExit();
         super.onDestroyView();
     }
 
@@ -235,7 +235,6 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
 
     public interface DetailFragInteractionHandler {
         void favFabClicked(Movie movie, Boolean isFavourite);
-        void onFragmentExit();
     }
 
 }

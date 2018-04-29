@@ -3,23 +3,31 @@
     <!-- Base application theme. -->
     <style name="MovieAppTheme" parent="Theme.AppCompat.NoActionBar">
         <!-- Customize your theme here. -->
+        <item name="android:fontFamily">@font/asap_medium</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:textColorSecondary">@color/textColorSecondary</item>
         <item name="android:textColorPrimary">@color/textColorPrimary</item>
         <item name="android:colorBackground">@color/colorPrimaryDark</item>
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowAllowEnterTransitionOverlap">true</item>
+        <item name="android:windowAllowReturnTransitionOverlap">true</item>
+        <item name="android:windowSharedElementEnterTransition">@android:transition/move</item>
+        <item name="android:windowSharedElementExitTransition">@android:transition/move</item>
+
     </style>
 
     <style name="MovieCardStyle" parent="MovieAppTheme">
         <item name="cardCornerRadius">@dimen/card_radius</item>
         <item name="cardBackgroundColor">@color/colorPrimary</item>
+        <item name="cardElevation">@dimen/card_elevation</item>
     </style>
 
     <!-- Found a lot of help to make the app compatible with pre lollipop here:
         https://medium.com/@etiennelawlor/layout-tips-for-pre-and-post-lollipop-bcb2e4cdd6b2 -->
     <style name="MovieCardStyle.PosterCard" parent="android:Widget.TextView">
-        <!--<item name="android:foreground">@drawable/selector_bg_card</item> _-->
+        <!--<item name="android:foreground">?attr/itemBackground</item>-->
         <item name="cardCornerRadius">@dimen/card_radius</item>
         <item name="cardElevation">@dimen/card_elevation</item>
         <item name="cardPreventCornerOverlap">false</item>
@@ -37,18 +45,14 @@
         <item name="android:textAlignment">center</item>
     </style>
 
+    <style name="Fab">
+        <item name="colorAccent">@color/colorPrimaryDark</item>
+    </style>
+
     <style name="MovieCardStyle.Text.Header" parent="MovieCardStyle.Text">
         <item name="android:textSize">24sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textAlignment">center</item>
-    </style>
-
-    <style name="MovieCardStyle.Text.Tabs" parent="TextAppearance.Design.Tab">
-        <item name="android:fontFamily">@font/asap_medium</item>
-    </style>
-
-    <style name="Fab">
-        <item name="colorAccent">@color/colorPrimaryDark</item>
     </style>
 
     <style name="MovieCardStyle.Button" parent="Widget.AppCompat.Button.Borderless">
@@ -57,10 +61,15 @@
         <item name="android:textAllCaps">true</item>
     </style>
 
+    <style name="MovieCardStyle.Text.Tabs" parent="TextAppearance.Design.Tab">
+        <item name="android:fontFamily">@font/asap_medium</item>
+    </style>
+
     <style name="MovieCardStyle.VoteBar" parent="Widget.AppCompat.ProgressBar.Horizontal">
         <item name="android:max">100</item>
         <item name="android:progress">15</item>
         <item name="android:progressDrawable">@drawable/shape_progress_bar</item>
     </style>
+
 
 </resources>
