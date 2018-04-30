@@ -31,8 +31,10 @@ import static io.magics.popularmovies.utils.MovieUtils.toggleViewVisibility;
 public class MovieDetailsTrailers extends Fragment
     implements TrailerAdapter.OnTrailerSelect{
 
-    @BindView(R.id.rv_trailers) RecyclerView mRvTrailerRecycler;
-    @BindView(R.id.tv_no_trailers) TextView mTvNoTrailers;
+    @BindView(R.id.rv_trailers)
+    RecyclerView mRvTrailerRecycler;
+    @BindView(R.id.tv_no_trailers)
+    TextView mTvNoTrailers;
 
     private TrailersViewModel mViewModel;
 

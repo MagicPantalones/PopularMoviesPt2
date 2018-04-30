@@ -36,7 +36,8 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         MarkdownView mdvReview = holder.mMdvReview;
 
         tvAuthor.setText(review.getAuthor());
-        mdvReview.loadMarkdown(review.getContent(), "file:///android_asset/PopMovies.css");
+
+        //mdvReview.loadMarkdown(review.getContent(), "file:///android_asset/PopMovies.css");
     }
 
     @Override

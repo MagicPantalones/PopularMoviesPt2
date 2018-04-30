@@ -2,6 +2,7 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/view_holder_list"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
@@ -12,6 +13,7 @@
         style="@style/MovieCardStyle"
         app:cardElevation="2dp"
         app:cardUseCompatPadding="true"
+        android:transitionGroup="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 

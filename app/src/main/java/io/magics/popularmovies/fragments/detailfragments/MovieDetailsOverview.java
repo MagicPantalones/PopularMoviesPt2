@@ -28,11 +28,13 @@ public class MovieDetailsOverview extends Fragment {
 
     private Movie mMovie;
 
-    @BindView(R.id.tv_overview_frag) TextView mTvOverViewText;
-    @BindView(R.id.tv_overview_title_frag) TextView mTvOverviewTitle;
+    @BindView(R.id.tv_overview_frag)
+    TextView mTvOverViewText;
+    @BindView(R.id.tv_overview_title_frag)
+    TextView mTvOverviewTitle;
 
-    Unbinder mUnbinder;
-    OverviewFragEvent mFragEvent;
+    private Unbinder mUnbinder;
+    private OverviewFragEvent mFragEvent;
     Boolean mFragExpanded;
 
     public interface OverviewFragEvent {
@@ -88,6 +90,7 @@ public class MovieDetailsOverview extends Fragment {
     @Override
     public void onDetach() {
         mFragEvent = null;
+        if (mUnbinder != null) mUnbinder.unbind();
         super.onDetach();
     }
 

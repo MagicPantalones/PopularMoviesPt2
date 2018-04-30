@@ -1,6 +1,7 @@
 package io.magics.popularmovies.fragments.listfragments;
 
 import android.annotation.SuppressLint;
+import android.app.Fragment;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.content.res.Configuration;
@@ -14,9 +15,12 @@ import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.transition.TransitionInflater;
+import android.transition.TransitionSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,21 +57,25 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
     private MovieUtils.ImageSize mImageSize;
     private int mDefaultColor;
 
+    private ListFragment mFragment;
+
     public interface PosterClickHandler {
-        void onClick(View v, Movie movie);
+        void onClick(View v, Movie movie, int position);
     }
 
     //Help from https://medium.com/@ayhamorfali/android-detect-when-the-recyclerview-reaches-the-bottom-43f810430e1e
-    public interface ReachedEndHandler {
+    interface ReachedEndHandler {
         void endReached();
     }
 
-    public ListAdapter(PosterClickHandler posterClickHandler) {
+    public ListAdapter(PosterClickHandler posterClickHandler, ListFragment fragment) {
         this.mClickHandler = posterClickHandler;
+        mFragment = fragment;
     }
 
-    public ListAdapter(PosterClickHandler posterClickHandler, ViewModel viewModel) {
+    public ListAdapter(PosterClickHandler posterClickHandler, ViewModel viewModel, ListFragment fragment) {
         this.mClickHandler = posterClickHandler;
+        mFragment = fragment;
         mReachedEndHandler = () -> {
             if (viewModel instanceof TopListViewModel) ((TopListViewModel) viewModel).notifyGetMoreTopPages();
             else if (viewModel instanceof PopListViewModel) ((PopListViewModel) viewModel).notifyGetMorePopPages();
@@ -103,6 +111,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         ProgressBar pbVotes = holder.mPbVoteBar;
         TextView tvVotes = holder.mTvVote;
         ImageView shadow = holder.mShadowLayer;
+
+        cvWrapper.setTransitionName(mfg.getMovieId().toString());
 
         posterUrl = MovieUtils.posterUrlConverter(mImageSize, mfg.getPosterUrl());
         if (position == mMovieData.size() - 5 && mReachedEndHandler != null) {
@@ -147,7 +157,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
                                                 palette.getDarkVibrantColor(
                                                         palette.getDominantColor(mDefaultColor)));
                                 shadow.setColorFilter(solid, PorterDuff.Mode.SRC_IN);
-                                mMovieData.get(position).setShadowInt(solid);
+                                mMovieData.get(holder.getAdapterPosition()).setShadowInt(solid);
                                 mfg.setShadowInt(solid);
                             });
                         } else shadow.setColorFilter(mfg.getShadowInt(), PorterDuff.Mode.SRC_IN);
@@ -210,7 +220,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
 
         @Override
         public void onClick(View v) {
-            mClickHandler.onClick(v, mMovieData.get(getAdapterPosition()));
+            mClickHandler.onClick(v, mMovieData.get(getAdapterPosition()), getAdapterPosition());
+
         }
 
     }

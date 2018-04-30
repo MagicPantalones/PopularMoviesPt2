@@ -3,24 +3,37 @@ package io.magics.popularmovies.fragments.listfragments;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.SharedElementCallback;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.Explode;
+import android.transition.Fade;
+import android.transition.Slide;
+import android.transition.Transition;
+import android.transition.TransitionInflater;
+import android.transition.TransitionSet;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.magics.popularmovies.MovieListsActivity;
 import io.magics.popularmovies.R;
+import io.magics.popularmovies.fragments.detailfragments.MovieDetailsFragment;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.utils.MovieUtils;
 import io.magics.popularmovies.utils.MovieUtils.ScrollDirection;
@@ -53,7 +66,7 @@ public class ListFragment extends Fragment implements ListAdapter.PosterClickHan
     @BindView(R.id.tv_list_error)
     TextView mTvError;
 
-    Unbinder mUnbinder;
+    private Unbinder mUnbinder;
 
     private ListAdapter mAdapter;
     private GridLayoutManager mGridManager;
@@ -94,15 +107,15 @@ public class ListFragment extends Fragment implements ListAdapter.PosterClickHan
         switch (mFragType){
             case 0:
                 mTopVm = ViewModelProviders.of(getActivity()).get(TopListViewModel.class);
-                mAdapter = new ListAdapter(this, mTopVm);
+                mAdapter = new ListAdapter(this, mTopVm, this);
                 break;
             case 1:
                 mPopVm = ViewModelProviders.of(getActivity()).get(PopListViewModel.class);
-                mAdapter = new ListAdapter(this, mPopVm);
+                mAdapter = new ListAdapter(this, mPopVm, this);
                 break;
             case 2:
                 mFavVm = ViewModelProviders.of(getActivity()).get(FavListViewModel.class);
-                mAdapter = new ListAdapter(this);
+                mAdapter = new ListAdapter(this, this);
                 break;
             default:
                 //should never happen
@@ -171,21 +184,18 @@ public class ListFragment extends Fragment implements ListAdapter.PosterClickHan
 
     public void scrollRecyclerViewToTop(){ mRecyclerView.smoothScrollToPosition(0); }
 
-    public void setSavedAdapterData(List<Movie> movies, int adapterPosition, int adapterOffset){
-        mAdapter.setMovieData(movies);
-        mRecyclerView.setAdapter(mAdapter);
-        mGridManager.scrollToPositionWithOffset(adapterPosition, adapterOffset);
-    }
-
     @Override
-    public void onClick(View v, Movie movie) {
+    public void onClick(View v, Movie movie, int position) {
+
         if (mListener == null) mListener = (FragmentListener) getContext();
         //noinspection ConstantConditions
-        mListener.onMovieViewHolderClicked(mRecyclerView, v, movie);
+        mListener.onMovieViewHolderClicked(v, movie);
+
     }
 
     public interface FragmentListener {
-        void onMovieViewHolderClicked(RecyclerView recycler, View v, Movie movie);
+        void onMovieViewHolderClicked(View v, Movie movie);
         void onRecyclerViewScrolled(ScrollDirection scrollDirection);
     }
+
 }

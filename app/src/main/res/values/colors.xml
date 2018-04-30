@@ -11,7 +11,4 @@
     <color name="colorSecondaryAccent">#e96a6a</color>
     <color name="colorAccent">#44456d</color>
 
-    <color name="colorControlHighlight">@color/fifty_percent_transparency_grey_400</color>
-    <color name="fifty_percent_transparency_grey_400">#80bdbdbd</color>
-
 </resources>

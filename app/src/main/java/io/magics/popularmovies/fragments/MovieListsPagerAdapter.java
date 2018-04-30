@@ -52,6 +52,8 @@ public class MovieListsPagerAdapter extends FragmentPagerAdapter {
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         ListFragment createdFrag = (ListFragment) super.instantiateItem(container, position);
+        createdFrag.setAllowEnterTransitionOverlap(true);
+        createdFrag.setAllowReturnTransitionOverlap(true);
 
         switch (position){
             case 0:
