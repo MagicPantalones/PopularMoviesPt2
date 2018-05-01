@@ -194,9 +194,9 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         CardView mCvWrapper;
         @BindView(R.id.tv_movie_title_list)
         TextView mTvTitle;
-        @BindView(R.id.pb_vote_detail)
+        @BindView(R.id.pb_list_vote)
         ProgressBar mPbVoteBar;
-        @BindView(R.id.tv_vote_list)
+        @BindView(R.id.tv_list_vote)
         TextView mTvVote;
         GradientDrawable mGradientDrawable;
 

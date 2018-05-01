@@ -5,22 +5,15 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.res.ResourcesCompat;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.CardView;
-import android.transition.Transition;
-import android.transition.TransitionInflater;
+import android.transition.Slide;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -28,21 +21,19 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import io.magics.popularmovies.MovieListsActivity;
+import devlight.io.library.ntb.NavigationTabBar;
 import io.magics.popularmovies.R;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.utils.AnimationHelper;
 import io.magics.popularmovies.utils.GlideApp;
+import io.magics.popularmovies.utils.MovieUtils;
 
+import static io.magics.popularmovies.utils.AnimationHelper.*;
 import static io.magics.popularmovies.utils.MovieUtils.*;
 
 
@@ -51,7 +42,7 @@ import static io.magics.popularmovies.utils.MovieUtils.*;
  * Use the {@link MovieDetailsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MovieDetailsFragment extends Fragment implements MovieDetailsOverview.OverviewFragEvent{
+public class MovieDetailsFragment extends Fragment {
 
     public static final String ARG_MOVIE = "movie";
     public static final String ARG_IS_FAVOURITE = "isFavourite";
@@ -60,38 +51,35 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
     private static final String TRAILER_TAG = "trailerTag";
     private static final String REVIEW_TAG = "reviewTag";
 
+    private static final int CARD_FRAGMENT_CONTAINER = R.id.detail_fragment_container;
+
     private Movie mMovie;
     private boolean mIsFavourite;
-    private boolean mEnterTransitionStarted = false;
+    private int mCurrentOptionsId;
 
-    @BindView(R.id.detail_fragment)
-    CoordinatorLayout mCoordinator;
-    @BindView(R.id.detail_wrapper)
-    ConstraintLayout mDetailWrapper;
-    @BindView(R.id.frame_trailers_and_reviews)
-    FrameLayout mFragFrame;
-    @BindView(R.id.iv_poster_detail)
+    @BindView(R.id.detail_fragment_poster)
     ImageView mPoster;
-    @BindView(R.id.cv_backdrop)
-    CardView mPosterCardView;
-    @BindView(R.id.tv_movie_title_detail)
+    @BindView(R.id.wrapper_card_details_poster)
+    CardView mPosterWrapperCard;
+    @BindView(R.id.wrapper_details_main_card)
+    CardView mMainCardWrapper;
+    @BindView(R.id.tv_details_title)
     TextView mTitle;
-    @BindView(R.id.tv_release_date_detail)
+    @BindView(R.id.tv_details_release)
     TextView mReleaseDate;
-    @BindView(R.id.pb_vote_count_detail)
+    @BindView(R.id.pb_details_vote)
     ProgressBar mVoteBar;
-    @BindView(R.id.tv_vote_average_detail)
+    @BindView(R.id.tv_details_vote)
     TextView mVoteNumber;
     @BindView(R.id.fav_fab)
     FloatingActionButton mFavFab;
     @BindView(R.id.fav_fab_anim)
     ImageView mFavFabAnim;
-    @BindView(R.id.bottom_nav_details)
-    BottomNavigationView mBotNav;
-    @BindView(R.id.app_bar_main_details)
-    AppBarLayout mAppBar;
-    @BindView(R.id.nsv_contentNsv)
-    NestedScrollView mScrollView;
+    @BindView(R.id.detail_fragment_container)
+    FrameLayout mDetailsContainer;
+    @BindView(R.id.nav_detail_frag)
+    NavigationTabBar mNavTabBar;
+
 
     private Unbinder mUnbinder;
     private FragmentManager mFragManager;
@@ -131,19 +119,26 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
         mUnbinder = ButterKnife.bind(this, root);
         mFragManager = getChildFragmentManager();
 
-        //noinspection ConstantConditions
+        if (savedInstanceState == null){
+            mCurrentOptionsId = -1;
+        }
 
         if (mFragManager.getFragments() == null || mFragManager.getFragments().isEmpty()) {
-            FragmentTransaction ft = mFragManager.beginTransaction();
-            MovieDetailsOverview frag = MovieDetailsOverview.newInstance(mMovie);
-            ft.add(R.id.frame_trailers_and_reviews, frag);
-            ft.commit();
-        } else {
-            Fragment frag = mFragManager.findFragmentById(R.id.frame_trailers_and_reviews);
-            if (frag != null && !(frag instanceof MovieDetailsReviews)) {
-                mScrollView.setNestedScrollingEnabled(false);
-            }
+            MovieDetailsOverview overviewFrag = MovieDetailsOverview.newInstance(mMovie);
+            MovieDetailsTrailers trailerFrag = new MovieDetailsTrailers();
+            MovieDetailsReviews reviewFrag = new MovieDetailsReviews();
+
+            mFragManager.beginTransaction()
+                    .add(CARD_FRAGMENT_CONTAINER, overviewFrag, OVERVIEW_TAG)
+                    .add(CARD_FRAGMENT_CONTAINER, trailerFrag, TRAILER_TAG)
+                    .add(CARD_FRAGMENT_CONTAINER, reviewFrag, REVIEW_TAG)
+                    .hide(overviewFrag)
+                    .hide(trailerFrag)
+                    .hide(reviewFrag)
+                    .commit();
         }
+
+
         return root;
     }
 
@@ -153,7 +148,9 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
         super.onViewCreated(view, savedInstanceState);
         Context context = view.getContext();
 
-        mPosterCardView.setTransitionName(mMovie.getMovieId().toString());
+        mMainCardWrapper.setTransitionName("wrapper" + mMovie.getMovieId().toString());
+        mPosterWrapperCard.setTransitionName(mMovie.getMovieId().toString());
+
         //noinspection ConstantConditions
         mAnimator = new AnimationHelper(getContext(), mMovie, mFavFabAnim, mFavFab);
 
@@ -178,37 +175,41 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
             mAnimator.runFabAnim(mIsFavourite);
         });
 
-        mBotNav.setOnNavigationItemSelectedListener(item -> {
-            FragmentTransaction ft = mFragManager.beginTransaction();
+        int defaultColor = ResourcesCompat.getColor(getResources(), R.color.colorPrimary,
+                context.getTheme());
 
-            if (!item.isChecked()) {
-                switch (item.getItemId()) {
-                    case R.id.action_overview:
-                        ft.replace(R.id.frame_trailers_and_reviews,
-                                MovieDetailsOverview.newInstance(mMovie), OVERVIEW_TAG);
-                        break;
-                    case R.id.action_trailers:
-                        ft.replace(R.id.frame_trailers_and_reviews, new MovieDetailsTrailers(),
-                                TRAILER_TAG);
-                        mAppBar.setExpanded(true, true);
-                        mScrollView.setNestedScrollingEnabled(false);
-                        break;
-                    case R.id.action_reviews:
-                        ft.replace(R.id.frame_trailers_and_reviews, new MovieDetailsReviews(),
-                                REVIEW_TAG);
-                        mScrollView.setNestedScrollingEnabled(true);
-                        break;
-                    default:
-                        break;
-                }
+        ArrayList<NavigationTabBar.Model> models = new ArrayList<>();
+        models.add(new NavigationTabBar.Model.Builder(getResDrawable(
+                R.drawable.ic_info_outline_black_24dp), defaultColor).build());
+        models.add(new NavigationTabBar.Model.Builder(getResDrawable(
+                R.drawable.ic_movie_black_24dp), defaultColor).build());
+        models.add(new NavigationTabBar.Model.Builder(
+                getResDrawable(R.drawable.ic_star_half_black_24dp),defaultColor).build());
 
-                ft.commit();
+        mNavTabBar.setModels(models);
 
-                return true;
+        mNavTabBar.setOnTabBarSelectedIndexListener(new NavigationTabBar.OnTabBarSelectedIndexListener() {
+            @Override
+            public void onStartTabSelected(NavigationTabBar.Model model, int index) {
+                //Intentionally Empty
             }
-            return true;
+
+            @Override
+            public void onEndTabSelected(NavigationTabBar.Model model, int index) {
+                if (index == mCurrentOptionsId){
+                    mNavTabBar.deselect();
+                    mCurrentOptionsId = -1;
+                } else {
+                    mCurrentOptionsId = index;
+                }
+            }
         });
 
+    }
+
+    private Drawable getResDrawable(int resId){
+        //noinspection ConstantConditions
+        return ResourcesCompat.getDrawable(getResources(), resId, getContext().getTheme());
     }
 
     @Override
@@ -225,31 +226,6 @@ public class MovieDetailsFragment extends Fragment implements MovieDetailsOvervi
         mAnimator.disposeAnimations();
         mUnbinder.unbind();
         super.onDestroyView();
-    }
-
-    private void setAppBarOffsetForOverview(int totalTextHeight, int offset){
-        ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) mFragFrame.getLayoutParams();
-        int margin = lp.topMargin * 2;
-        int heightLimit = mScrollView.getTop() - margin;
-        int visibleText = totalTextHeight + mDetailWrapper.getHeight();
-
-        if (visibleText > heightLimit) {
-            AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) ((CoordinatorLayout.LayoutParams)
-                    mAppBar.getLayoutParams()).getBehavior();
-            if (behavior != null) {
-                behavior.setTopAndBottomOffset(0);
-                mAnimator.runOverviewAnim(margin / 2 + offset, value -> {
-                    behavior.setTopAndBottomOffset(value);
-                    mAppBar.requestLayout();
-                });
-            }
-        }
-        mScrollView.setNestedScrollingEnabled(false);
-    }
-
-    @Override
-    public void onFragmentDrawn(int totalTextHeight) {
-        setAppBarOffsetForOverview(totalTextHeight, mBotNav.getHeight() / 2);
     }
 
     public interface DetailFragInteractionHandler {

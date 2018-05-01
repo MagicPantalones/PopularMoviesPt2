@@ -34,12 +34,6 @@ public class MovieDetailsOverview extends Fragment {
     TextView mTvOverviewTitle;
 
     private Unbinder mUnbinder;
-    private OverviewFragEvent mFragEvent;
-    Boolean mFragExpanded;
-
-    public interface OverviewFragEvent {
-        void onFragmentDrawn(int totalTextHeight);
-    }
 
     public static MovieDetailsOverview newInstance(Movie movie){
         MovieDetailsOverview frag = new MovieDetailsOverview();
@@ -68,28 +62,11 @@ public class MovieDetailsOverview extends Fragment {
         mUnbinder = ButterKnife.bind(this, root);
         mTvOverViewText.setText(mMovie.getOverview());
 
-        mTvOverViewText.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                mTvOverViewText.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                mFragEvent.onFragmentDrawn(mTvOverViewText.getHeight() + mTvOverviewTitle.getHeight());
-            }
-        });
-
         return root;
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (getParentFragment() instanceof OverviewFragEvent) {
-            mFragEvent = (OverviewFragEvent) getParentFragment();
-        }
-    }
-
-    @Override
     public void onDetach() {
-        mFragEvent = null;
         if (mUnbinder != null) mUnbinder.unbind();
         super.onDetach();
     }

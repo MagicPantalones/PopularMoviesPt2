@@ -29,7 +29,6 @@
         <item name="cardPreventCornerOverlap">false</item>
         <item name="cardUseCompatPadding">true</item>
         <item name="android:background">@color/colorPrimary</item>
-        <item name="android:elevation">0dp</item>
     </style>
 
     <style name="MovieCardStyle.Text" parent="MovieCardStyle">

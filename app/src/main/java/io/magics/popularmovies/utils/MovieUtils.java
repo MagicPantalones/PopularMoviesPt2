@@ -9,8 +9,11 @@ import java.util.concurrent.TimeUnit;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.support.v4.content.res.ResourcesCompat;
 import android.util.Log;
 import android.view.View;
 
@@ -18,6 +21,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 
+import io.magics.popularmovies.R;
 import io.magics.popularmovies.database.FavouritesDBHelper.FavouritesEntry;
 import io.magics.popularmovies.models.Movie;
 import okhttp3.OkHttpClient;
@@ -169,6 +173,18 @@ public class MovieUtils {
         return cv;
     }
 
+    public static int getBotNavResource(int id){
+        switch (id){
+            case R.id.action_overview:
+                return R.drawable.ic_info_outline_black_24dp;
+            case R.id.action_trailers:
+                return R.drawable.ic_movie_black_24dp;
+            case R.id.action_reviews:
+                return R.drawable.ic_star_half_black_24dp;
+            default:
+                return -1;
+        }
+    }
 
     public enum ImageSize{
         @SerializedName("w500")

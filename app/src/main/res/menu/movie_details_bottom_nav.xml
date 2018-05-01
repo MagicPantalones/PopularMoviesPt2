@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <group android:checkableBehavior="single">
+    <group android:checkableBehavior="all">
     <item
         android:id="@+id/action_overview"
-        android:checked="true"
+        android:checked="false"
         android:icon="@drawable/ic_info_outline_black_24dp"
         android:title="@string/bnav_overview_title"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/action_trailers"
-
+        android:checked="false"
         android:icon="@drawable/ic_movie_black_24dp"
         android:title="@string/bnav_trailers_title"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/action_reviews"
+        android:checked="false"
         android:icon="@drawable/ic_star_half_black_24dp"
         android:title="@string/bnav_reviews_title"
         app:showAsAction="ifRoom"/>

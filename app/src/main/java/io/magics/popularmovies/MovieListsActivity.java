@@ -13,6 +13,7 @@ import android.transition.TransitionInflater;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 
 import com.facebook.stetho.Stetho;
@@ -133,8 +134,6 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
 
         mUpFab.hide();
 
-
-
         newFrag.setSharedElementEnterTransition(TransitionInflater.from(this)
                 .inflateTransition(R.transition.card_enter_transition));
 
@@ -181,7 +180,7 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
         https://medium.com/bynder-tech/how-to-use-material-transitions-in-fragment-transactions-5a62b9d0b26b
         https://www.androiddesignpatterns.com/2014/12/activity-fragment-transitions-in-android-lollipop-part1.html
         http://mikescamell.com/shared-element-transitions-part-4-recyclerview/
-
+        https://developer.android.com/training/animation/reveal-or-hide-view
      */
 
 }
