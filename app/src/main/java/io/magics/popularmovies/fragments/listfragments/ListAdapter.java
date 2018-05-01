@@ -1,7 +1,6 @@
 package io.magics.popularmovies.fragments.listfragments;
 
 import android.annotation.SuppressLint;
-import android.app.Fragment;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.content.res.Configuration;
@@ -12,15 +11,10 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.res.ResourcesCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.transition.TransitionInflater;
-import android.transition.TransitionSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -200,7 +194,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         CardView mCvWrapper;
         @BindView(R.id.tv_movie_title_list)
         TextView mTvTitle;
-        @BindView(R.id.pb_vote_list)
+        @BindView(R.id.pb_vote_detail)
         ProgressBar mPbVoteBar;
         @BindView(R.id.tv_vote_list)
         TextView mTvVote;

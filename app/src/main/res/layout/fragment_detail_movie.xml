@@ -73,7 +73,7 @@
                     android:id="@+id/btn_toolbar_back"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:contentDescription="@string/detail_fragment_back_ic_a11y"
+                    android:contentDescription="@string/toolbar_back_ic_a11y"
                     android:fitsSystemWindows="true"
                     app:srcCompat="@drawable/ic_appbar_back" />
             </Toolbar>

@@ -17,6 +17,7 @@
         <item name="cardCornerRadius">@dimen/card_radius</item>
         <item name="cardBackgroundColor">@color/colorPrimary</item>
         <item name="cardElevation">@dimen/card_elevation</item>
+        <item name="android:elevation">0dp</item>
     </style>
 
     <!-- Found a lot of help to make the app compatible with pre lollipop here:
@@ -28,6 +29,7 @@
         <item name="cardPreventCornerOverlap">false</item>
         <item name="cardUseCompatPadding">true</item>
         <item name="android:background">@color/colorPrimary</item>
+        <item name="android:elevation">0dp</item>
     </style>
 
     <style name="MovieCardStyle.Text" parent="MovieCardStyle">

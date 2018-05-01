@@ -68,7 +68,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/tv_movie_title_list">
 
                 <ProgressBar
-                    android:id="@+id/pb_vote_list"
+                    android:id="@+id/pb_vote_detail"
                     style="@style/MovieCardStyle.VoteBar"
                     android:layout_width="100dp"
                     android:layout_height="wrap_content"
@@ -80,9 +80,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    app:layout_constraintBottom_toBottomOf="@+id/pb_vote_list"
-                    app:layout_constraintStart_toEndOf="@+id/pb_vote_list"
-                    app:layout_constraintTop_toTopOf="@+id/pb_vote_list"
+                    app:layout_constraintBottom_toBottomOf="@+id/pb_vote_detail"
+                    app:layout_constraintStart_toEndOf="@+id/pb_vote_detail"
+                    app:layout_constraintTop_toTopOf="@+id/pb_vote_detail"
                     app:layout_constraintVertical_bias="0.1"
                     tools:text="7.5" />
             </android.support.constraint.ConstraintLayout>
