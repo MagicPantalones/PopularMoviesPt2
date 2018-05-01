@@ -1,0 +1,64 @@
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/detail_fragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginBottom="4dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginTop="8dp"
+    android:clickable="true"
+    tools:ignore="KeyboardInaccessibleWidget">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/wrapper_details_main_card"
+        style="@style/MovieCardStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+        
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+
+
+            </android.support.v7.widget.CardView>
+            
+        </android.support.constraint.ConstraintLayout>
+
+        <ImageView
+            android:id="@+id/fav_fab_anim"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:visibility="gone"
+            app:layout_anchor="@+id/fav_fab"
+            app:layout_anchorGravity="center"
+            tools:ignore="ContentDescription" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fav_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="@string/favourite_btn_a11y"
+            android:scaleType="fitCenter"
+            android:theme="@style/Fab"
+            app:srcCompat="@drawable/ic_heart_fab_static" />
+
+        <android.support.design.widget.BottomNavigationView
+            android:id="@+id/bottom_nav_details"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            app:itemBackground="@drawable/bg_bottom_round_top_outline"
+            app:itemIconTint="@drawable/selector_bottom_nav"
+            app:itemTextColor="@drawable/selector_bottom_nav"
+            app:menu="@menu/movie_details_bottom_nav" />
+    </android.support.v7.widget.CardView>
+</android.support.design.widget.CoordinatorLayout>
