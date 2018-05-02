@@ -70,7 +70,7 @@ public class MovieDetailsTrailers extends Fragment
             if (trailerResults != null){
                 if (trailerResults.isEmpty()) toggleViewVisibility(mTvNoTrailers, mRvTrailerRecycler);
                 else {
-                    toggleViewVisibility(mRvTrailerRecycler, mTvNoTrailers);
+                    toggleViewVisibility(View.VISIBLE, mRvTrailerRecycler, mTvNoTrailers);
                     adapter.setTrailerList(trailerResults);
                 }
             } else toggleViewVisibility(mTvNoTrailers, mRvTrailerRecycler);

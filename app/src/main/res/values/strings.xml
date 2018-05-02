@@ -20,4 +20,7 @@
     <string name="shared_element_vote_num" translatable="false">seVoteNum</string>
     <string name="shared_element_background" translatable="false">seBackground</string>
 
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

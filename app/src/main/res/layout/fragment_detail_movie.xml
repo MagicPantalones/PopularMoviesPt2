@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:clickable="true"
     tools:ignore="KeyboardInaccessibleWidget">
-
+    <!-- W 256dp H 384dp -->
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar_detail_fragment"
         android:layout_width="match_parent"
@@ -14,6 +14,7 @@
         android:background="@drawable/bg_toolbar_list">
 
         <ImageView
+            android:id="@+id/btn_detail_bar_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@string/toolbar_back_ic_a11y"
@@ -30,111 +31,21 @@
         app:cardUseCompatPadding="true">
 
         <android.support.constraint.ConstraintLayout
-            android:id="@+id/wrapper_details_poster"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="8dp">
 
-            <android.support.v7.widget.CardView
-                android:id="@+id/wrapper_card_details_poster"
-                style="@style/MovieCardStyle.PosterCard"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <android.support.v4.view.ViewPager
+                android:id="@+id/nested_details_container"
+                android:layout_width="256dp"
+                android:layout_height="384dp"
+                android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
-
-                <ImageView
-                    android:id="@+id/detail_fragment_poster"
-                    android:layout_width="256dp"
-                    android:layout_height="384dp"
-                    android:scaleType="fitCenter"
-                    tools:ignore="ContentDescription"
-                    tools:src="@drawable/minions_poster_placehodler" />
-
-                <View
-                    android:id="@+id/v_detail_poster_shade"
-                    android:layout_width="256dp"
-                    android:layout_height="192dp"
-                    android:layout_gravity="bottom"
-                    android:background="@drawable/fg_fading_shade_light" />
-            </android.support.v7.widget.CardView>
-
-            <android.support.v4.widget.NestedScrollView
-                android:id="@+id/detail_fragment_nsv"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:fillViewport="true"
-                android:layout_marginBottom="4dp"
-                android:layout_margin="@dimen/card_margin"
-                android:elevation="4dp"
-                app:layout_constraintEnd_toEndOf="@+id/wrapper_card_details_poster"
-                app:layout_constraintStart_toStartOf="@+id/wrapper_card_details_poster"
-                app:layout_constraintTop_toTopOf="@+id/wrapper_card_details_poster"
-                app:layout_constraintBottom_toTopOf="@+id/tv_details_title"
-                >
-                <FrameLayout
-                    android:id="@+id/detail_fragment_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    />
-            </android.support.v4.widget.NestedScrollView>
-
-            <TextView
-                android:id="@+id/tv_details_title"
-                style="@style/MovieCardStyle.Text.Normal"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginStart="8dp"
-                android:textColor="@color/colorPrimaryDark"
-                android:textSize="16sp"
-                android:elevation="4dp"
-                app:layout_constraintBottom_toTopOf="@+id/wrapper_details_release"
-                app:layout_constraintEnd_toEndOf="@+id/wrapper_card_details_poster"
-                app:layout_constraintStart_toStartOf="@+id/wrapper_card_details_poster"
-                tools:text="Lord of the rings:\nFellowship of the ring" />
-
-            <android.support.constraint.ConstraintLayout
-                android:id="@+id/wrapper_details_release"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginStart="8dp"
-                android:elevation="4dp"
-                app:layout_constraintBottom_toBottomOf="@+id/wrapper_card_details_poster"
-                app:layout_constraintEnd_toEndOf="@+id/tv_details_title"
-                app:layout_constraintStart_toStartOf="@+id/tv_details_title">
-
-                <ImageView
-                    android:id="@+id/iv_details_release_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginTop="8dp"
-                    android:contentDescription="@string/release_calendar_a11y"
-                    android:tint="@color/colorPrimaryDark"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/ic_date_range_black_24dp" />
-
-                <TextView
-                    android:id="@+id/tv_details_release"
-                    style="@style/MovieCardStyle.Text.Normal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:textColor="@color/colorPrimaryDark"
-                    app:layout_constraintBottom_toBottomOf="@+id/iv_details_release_icon"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/iv_details_release_icon"
-                    app:layout_constraintTop_toTopOf="@+id/iv_details_release_icon"
-                    tools:text="September 20th, 2017" />
-
-
-            </android.support.constraint.ConstraintLayout>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:background="@drawable/bg_loading_realydarkgrey"
+                />
 
             <android.support.constraint.ConstraintLayout
                 android:id="@+id/wrapper_details_vote"
@@ -196,14 +107,16 @@
                 android:id="@+id/fav_fab"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
                 android:contentDescription="@string/favourite_btn_a11y"
                 android:scaleType="fitCenter"
                 android:theme="@style/Fab"
-                app:layout_constraintBottom_toBottomOf="@+id/wrapper_card_details_poster"
-                app:layout_constraintStart_toEndOf="@+id/wrapper_card_details_poster"
-                app:layout_constraintTop_toBottomOf="@+id/wrapper_card_details_poster"
-                app:layout_constraintEnd_toEndOf="@+id/wrapper_card_details_poster"
+                app:layout_constraintBottom_toBottomOf="@+id/nested_details_container"
+                app:layout_constraintEnd_toEndOf="@+id/nested_details_container"
+                app:layout_constraintStart_toEndOf="@+id/nested_details_container"
+                app:layout_constraintTop_toBottomOf="@+id/nested_details_container"
                 app:srcCompat="@drawable/ic_heart_fab_static" />
 
             <devlight.io.library.ntb.NavigationTabBar
@@ -211,19 +124,16 @@
                 android:layout_width="140dp"
                 android:layout_height="36dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginEnd="28dp"
-                android:layout_marginStart="28dp"
-                app:layout_constraintEnd_toEndOf="@+id/wrapper_card_details_poster"
-                app:layout_constraintStart_toStartOf="@+id/wrapper_card_details_poster"
-                app:layout_constraintTop_toBottomOf="@+id/wrapper_card_details_poster"
+                app:layout_constraintEnd_toEndOf="@+id/nested_details_container"
+                app:layout_constraintStart_toStartOf="@+id/nested_details_container"
+                app:layout_constraintTop_toBottomOf="@+id/nested_details_container"
                 app:ntb_active_color="@color/colorSecondary"
-                app:ntb_inactive_color="@color/colorPrimaryDark"
-                app:ntb_preview_colors="@array/details_pager_color_pew"
                 app:ntb_animation_duration="300"
                 app:ntb_bg_color="@android:color/transparent"
                 app:ntb_corners_radius="25dp"
-                app:ntb_scaled="false"
-                />
+                app:ntb_inactive_color="@color/colorPrimaryDark"
+                app:ntb_preview_colors="@array/details_pager_color_pew"
+                app:ntb_scaled="false" />
 
         </android.support.constraint.ConstraintLayout>
 

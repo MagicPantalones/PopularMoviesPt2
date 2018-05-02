@@ -61,7 +61,7 @@ public class MovieDetailsReviews extends Fragment {
             if (reviewResults != null){
                 if (reviewResults.isEmpty()) toggleViewVisibility(mTvNoReviews, mRvReviewRecycler);
                 else {
-                    toggleViewVisibility(mRvReviewRecycler, mTvNoReviews);
+                    toggleViewVisibility(View.VISIBLE, mRvReviewRecycler, mTvNoReviews);
                     adapter.setReviewData(reviewResults);
                 }
             }

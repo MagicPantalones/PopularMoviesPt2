@@ -12,16 +12,13 @@ import android.support.graphics.drawable.Animatable2Compat;
 import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.res.ResourcesCompat;
 import android.transition.Slide;
 import android.view.Gravity;
 import android.view.View;
 import android.view.animation.BounceInterpolator;
-import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
-import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
@@ -133,7 +130,7 @@ public class AnimationHelper {
 
     public void runCardFlipAnimation(View container, FragmentManager fragmentManager,
                                      Fragment newFragment, int direction){
-        Fragment frag = fragmentManager.findFragmentById(R.id.detail_fragment_container);
+        Fragment frag = fragmentManager.findFragmentById(R.id.nested_details_container);
 
         container.animate().withLayer()
                 .rotationY(direction == FLIP_LEFT ? -90 : 90)
