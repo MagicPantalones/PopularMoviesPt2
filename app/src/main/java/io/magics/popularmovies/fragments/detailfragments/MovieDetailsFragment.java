@@ -156,6 +156,8 @@ public class MovieDetailsFragment extends Fragment {
         void favFabClicked(Movie movie, Boolean isFavourite);
     }
 
+    //From Tristan Richard's  answer here:
+    //https://stackoverflow.com/questions/16107016/synchronizing-two-viewpagers-using-onpagechangelistener
     public class OnViewPagerPageChange implements ViewPager.OnPageChangeListener {
 
         private ViewPager mMasterPager;
