@@ -28,6 +28,7 @@ import devlight.io.library.ntb.NavigationTabBar;
 import io.magics.popularmovies.R;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.utils.AnimationHelper;
+import io.magics.popularmovies.utils.MovieUtils;
 
 import static io.magics.popularmovies.utils.MovieUtils.*;
 
@@ -57,15 +58,15 @@ public class MovieDetailsFragment extends Fragment {
     ImageView mFavFabAnim;
     @BindView(R.id.nested_details_container)
     ViewPager mNestedViewPager;
-    @BindView(R.id.nav_detail_frag)
-    NavigationTabBar mNavTabBar;
+    @BindView(R.id.nested_details_titles)
+    ViewPager mNestedPagerTitles;
 
 
     private Unbinder mUnbinder;
-    private FragmentManager mFragManager;
     private DetailFragInteractionHandler mFragInteractionHandler;
 
     private MovieDetailsPagerAdapter mPagerAdapter;
+    private TitlePagerAdapter mPagerTitleAdapter;
     private AnimationHelper mAnimator;
 
     public MovieDetailsFragment() {
@@ -100,6 +101,7 @@ public class MovieDetailsFragment extends Fragment {
         mUnbinder = ButterKnife.bind(this, root);
 
         mPagerAdapter = new MovieDetailsPagerAdapter(mMovie, getChildFragmentManager());
+        mPagerTitleAdapter = new TitlePagerAdapter(getContext());
 
         return root;
 
@@ -109,10 +111,15 @@ public class MovieDetailsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Context context = view.getContext();
 
         mNestedViewPager.setOffscreenPageLimit(4);
         mNestedViewPager.setAdapter(mPagerAdapter);
+
+        mNestedPagerTitles.setOffscreenPageLimit(4);
+        mNestedPagerTitles.setAdapter(mPagerTitleAdapter);
+
+        mNestedViewPager.addOnPageChangeListener(new OnViewPagerPageChange(mNestedViewPager, mNestedPagerTitles));
+        mNestedPagerTitles.addOnPageChangeListener(new OnViewPagerPageChange(mNestedPagerTitles, mNestedViewPager));
 
         mMainCardWrapper.setTransitionName("wrapper" + mMovie.getMovieId().toString());
 
@@ -127,28 +134,6 @@ public class MovieDetailsFragment extends Fragment {
             mIsFavourite = !mIsFavourite;
             mAnimator.runFabAnim(mIsFavourite);
         });
-
-        int defaultColor = ResourcesCompat.getColor(getResources(), R.color.colorPrimary,
-                context.getTheme());
-
-        ArrayList<NavigationTabBar.Model> models = new ArrayList<>();
-        models.add(new NavigationTabBar.Model.Builder(getResDrawable(
-                R.drawable.ic_ticket_24dp), defaultColor).build());
-        models.add(new NavigationTabBar.Model.Builder(getResDrawable(
-                R.drawable.ic_file_document_box_24dp), defaultColor).build());
-        models.add(new NavigationTabBar.Model.Builder(getResDrawable(
-                R.drawable.ic_movie_black_24dp), defaultColor).build());
-        models.add(new NavigationTabBar.Model.Builder(
-                getResDrawable(R.drawable.ic_star_half_black_24dp),defaultColor).build());
-
-        mNavTabBar.setModels(models);
-        mNavTabBar.setViewPager(mNestedViewPager, 0);
-
-    }
-
-    private Drawable getResDrawable(int resId){
-        //noinspection ConstantConditions
-        return ResourcesCompat.getDrawable(getResources(), resId, getContext().getTheme());
     }
 
     @Override
@@ -171,4 +156,35 @@ public class MovieDetailsFragment extends Fragment {
         void favFabClicked(Movie movie, Boolean isFavourite);
     }
 
+    public class OnViewPagerPageChange implements ViewPager.OnPageChangeListener {
+
+        private ViewPager mMasterPager;
+        private ViewPager mSlavePager;
+        private int mScrollState = ViewPager.SCROLL_STATE_IDLE;
+
+        OnViewPagerPageChange(ViewPager master, ViewPager slave){
+            mMasterPager = master;
+            mSlavePager = slave;
+        }
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            if (mScrollState == ViewPager.SCROLL_STATE_IDLE) return;
+            mSlavePager.scrollTo(mMasterPager.getScrollX()
+                    * mSlavePager.getWidth() / mMasterPager.getWidth(), 0);
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            //Empty
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+            mScrollState = state;
+            if (state == ViewPager.SCROLL_STATE_IDLE){
+                mSlavePager.setCurrentItem(mMasterPager.getCurrentItem(), false);
+            }
+        }
+    }
 }

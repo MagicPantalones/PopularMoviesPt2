@@ -29,7 +29,7 @@ import static io.magics.popularmovies.utils.MovieUtils.toggleViewVisibility;
 
 
 public class MovieDetailsTrailers extends Fragment
-    implements TrailerAdapter.OnTrailerSelect{
+        implements TrailerAdapter.OnTrailerSelect {
 
     @BindView(R.id.rv_trailers)
     RecyclerView mRvTrailerRecycler;
@@ -61,19 +61,16 @@ public class MovieDetailsTrailers extends Fragment
         super.onViewCreated(view, savedInstanceState);
         TrailerAdapter adapter = new TrailerAdapter(this);
 
-        mRvTrailerRecycler.setLayoutManager(new LinearLayoutManager(view.getContext(),
-                LinearLayoutManager.HORIZONTAL, false));
         mRvTrailerRecycler.setAdapter(adapter);
 
         //noinspection ConstantConditions
         mViewModel.mTrailers.observe(getActivity(), trailerResults -> {
-            if (trailerResults != null){
-                if (trailerResults.isEmpty()) toggleViewVisibility(mTvNoTrailers, mRvTrailerRecycler);
-                else {
-                    toggleViewVisibility(View.VISIBLE, mRvTrailerRecycler, mTvNoTrailers);
-                    adapter.setTrailerList(trailerResults);
-                }
-            } else toggleViewVisibility(mTvNoTrailers, mRvTrailerRecycler);
+            if (trailerResults != null && !trailerResults.isEmpty()) {
+
+                toggleViewVisibility(mRvTrailerRecycler, mTvNoTrailers);
+                adapter.setTrailerList(trailerResults);
+
+            }
         });
 
     }
@@ -89,7 +86,7 @@ public class MovieDetailsTrailers extends Fragment
         Intent ytAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + trailerResult.getKey()));
         try {
             Objects.requireNonNull(getContext()).startActivity(ytAppIntent);
-        } catch (ActivityNotFoundException e){
+        } catch (ActivityNotFoundException e) {
             Intent ytWebIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + trailerResult.getKey()));
             Objects.requireNonNull(getContext()).startActivity(ytWebIntent);
         }

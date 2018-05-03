@@ -14,7 +14,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.magics.popularmovies.R;
 import io.magics.popularmovies.models.ReviewResult;
-import us.feras.mdv.MarkdownView;
+import ru.noties.markwon.Markwon;
 
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder> {
@@ -32,12 +32,11 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
     @Override
     public void onBindViewHolder(@NonNull ReviewViewHolder holder, int position) {
         ReviewResult review = mReviewData.get(position);
-        TextView tvAuthor = holder.mTvAuthor;
-        MarkdownView mdvReview = holder.mMdvReview;
 
-        tvAuthor.setText(review.getAuthor());
+        holder.mTvAuthor.setText(review.getAuthor());
 
-        //mdvReview.loadMarkdown(review.getContent(), "file:///android_asset/PopMovies.css");
+        Markwon.setMarkdown(holder.mMdvReview, review.getContent());
+
     }
 
     @Override
@@ -54,7 +53,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
 
     public class ReviewViewHolder extends RecyclerView.ViewHolder{
 
-        @BindView(R.id.mdv_review_text) MarkdownView mMdvReview;
+        @BindView(R.id.mdv_review_text) TextView mMdvReview;
         @BindView(R.id.tv_author) TextView mTvAuthor;
 
 

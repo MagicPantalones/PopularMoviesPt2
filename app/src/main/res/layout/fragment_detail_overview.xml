@@ -16,14 +16,16 @@
         >
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            >
 
             <TextView
                 android:id="@+id/tv_overview_title_frag"
                 style="@style/MovieCardStyle.Text.Header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/bnav_overview_title"
+                android:text="@string/nav_overview_title"
                 android:textSize="30sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -35,7 +37,10 @@
                 style="@style/MovieCardStyle.Text.Normal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
+                android:padding="8dp"
+                android:background="@drawable/bg_card_reviews"
+                tools:text="@tools:sample/lorem/random"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_overview_title_frag" />

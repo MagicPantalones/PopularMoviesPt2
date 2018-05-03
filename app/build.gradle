@@ -70,8 +70,8 @@ dependencies {
     //ButterKnife
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
-    //MarkdownView
-    implementation 'us.feras.mdv:markdownview:1.1.0'
+    //Markwon
+    implementation 'ru.noties:markwon:1.0.4'
     //ViewPager Indicator Library
     implementation 'devlight.io:navigationtabbar:1.2.5'
 }

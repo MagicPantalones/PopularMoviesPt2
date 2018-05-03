@@ -6,19 +6,19 @@
         android:id="@+id/action_overview"
         android:checked="false"
         android:icon="@drawable/ic_info_outline_black_24dp"
-        android:title="@string/bnav_overview_title"
+        android:title="@string/nav_overview_title"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/action_trailers"
         android:checked="false"
         android:icon="@drawable/ic_movie_black_24dp"
-        android:title="@string/bnav_trailers_title"
+        android:title="@string/nav_trailers_title"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/action_reviews"
         android:checked="false"
         android:icon="@drawable/ic_star_half_black_24dp"
-        android:title="@string/bnav_reviews_title"
+        android:title="@string/nav_reviews_title"
         app:showAsAction="ifRoom"/>
     </group>
 </menu>

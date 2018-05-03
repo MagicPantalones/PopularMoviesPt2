@@ -1,5 +1,6 @@
 package io.magics.popularmovies.fragments.detailfragments;
 
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -9,6 +10,10 @@ import io.magics.popularmovies.models.Movie;
 public class MovieDetailsPagerAdapter extends FragmentPagerAdapter {
 
     private static final int PAGE_COUNT = 4;
+
+    private static final String[] pageTitles = new String[]{
+            "Poster", "Overview", "Trailers", "Reviews"
+    };
 
     private Movie mMovie;
 

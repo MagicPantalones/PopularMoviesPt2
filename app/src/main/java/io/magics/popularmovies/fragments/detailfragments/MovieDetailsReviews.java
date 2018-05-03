@@ -23,8 +23,10 @@ import static io.magics.popularmovies.utils.MovieUtils.toggleViewVisibility;
 
 public class MovieDetailsReviews extends Fragment {
 
-    @BindView(R.id.rv_reviews) RecyclerView mRvReviewRecycler;
-    @BindView(R.id.tv_no_reviews) TextView mTvNoReviews;
+    @BindView(R.id.rv_reviews)
+    RecyclerView mRvReviewRecycler;
+    @BindView(R.id.tv_no_reviews)
+    TextView mTvNoReviews;
 
     private ReviewsViewModel mViewModel;
 
@@ -58,12 +60,11 @@ public class MovieDetailsReviews extends Fragment {
 
         //noinspection ConstantConditions
         mViewModel.mReviews.observe(getActivity(), reviewResults -> {
-            if (reviewResults != null){
-                if (reviewResults.isEmpty()) toggleViewVisibility(mTvNoReviews, mRvReviewRecycler);
-                else {
-                    toggleViewVisibility(View.VISIBLE, mRvReviewRecycler, mTvNoReviews);
-                    adapter.setReviewData(reviewResults);
-                }
+            if (reviewResults != null && !reviewResults.isEmpty()) {
+
+                toggleViewVisibility(mRvReviewRecycler, mTvNoReviews);
+                adapter.setReviewData(reviewResults);
+
             }
         });
 

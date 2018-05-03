@@ -1,14 +1,16 @@
 <resources>
     <string name="app_name">Popular Movies</string>
     <string name="favourite_btn_a11y" translatable="true">Add to favourites</string>
-    <string name="trailer_icon_play" translatable="true">Play trailer</string>
+    <string name="play_icon_a11y" translatable="true">Play trailer</string>
+    <string name="share_icon_a11y" translatable="true">Share trailer</string>
     <string name="toolbar_back_ic_a11y" translatable="true">Back to movie list</string>
     <string name="release_calendar_a11y" translatable="true">Release date</string>
     <string name="vote_heart_icon_a11y" translatable="true">Average Votes</string>
 
-    <string name="bnav_overview_title" translatable="true">Overview</string>
-    <string name="bnav_trailers_title" translatable="true">Trailers</string>
-    <string name="bnav_reviews_title" translatable="true">Reviews</string>
+    <string name="nav_poster_title" translatable="true">Poster</string>
+    <string name="nav_overview_title" translatable="true">Overview</string>
+    <string name="nav_trailers_title" translatable="true">Trailers</string>
+    <string name="nav_reviews_title" translatable="true">Reviews</string>
 
     <string name="list_no_network_available" translatable="true">No Network Available!</string>
     <string name="details_no_trailers" translatable="true">No Trailers Available!</string>
@@ -20,7 +22,5 @@
     <string name="shared_element_vote_num" translatable="false">seVoteNum</string>
     <string name="shared_element_background" translatable="false">seBackground</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

@@ -9,11 +9,9 @@ import java.util.concurrent.TimeUnit;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.res.Resources;
 import android.database.Cursor;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
 
@@ -206,4 +204,6 @@ public class MovieUtils {
         SCROLL_UP,
         SCROLL_DOWN
     }
+
+
 }
