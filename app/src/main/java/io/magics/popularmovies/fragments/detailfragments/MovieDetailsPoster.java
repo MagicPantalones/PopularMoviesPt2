@@ -80,7 +80,6 @@ public class MovieDetailsPoster extends Fragment {
 
         GlideApp.with(this)
                 .load(posterUrlConverter(getOptimalImgSize(context), mMovie.getPosterUrl()))
-                .centerCrop()
                 .placeholder(R.drawable.bg_loading_realydarkgrey)
                 .dontAnimate()
                 .into(mPoster);

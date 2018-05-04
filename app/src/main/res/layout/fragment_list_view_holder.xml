@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/view_holder_list"
+    android:layout_marginTop="8dp"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
     >
     <!-- contentDescription is set programmatically -->
     <android.support.v7.widget.CardView

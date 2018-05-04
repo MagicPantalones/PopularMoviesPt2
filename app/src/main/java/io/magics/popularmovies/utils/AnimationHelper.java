@@ -128,37 +128,6 @@ public class AnimationHelper {
         fabAnim(false, isFavourite);
     }
 
-    public void runCardFlipAnimation(View container, FragmentManager fragmentManager,
-                                     Fragment newFragment, int direction){
-        Fragment frag = fragmentManager.findFragmentById(R.id.nested_details_container);
-
-        container.animate().withLayer()
-                .rotationY(direction == FLIP_LEFT ? -90 : 90)
-                .setDuration(300)
-                .withEndAction(() -> {
-
-                    fragmentManager.beginTransaction()
-                            .hide(frag)
-                            .show(newFragment)
-                            .commit();
-
-                    container.setRotation(direction == FLIP_LEFT ? 90 : -90);
-                    container.animate().withLayer()
-                            .rotationY(0)
-                            .setDuration(300)
-                            .start();
-                }).start();
-
-    }
-
-    public Slide runFragmentSlideAnimation(int direction){
-        Slide slide = new Slide();
-        slide.setSlideEdge(direction == SLIDE_ENTER ? Gravity.TOP : Gravity.BOTTOM);
-        slide.setDuration(300);
-        slide.setInterpolator(new LinearInterpolator());
-        return slide;
-    }
-
     public void disposeAnimations(){
         if (mVoteProgressAnim != null && mVoteProgressAnim.isStarted()) mVoteProgressAnim.cancel();
         if (mVoteTextAnim != null && mVoteTextAnim.isStarted()) mVoteTextAnim.cancel();

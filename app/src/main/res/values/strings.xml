@@ -1,8 +1,6 @@
 <resources>
     <string name="app_name">Popular Movies</string>
     <string name="favourite_btn_a11y" translatable="true">Add to favourites</string>
-    <string name="play_icon_a11y" translatable="true">Play trailer</string>
-    <string name="share_icon_a11y" translatable="true">Share trailer</string>
     <string name="toolbar_back_ic_a11y" translatable="true">Back to movie list</string>
     <string name="release_calendar_a11y" translatable="true">Release date</string>
     <string name="vote_heart_icon_a11y" translatable="true">Average Votes</string>
@@ -22,5 +20,7 @@
     <string name="shared_element_vote_num" translatable="false">seVoteNum</string>
     <string name="shared_element_background" translatable="false">seBackground</string>
 
+    <string name="play_trailer_text" translatable="true">Play</string>
+    <string name="share_trailer_text" translatable="true">Share</string>
 
 </resources>

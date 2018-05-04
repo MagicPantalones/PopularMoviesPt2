@@ -30,8 +30,6 @@ public class MovieDetailsOverview extends Fragment {
 
     @BindView(R.id.tv_overview_frag)
     TextView mTvOverViewText;
-    @BindView(R.id.tv_overview_title_frag)
-    TextView mTvOverviewTitle;
 
     private Unbinder mUnbinder;
 

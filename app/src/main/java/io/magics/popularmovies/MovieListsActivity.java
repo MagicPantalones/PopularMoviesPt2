@@ -17,6 +17,7 @@ import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 
 import com.facebook.stetho.Stetho;
+import com.squareup.leakcanary.LeakCanary;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -44,8 +45,6 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
 
     private static final String FRAG_PAGER_TAG = "pagerTag";
     private static final String DETAIL_FRAGMENT_TAG = "detailFrag";
-
-    public static final String PAGER_STATE = "pagerState";
 
     @BindView(R.id.up_fab)
     FloatingActionButton mUpFab;
@@ -84,6 +83,8 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
 
         mDataProvider.initialiseApp();
 
+        mUpFab.hide();
+
         mUpFab.setOnClickListener(v -> {
             ListTabLayout tabFrag = (ListTabLayout) mAppFragManager
                     .findFragmentByTag(FRAG_PAGER_TAG);
@@ -113,7 +114,6 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
         if (fragCount == 0) {
             super.onBackPressed();
         } else {
-            mUpFab.show();
             mAppFragManager.popBackStack();
         }
 
@@ -123,6 +123,8 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
 
         if (isDestroyed()) return;
 
+        mUpFab.hide();
+
         Fragment curFrag = mAppFragManager.findFragmentById(R.id.container_main);
         MovieDetailsFragment newFrag = MovieDetailsFragment.newInstance(movie,
                 mFavListVM.checkIfFavourite(movie.getMovieId()));
@@ -131,8 +133,6 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
         slide.setDuration(500);
         slide.setSlideEdge(Gravity.END);
         curFrag.setExitTransition(slide);
-
-        mUpFab.hide();
 
         newFrag.setSharedElementEnterTransition(TransitionInflater.from(this)
                 .inflateTransition(R.transition.card_enter_transition));

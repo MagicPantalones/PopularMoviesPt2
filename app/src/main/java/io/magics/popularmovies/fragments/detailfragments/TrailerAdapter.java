@@ -48,7 +48,6 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
         trailerIv.setContentDescription(trailer.getName());
         GlideApp.with(trailerIv)
                 .load(trailerImgUrl)
-                .centerCrop()
                 .into(trailerIv);
 
     }

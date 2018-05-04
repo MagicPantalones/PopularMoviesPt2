@@ -1,42 +1,48 @@
 <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:fillViewport="true"
     tools:context="io.magics.popularmovies.fragments.detailfragments.MovieDetailsTrailers">
 
-    <android.support.v7.widget.CardView
-        style="@style/MovieCardStyle"
-        android:layout_width="256dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardPreventCornerOverlap="true"
-        app:cardUseCompatPadding="true"
+        android:orientation="vertical"
+        android:weightSum="1"
         >
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_trailers"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
+        <android.support.v7.widget.CardView
+            style="@style/MovieCardStyle"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:layout_gravity="center_horizontal"
-            android:visibility="invisible"
-            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-            app:reverseLayout="false"
-            tools:listitem="@layout/fragment_detail_trailer_view_holder"
-            tools:itemCount="4"
-            />
-
-        <TextView
-            android:id="@+id/tv_no_trailers"
-            style="@style/MovieCardStyle.Text.Header"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:text="@string/details_no_trailers"
-            android:layout_gravity="center"
-            android:visibility="visible" />
-    </android.support.v7.widget.CardView>
+            app:contentPadding="8dp"
+            app:contentPaddingBottom="16dp"
+            >
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_trailers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:visibility="invisible"
+                app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                app:reverseLayout="false"
+                tools:itemCount="4"
+                tools:listitem="@layout/fragment_detail_trailer_view_holder" />
+
+            <TextView
+                android:id="@+id/tv_no_trailers"
+                style="@style/MovieCardStyle.Text.Header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/details_no_trailers"
+                android:visibility="visible" />
+        </android.support.v7.widget.CardView>
+    </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

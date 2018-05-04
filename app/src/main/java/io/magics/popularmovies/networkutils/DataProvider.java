@@ -196,7 +196,7 @@ public class DataProvider
                     Reviews reviews = trailersAndReviews.getReviews();
                     Trailers trailers = trailersAndReviews.getTrailers();
 
-                    mReviewsToViewModel.addAll(reviews.getReviewResults());
+                    mReviewsToViewModel = reviews.getReviewResults();
                     mTrailerVm.setTrailers(trailers.getTrailerResults());
 
                     if (reviews.getTotalPages() > 1){

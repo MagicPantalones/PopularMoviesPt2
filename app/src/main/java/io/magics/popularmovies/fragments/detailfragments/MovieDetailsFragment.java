@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.res.ResourcesCompat;
@@ -58,15 +59,16 @@ public class MovieDetailsFragment extends Fragment {
     ImageView mFavFabAnim;
     @BindView(R.id.nested_details_container)
     ViewPager mNestedViewPager;
-    @BindView(R.id.nested_details_titles)
-    ViewPager mNestedPagerTitles;
+    @BindView(R.id.btn_detail_bar_back)
+    ImageView mBtnToolbarBack;
+    @BindView(R.id.titles_indicator)
+    TabLayout mTitlesIndicator;
 
 
     private Unbinder mUnbinder;
     private DetailFragInteractionHandler mFragInteractionHandler;
 
     private MovieDetailsPagerAdapter mPagerAdapter;
-    private TitlePagerAdapter mPagerTitleAdapter;
     private AnimationHelper mAnimator;
 
     public MovieDetailsFragment() {
@@ -101,7 +103,6 @@ public class MovieDetailsFragment extends Fragment {
         mUnbinder = ButterKnife.bind(this, root);
 
         mPagerAdapter = new MovieDetailsPagerAdapter(mMovie, getChildFragmentManager());
-        mPagerTitleAdapter = new TitlePagerAdapter(getContext());
 
         return root;
 
@@ -115,11 +116,9 @@ public class MovieDetailsFragment extends Fragment {
         mNestedViewPager.setOffscreenPageLimit(4);
         mNestedViewPager.setAdapter(mPagerAdapter);
 
-        mNestedPagerTitles.setOffscreenPageLimit(4);
-        mNestedPagerTitles.setAdapter(mPagerTitleAdapter);
+        mTitlesIndicator.setupWithViewPager(mNestedViewPager, true);
 
-        mNestedViewPager.addOnPageChangeListener(new OnViewPagerPageChange(mNestedViewPager, mNestedPagerTitles));
-        mNestedPagerTitles.addOnPageChangeListener(new OnViewPagerPageChange(mNestedPagerTitles, mNestedViewPager));
+        mBtnToolbarBack.setOnClickListener(v -> getActivity().onBackPressed());
 
         mMainCardWrapper.setTransitionName("wrapper" + mMovie.getMovieId().toString());
 
@@ -156,37 +155,4 @@ public class MovieDetailsFragment extends Fragment {
         void favFabClicked(Movie movie, Boolean isFavourite);
     }
 
-    //From Tristan Richard's  answer here:
-    //https://stackoverflow.com/questions/16107016/synchronizing-two-viewpagers-using-onpagechangelistener
-    public class OnViewPagerPageChange implements ViewPager.OnPageChangeListener {
-
-        private ViewPager mMasterPager;
-        private ViewPager mSlavePager;
-        private int mScrollState = ViewPager.SCROLL_STATE_IDLE;
-
-        OnViewPagerPageChange(ViewPager master, ViewPager slave){
-            mMasterPager = master;
-            mSlavePager = slave;
-        }
-
-        @Override
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            if (mScrollState == ViewPager.SCROLL_STATE_IDLE) return;
-            mSlavePager.scrollTo(mMasterPager.getScrollX()
-                    * mSlavePager.getWidth() / mMasterPager.getWidth(), 0);
-        }
-
-        @Override
-        public void onPageSelected(int position) {
-            //Empty
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int state) {
-            mScrollState = state;
-            if (state == ViewPager.SCROLL_STATE_IDLE){
-                mSlavePager.setCurrentItem(mMasterPager.getCurrentItem(), false);
-            }
-        }
-    }
 }

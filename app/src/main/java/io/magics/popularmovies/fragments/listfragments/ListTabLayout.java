@@ -33,8 +33,6 @@ public class ListTabLayout extends Fragment {
     TabLayout mTabLayout;
     @BindView(R.id.app_bar_tab_layout)
     AppBarLayout mAppBar;
-    @BindView(R.id.iv_app_bar_back)
-    ImageView mAppBarBack;
 
     Unbinder mUnbinder;
 

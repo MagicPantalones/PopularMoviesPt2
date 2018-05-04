@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
     android:id="@+id/list_wrapper"
     android:transitionGroup="false"
+    android:layout_centerHorizontal="true"
     tools:context="io.magics.popularmovies.fragments.listfragments.ListFragment">
 
     <android.support.v7.widget.RecyclerView
@@ -13,6 +14,8 @@
         tools:listitem="@layout/fragment_list_view_holder"
         android:visibility="visible"
         android:transitionGroup="false"
+        tools:layoutManager="android.support.v7.widget.GridLayoutManager"
+        tools:spanCount="2"
         />
     <TextView
         android:id="@+id/tv_list_error"

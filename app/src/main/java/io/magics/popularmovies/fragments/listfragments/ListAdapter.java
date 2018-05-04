@@ -94,7 +94,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         return new PosterViewHolder(v);
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("RecyclerView")
     @Override
     public void onBindViewHolder(@NonNull PosterViewHolder holder, int position) {
         String posterUrl;
@@ -119,15 +119,22 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         double cos45 = Math.cos(Math.toRadians(45));
         float elevation = cvWrapper.getCardElevation();
         float radius = cvWrapper.getRadius();
+
         int compatPad = (int) ((elevation + (1 - cos45) * radius) +
                 (elevation * 1.5 + (1 - cos45) * radius));
+
         int centerImg = ((ViewGroup) cvWrapper.getParent()).getPaddingStart() * 2 + compatPad * 2;
 
-        iv.setLayoutParams(new FrameLayout.LayoutParams(mViewWidth - centerImg, mViewHeight - centerImg));
+        int padding = cvWrapper.getPaddingEnd() * 2;
+
+        int imgViewWidth = mViewWidth - centerImg - padding;
+        int imgViewHeight = mViewWidth / 2 * 3 - centerImg - padding;
+
+        iv.setLayoutParams(new FrameLayout.LayoutParams(imgViewWidth, imgViewHeight));
 
         tvTitle.setText(mfg.getTitle());
         pbVotes.setProgress(mfg.getVoteAverage().intValue() * 10);
-        tvVotes.setText(Double.toString(mfg.getVoteAverage()));
+        tvVotes.setText(String.valueOf(mfg.getVoteAverage()));
         iv.setContentDescription(mfg.getTitle());
         shadow.setImageDrawable(holder.mGradientDrawable.mutate());
 
@@ -151,7 +158,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
                                                 palette.getDarkVibrantColor(
                                                         palette.getDominantColor(mDefaultColor)));
                                 shadow.setColorFilter(solid, PorterDuff.Mode.SRC_IN);
-                                mMovieData.get(holder.getAdapterPosition()).setShadowInt(solid);
+                                mMovieData.get(position).setShadowInt(solid);
                                 mfg.setShadowInt(solid);
                             });
                         } else shadow.setColorFilter(mfg.getShadowInt(), PorterDuff.Mode.SRC_IN);

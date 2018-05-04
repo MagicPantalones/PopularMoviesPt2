@@ -17,8 +17,6 @@ public class ReviewsViewModel extends ViewModel {
         }
     }
 
-    public void clear(){
-        mReviews = new MutableLiveData<>();
-    }
+    public void clear(){ mReviews = new MutableLiveData<>(); }
 
 }
