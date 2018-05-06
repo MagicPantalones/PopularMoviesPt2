@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:transitionGroup="false"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragments.listfragments.ListTabLayout">
 
@@ -18,13 +17,13 @@
         <android.support.design.widget.TabLayout
             android:id="@+id/sliding_tabs"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:transitionGroup="false"
+            android:layout_height="56dp"
             app:tabBackground="@color/colorPrimary"
             app:tabIndicatorColor="@color/colorSecondary"
             app:tabMode="fixed"
             app:tabSelectedTextColor="@color/colorSecondary"
             app:tabTextColor="@color/colorPrimaryDark" />
+
 
     </android.support.design.widget.AppBarLayout>
 
@@ -34,9 +33,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="-4dp"
-        android:layout_marginTop="44dp"
+        android:layout_marginTop="56dp"
         android:layout_marginStart="8dp"
         android:layout_weight="1"
-        android:transitionGroup="false"
         android:background="@color/colorPrimaryDark" />
 </android.support.design.widget.CoordinatorLayout>

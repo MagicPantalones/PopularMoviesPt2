@@ -13,7 +13,6 @@
         style="@style/MovieCardStyle"
         app:cardElevation="2dp"
         app:cardUseCompatPadding="true"
-        android:transitionGroup="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
@@ -89,10 +88,9 @@
 
             <android.support.v7.widget.CardView
                 android:id="@+id/cv_poster_wrapper"
-                style="@style/MovieCardStyle.PosterCard"
+                style="@style/MovieCardStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@android:color/transparent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -103,7 +101,7 @@
                     android:layout_height="wrap_content"
                     android:adjustViewBounds="true"
                     android:layout_gravity="bottom"
-                    android:scaleType="centerCrop"
+                    android:scaleType="fitXY"
                     tools:ignore="contentDescription"
                     tools:src="@drawable/minions_poster_placehodler" />
             </android.support.v7.widget.CardView>

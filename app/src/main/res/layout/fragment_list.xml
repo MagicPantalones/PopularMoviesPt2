@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/list_wrapper"
-    android:transitionGroup="false"
     android:layout_centerHorizontal="true"
     tools:context="io.magics.popularmovies.fragments.listfragments.ListFragment">
 
@@ -13,7 +12,6 @@
         android:layout_height="match_parent"
         tools:listitem="@layout/fragment_list_view_holder"
         android:visibility="visible"
-        android:transitionGroup="false"
         tools:layoutManager="android.support.v7.widget.GridLayoutManager"
         tools:spanCount="2"
         />

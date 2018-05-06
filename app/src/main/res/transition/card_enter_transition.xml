@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <transitionSet android:duration="500"
-    android:interpolator="@android:interpolator/fast_out_slow_in"
+    android:interpolator="@android:interpolator/accelerate_cubic"
     android:transitionOrdering="together"
-    android:startDelay="500"
     xmlns:android="http://schemas.android.com/apk/res/android">
-    <changeBounds/>
+    <changeClipBounds/>
     <changeClipBounds/>
     <changeTransform/>
+    <changeImageTransform/>
 </transitionSet>

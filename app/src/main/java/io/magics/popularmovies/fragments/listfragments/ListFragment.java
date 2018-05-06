@@ -51,7 +51,7 @@ import static io.magics.popularmovies.utils.MovieUtils.toggleViewVisibility;
  * Use the {@link ListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ListFragment extends Fragment implements ListAdapter.PosterClickHandler{
+public class ListFragment extends Fragment {
 
     public static final int TOP_FRAGMENT = 0;
     public static final int POP_FRAGMENT = 1;
@@ -107,15 +107,17 @@ public class ListFragment extends Fragment implements ListAdapter.PosterClickHan
         switch (mFragType){
             case 0:
                 mTopVm = ViewModelProviders.of(getActivity()).get(TopListViewModel.class);
-                mAdapter = new ListAdapter(this, mTopVm, this);
+                mAdapter = new ListAdapter((ListAdapter.PosterClickHandler) getContext(), mTopVm,
+                        mFragType);
                 break;
             case 1:
                 mPopVm = ViewModelProviders.of(getActivity()).get(PopListViewModel.class);
-                mAdapter = new ListAdapter(this, mPopVm, this);
+                mAdapter = new ListAdapter((ListAdapter.PosterClickHandler) getContext(), mPopVm,
+                        mFragType);
                 break;
             case 2:
                 mFavVm = ViewModelProviders.of(getActivity()).get(FavListViewModel.class);
-                mAdapter = new ListAdapter(this, this);
+                mAdapter = new ListAdapter((ListAdapter.PosterClickHandler) getContext());
                 break;
             default:
                 //should never happen
@@ -184,17 +186,8 @@ public class ListFragment extends Fragment implements ListAdapter.PosterClickHan
 
     public void scrollRecyclerViewToTop(){ mRecyclerView.smoothScrollToPosition(0); }
 
-    @Override
-    public void onClick(View v, Movie movie, int position) {
-
-        if (mListener == null) mListener = (FragmentListener) getContext();
-        //noinspection ConstantConditions
-        mListener.onMovieViewHolderClicked(v, movie);
-
-    }
 
     public interface FragmentListener {
-        void onMovieViewHolderClicked(View v, Movie movie);
         void onRecyclerViewScrolled(ScrollDirection scrollDirection);
     }
 

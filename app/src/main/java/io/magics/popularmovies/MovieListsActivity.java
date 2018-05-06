@@ -1,18 +1,26 @@
 package io.magics.popularmovies;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.arch.lifecycle.ViewModelProviders;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
+import android.transition.AutoTransition;
+import android.transition.ChangeBounds;
 import android.transition.Slide;
 import android.transition.TransitionInflater;
+import android.transition.TransitionValues;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 
@@ -23,6 +31,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import io.magics.popularmovies.fragments.detailfragments.MovieDetailsFragment;
+import io.magics.popularmovies.fragments.detailfragments.MovieDetailsPoster;
+import io.magics.popularmovies.fragments.listfragments.ListAdapter;
 import io.magics.popularmovies.fragments.listfragments.ListFragment;
 import io.magics.popularmovies.fragments.listfragments.ListTabLayout;
 import io.magics.popularmovies.models.Movie;
@@ -35,13 +45,11 @@ import io.magics.popularmovies.viewmodels.TopListViewModel;
 import io.magics.popularmovies.viewmodels.TrailersViewModel;
 
 public class MovieListsActivity extends AppCompatActivity implements ListFragment.FragmentListener,
-        MovieDetailsFragment.DetailFragInteractionHandler, ListTabLayout.TabLayoutPageEvents {
+        MovieDetailsFragment.DetailFragInteractionHandler, ListTabLayout.TabLayoutPageEvents,
+        ListAdapter.PosterClickHandler{
 
     //TODO Add horizontal layout support.
     //TODO Inspect for memoryleaks
-
-    static final int EXPLODE_DEFAULT_TIME = 1000;
-    static final int EXPAND_DEFAULT_TIME = 900;
 
     private static final String FRAG_PAGER_TAG = "pagerTag";
     private static final String DETAIL_FRAGMENT_TAG = "detailFrag";
@@ -83,18 +91,27 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
 
         mDataProvider.initialiseApp();
 
-        mUpFab.hide();
-
         mUpFab.setOnClickListener(v -> {
             ListTabLayout tabFrag = (ListTabLayout) mAppFragManager
                     .findFragmentByTag(FRAG_PAGER_TAG);
             if (tabFrag != null) tabFrag.notifyUpFabPressed();
         });
+
         if (savedInstanceState == null) {
             mAppFragManager.beginTransaction()
                     .replace(R.id.container_main, ListTabLayout.newInstance(), FRAG_PAGER_TAG)
                     .commit();
         }
+
+        mMainContainer.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                mMainContainer.getViewTreeObserver().removeOnPreDrawListener(this);
+                mUpFab.hide();
+                return true;
+            }
+        });
+
     }
 
     @Override
@@ -119,41 +136,6 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
 
     }
 
-    private void showMovieDetailsFrag(Movie movie, View v) {
-
-        if (isDestroyed()) return;
-
-        mUpFab.hide();
-
-        Fragment curFrag = mAppFragManager.findFragmentById(R.id.container_main);
-        MovieDetailsFragment newFrag = MovieDetailsFragment.newInstance(movie,
-                mFavListVM.checkIfFavourite(movie.getMovieId()));
-
-        Slide slide = new Slide();
-        slide.setDuration(500);
-        slide.setSlideEdge(Gravity.END);
-        curFrag.setExitTransition(slide);
-
-        newFrag.setSharedElementEnterTransition(TransitionInflater.from(this)
-                .inflateTransition(R.transition.card_enter_transition));
-
-        CardView sharedPoster = v.findViewById(R.id.cv_poster_wrapper);
-
-        getSupportFragmentManager().beginTransaction()
-                .addSharedElement(sharedPoster, sharedPoster.getTransitionName())
-                .replace(R.id.container_main, newFrag, DETAIL_FRAGMENT_TAG)
-                .addToBackStack(null)
-                .commit();
-
-    }
-
-
-    @Override
-    public void onMovieViewHolderClicked(View v, Movie movie) {
-        mDataProvider.setMovieAndFetch(movie);
-        showMovieDetailsFrag(movie, v);
-    }
-
     @Override
     public void onRecyclerViewScrolled(ScrollDirection scrollDirection) {
         if (scrollDirection == ScrollDirection.SCROLL_DOWN &&
@@ -173,6 +155,50 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
         if (state == ViewPager.SCROLL_STATE_DRAGGING && mUpFab.getVisibility() == View.VISIBLE) mUpFab.hide();
         else if (state == ViewPager.SCROLL_STATE_IDLE && mUpFab.getVisibility() != View.VISIBLE) mUpFab.show();
     }
+
+    @Override
+    public void onClick(View holder, Movie movie) {
+        mDataProvider.setMovieAndFetch(movie);
+
+        View posterImg = holder.findViewById(R.id.cv_poster_wrapper);
+        View bg = holder.findViewById(R.id.cv_view_holder_wrapper);
+        MovieDetailsFragment newFrag = MovieDetailsFragment.newInstance(movie,
+                mFavListVM.checkIfFavourite(movie.getMovieId()),
+                ViewCompat.getTransitionName(bg));
+
+        int imgCx = posterImg.getWidth() / 2;
+        int imgCy = posterImg.getHeight() / 2;
+        float initRadius = (float) Math.hypot(imgCx, imgCy);
+
+        Animator anim = ViewAnimationUtils
+                .createCircularReveal(posterImg, imgCx, imgCy, initRadius, 0);
+
+
+
+        anim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                anim.removeListener(this);
+                newFrag.setSharedElementEnterTransition(TransitionInflater.from(MovieListsActivity.this)
+                        .inflateTransition(android.R.transition.move));
+                newFrag.postponeEnterTransition();
+                posterImg.setVisibility(View.INVISIBLE);
+
+                mAppFragManager.beginTransaction()
+                        .addSharedElement(bg, bg.getTransitionName())
+                        .addToBackStack(null)
+                        .replace(R.id.container_main, newFrag, DETAIL_FRAGMENT_TAG)
+                        .commit();
+            }
+        });
+
+        mUpFab.hide();
+
+        holder.findViewById(R.id.v_card_shadow).setVisibility(View.INVISIBLE);
+        anim.start();
+    }
+
     /*
     Resources/Tutorials for this project:
     - FragmentTransitions:

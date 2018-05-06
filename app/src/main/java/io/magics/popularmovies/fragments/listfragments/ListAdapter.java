@@ -12,6 +12,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -43,18 +44,18 @@ import io.magics.popularmovies.viewmodels.TopListViewModel;
 
 public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHolder> {
 
+
     private List<Movie> mMovieData = new ArrayList<>();
     private int mViewWidth;
-    private int mViewHeight;
     private final PosterClickHandler mClickHandler;
     private ReachedEndHandler mReachedEndHandler;
     private MovieUtils.ImageSize mImageSize;
     private int mDefaultColor;
 
-    private ListFragment mFragment;
+    private String mListType;
 
     public interface PosterClickHandler {
-        void onClick(View v, Movie movie, int position);
+        void onClick(View holder, Movie movie);
     }
 
     //Help from https://medium.com/@ayhamorfali/android-detect-when-the-recyclerview-reaches-the-bottom-43f810430e1e
@@ -62,18 +63,19 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         void endReached();
     }
 
-    public ListAdapter(PosterClickHandler posterClickHandler, ListFragment fragment) {
+    public ListAdapter(PosterClickHandler posterClickHandler) {
         this.mClickHandler = posterClickHandler;
-        mFragment = fragment;
+        mListType = "favourites";
     }
 
-    public ListAdapter(PosterClickHandler posterClickHandler, ViewModel viewModel, ListFragment fragment) {
+    public ListAdapter(PosterClickHandler posterClickHandler, ViewModel viewModel, int listType) {
         this.mClickHandler = posterClickHandler;
-        mFragment = fragment;
         mReachedEndHandler = () -> {
             if (viewModel instanceof TopListViewModel) ((TopListViewModel) viewModel).notifyGetMoreTopPages();
             else if (viewModel instanceof PopListViewModel) ((PopListViewModel) viewModel).notifyGetMorePopPages();
         };
+        if (listType == ListFragment.TOP_FRAGMENT) mListType = "topRated";
+        else if (listType == ListFragment.POP_FRAGMENT) mListType = "popular";
     }
 
     @NonNull
@@ -86,7 +88,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
 
 
         //Sets the ViewHolder sizes based on the devise's orientation.
-        mViewHeight = orientation ? parent.getMeasuredHeight() / 2 : parent.getMeasuredHeight();
         mViewWidth = orientation ? parent.getMeasuredWidth() / 2 : parent.getMeasuredWidth() / 3;
 
         View v = LayoutInflater.from(context).inflate(R.layout.fragment_list_view_holder, parent, false);
@@ -106,8 +107,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         TextView tvVotes = holder.mTvVote;
         ImageView shadow = holder.mShadowLayer;
 
-        cvWrapper.setTransitionName(mfg.getMovieId().toString());
-
         posterUrl = MovieUtils.posterUrlConverter(mImageSize, mfg.getPosterUrl());
         if (position == mMovieData.size() - 5 && mReachedEndHandler != null) {
             mReachedEndHandler.endReached();
@@ -125,10 +124,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
 
         int centerImg = ((ViewGroup) cvWrapper.getParent()).getPaddingStart() * 2 + compatPad * 2;
 
-        int padding = cvWrapper.getPaddingEnd() * 2;
-
-        int imgViewWidth = mViewWidth - centerImg - padding;
-        int imgViewHeight = mViewWidth / 2 * 3 - centerImg - padding;
+        int imgViewWidth = mViewWidth - centerImg;
+        int imgViewHeight = imgViewWidth / 2 * 3;
 
         iv.setLayoutParams(new FrameLayout.LayoutParams(imgViewWidth, imgViewHeight));
 
@@ -137,6 +134,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         tvVotes.setText(String.valueOf(mfg.getVoteAverage()));
         iv.setContentDescription(mfg.getTitle());
         shadow.setImageDrawable(holder.mGradientDrawable.mutate());
+
+        holder.setTransitionName(mfg);
 
         GlideApp.with(iv)
                 .load(posterUrl)
@@ -188,10 +187,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         notifyDataSetChanged();
     }
 
-    public List<Movie> getMovieData(){
-        return mMovieData;
-    }
-
     public class PosterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         @BindView(R.id.iv_poster)
         ImageView mIv;
@@ -199,6 +194,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         ImageView mShadowLayer;
         @BindView(R.id.cv_poster_wrapper)
         CardView mCvWrapper;
+        @BindView(R.id.cv_view_holder_wrapper)
+        CardView mViewHolderWrapper;
         @BindView(R.id.tv_movie_title_list)
         TextView mTvTitle;
         @BindView(R.id.pb_list_vote)
@@ -219,10 +216,13 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
                     itemView.getContext().getTheme());
         }
 
+        void setTransitionName(Movie movie){
+            ViewCompat.setTransitionName(mViewHolderWrapper, mListType + movie.getPosterUrl());
+        }
+
         @Override
         public void onClick(View v) {
-            mClickHandler.onClick(v, mMovieData.get(getAdapterPosition()), getAdapterPosition());
-
+            mClickHandler.onClick(v, mMovieData.get(getAdapterPosition()));
         }
 
     }

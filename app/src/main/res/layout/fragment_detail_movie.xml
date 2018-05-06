@@ -36,15 +36,22 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="8dp">
 
-            <android.support.v4.view.ViewPager
-                android:id="@+id/nested_details_container"
-                android:layout_width="256dp"
-                android:layout_height="384dp"
-                android:layout_marginTop="8dp"
+            <android.support.v7.widget.CardView
+                android:id="@+id/wrap_test"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/MovieCardStyle"
+                android:visibility="invisible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:background="@drawable/bg_loading_realydarkgrey" />
+                app:layout_constraintTop_toTopOf="parent">
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/nested_details_container"
+                    android:layout_width="256dp"
+                    android:layout_height="384dp"
+                    tools:background="@drawable/bg_loading_realydarkgrey" />
+            </android.support.v7.widget.CardView>
 
             <android.support.constraint.ConstraintLayout
                 android:id="@+id/wrapper_details_vote"
@@ -93,7 +100,7 @@
                 android:id="@+id/fav_fab_anim"
                 android:layout_width="56dp"
                 android:layout_height="56dp"
-                android:elevation="8dp"
+                android:elevation="100dp"
                 app:layout_constraintBottom_toBottomOf="@+id/fav_fab"
                 app:layout_constraintEnd_toEndOf="@+id/fav_fab"
                 app:layout_constraintStart_toStartOf="@+id/fav_fab"
@@ -106,14 +113,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
                 android:contentDescription="@string/favourite_btn_a11y"
                 android:scaleType="fitCenter"
+                android:visibility="invisible"
                 android:theme="@style/Fab"
-                app:layout_constraintBottom_toBottomOf="@+id/nested_details_container"
-                app:layout_constraintEnd_toEndOf="@+id/nested_details_container"
-                app:layout_constraintStart_toEndOf="@+id/nested_details_container"
-                app:layout_constraintTop_toBottomOf="@+id/nested_details_container"
+                app:layout_constraintBottom_toBottomOf="@+id/wrap_test"
+                app:layout_constraintEnd_toEndOf="@+id/wrap_test"
+                app:layout_constraintStart_toEndOf="@+id/wrap_test"
+                app:layout_constraintTop_toBottomOf="@+id/wrap_test"
                 app:srcCompat="@drawable/ic_heart_fab_static" />
 
             <android.support.design.widget.TabLayout
@@ -121,9 +128,9 @@
                 android:layout_width="90dp"
                 android:layout_height="12dp"
                 android:layout_marginTop="16dp"
-                app:layout_constraintEnd_toEndOf="@+id/nested_details_container"
-                app:layout_constraintStart_toStartOf="@+id/nested_details_container"
-                app:layout_constraintTop_toBottomOf="@+id/nested_details_container"
+                app:layout_constraintEnd_toEndOf="@+id/wrap_test"
+                app:layout_constraintStart_toStartOf="@+id/wrap_test"
+                app:layout_constraintTop_toBottomOf="@+id/wrap_test"
                 app:tabBackground="@drawable/tab_titles_indicator_selector"
                 app:tabGravity="center"
                 app:tabIndicatorHeight="0dp" />

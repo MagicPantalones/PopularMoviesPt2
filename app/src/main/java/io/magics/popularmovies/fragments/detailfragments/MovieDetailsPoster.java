@@ -1,6 +1,7 @@
 package io.magics.popularmovies.fragments.detailfragments;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,6 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -31,14 +37,13 @@ public class MovieDetailsPoster extends Fragment {
 
     @BindView(R.id.detail_fragment_poster)
     ImageView mPoster;
-    @BindView(R.id.wrapper_card_details_poster)
-    CardView mPosterWrapperCard;
     @BindView(R.id.tv_details_title)
     TextView mTitle;
     @BindView(R.id.tv_details_release)
     TextView mReleaseDate;
 
     Unbinder mUnbinder;
+
 
     public MovieDetailsPoster() {
         // Required empty public constructor
@@ -64,7 +69,7 @@ public class MovieDetailsPoster extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_detail_poster, container, false);
@@ -72,6 +77,7 @@ public class MovieDetailsPoster extends Fragment {
         return root;
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -81,7 +87,22 @@ public class MovieDetailsPoster extends Fragment {
         GlideApp.with(this)
                 .load(posterUrlConverter(getOptimalImgSize(context), mMovie.getPosterUrl()))
                 .placeholder(R.drawable.bg_loading_realydarkgrey)
-                .dontAnimate()
+                .listener(new RequestListener<Drawable>() {
+
+                    @SuppressWarnings("ConstantConditions")
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        ((MovieDetailsFragment)getParentFragment()).startSharedElementTransition();
+                        return false;
+                    }
+
+                    @SuppressWarnings("ConstantConditions")
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        ((MovieDetailsFragment)getParentFragment()).startSharedElementTransition();
+                        return false;
+                    }
+                })
                 .into(mPoster);
 
         mTitle.setText(mMovie.getTitle());

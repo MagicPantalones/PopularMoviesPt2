@@ -40,7 +40,6 @@ public class AnimationHelper {
 
     private ValueAnimator mVoteTextAnim;
     private ObjectAnimator mVoteProgressAnim;
-    private ObjectAnimator mCardFlipAnimation;
     private AnimatedVectorDrawableCompat mFabAnim;
 
     private int mFavouriteColor;
@@ -51,7 +50,7 @@ public class AnimationHelper {
 
 
     public AnimationHelper(Context context, Movie movie,
-                           ImageView fabAnimation, FloatingActionButton fab){
+                           ImageView fabAnimation, FloatingActionButton fab) {
 
         this.mContext = context;
         this.mMovie = movie;
@@ -67,10 +66,10 @@ public class AnimationHelper {
     }
 
     public void runInitialDetailAnimation(@NonNull ProgressBar progressBar,
-                                          @NonNull Boolean isFavourite,
+                                          boolean isFavourite,
                                           @Nullable Integer duration,
                                           @Nullable Interpolator interpolator,
-                                          @NonNull InitialAnimationUpdateListener listener){
+                                          @NonNull InitialAnimationUpdateListener listener) {
 
         mVoteTextAnim = ValueAnimator.ofFloat(0.0f, mMovie.getVoteAverage().floatValue());
 
@@ -92,20 +91,15 @@ public class AnimationHelper {
         mVoteTextAnim.start();
         mVoteProgressAnim.start();
 
-        fabAnim(true, isFavourite);
+        mFab.setBackgroundTintList(
+                ColorStateList.valueOf(isFavourite ? mFavouriteColor : mDefaultColor));
 
     }
 
-    private void fabAnim(boolean init, boolean favCheck){
+    public void fabAnim(boolean favCheck) {
 
-        if (init){
-            mFabAnim = AnimatedVectorDrawableCompat.create(mContext, favCheck ?
-                    R.drawable.ic_anim_heart_enter_to_fav :
-                    R.drawable.ic_anim_heart_enter_to_default);
-        } else {
-            mFabAnim = AnimatedVectorDrawableCompat.create(mContext, favCheck ?
-                    R.drawable.ic_anim_heart_to_fav : R.drawable.ic_anim_heart_from_fav);
-        }
+        mFabAnim = AnimatedVectorDrawableCompat.create(mContext, favCheck ?
+                R.drawable.ic_anim_heart_to_fav : R.drawable.ic_anim_heart_from_fav);
 
         mIvFabAnimation.setImageDrawable(mFabAnim);
 
@@ -114,27 +108,24 @@ public class AnimationHelper {
             public void onAnimationEnd(Drawable drawable) {
                 mFab.setBackgroundTintList(ColorStateList.valueOf(favCheck ?
                         mFavouriteColor : mDefaultColor));
-                MovieUtils.toggleViewVisibility(mIvFabAnimation, mFab);
+                mFab.show();
                 super.onAnimationEnd(drawable);
             }
         });
 
-        MovieUtils.toggleViewVisibility(mIvFabAnimation, mFab);
+        mFab.hide();
+        mIvFabAnimation.setVisibility(View.VISIBLE);
         mFabAnim.start();
 
     }
 
-    public void runFabAnim(boolean isFavourite){
-        fabAnim(false, isFavourite);
-    }
-
-    public void disposeAnimations(){
+    public void disposeAnimations() {
         if (mVoteProgressAnim != null && mVoteProgressAnim.isStarted()) mVoteProgressAnim.cancel();
         if (mVoteTextAnim != null && mVoteTextAnim.isStarted()) mVoteTextAnim.cancel();
         if (mFabAnim != null && mFabAnim.isRunning()) mFabAnim.stop();
     }
 
-    public interface InitialAnimationUpdateListener{
+    public interface InitialAnimationUpdateListener {
         void updatedValue(String updatedValue);
     }
 

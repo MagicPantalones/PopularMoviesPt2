@@ -3,60 +3,51 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
-    <android.support.v7.widget.CardView
-        android:id="@+id/wrapper_card_details_poster"
-        style="@style/MovieCardStyle"
-        android:layout_margin="8dp"
+    <ImageView
+        android:id="@+id/detail_fragment_poster"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:scaleType="fitXY"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription"
+        tools:src="@drawable/minions_poster_placehodler" />
 
-        <ImageView
-            android:id="@+id/detail_fragment_poster"
-            android:layout_width="256dp"
-            android:layout_height="384dp"
-            android:scaleType="fitXY"
-            tools:ignore="ContentDescription"
-            tools:src="@drawable/minions_poster_placehodler" />
-
-        <View
-            android:id="@+id/v_detail_poster_shade"
-            android:layout_width="256dp"
-            android:layout_height="192dp"
-            android:layout_gravity="bottom"
-            android:background="@drawable/fg_fading_shade_light" />
-    </android.support.v7.widget.CardView>
+    <View
+        android:id="@+id/v_detail_poster_shade"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/fg_fading_shade_light"
+        app:layout_constraintBottom_toBottomOf="@+id/detail_fragment_poster"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/tv_details_title"
         style="@style/MovieCardStyle.Text.Normal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
         android:elevation="4dp"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/wrapper_details_release"
-        app:layout_constraintEnd_toEndOf="@+id/wrapper_card_details_poster"
-        app:layout_constraintStart_toStartOf="@+id/wrapper_card_details_poster"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         tools:text="Lord of the rings:\nFellowship of the ring" />
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/wrapper_details_release"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
         android:elevation="4dp"
-        app:layout_constraintBottom_toBottomOf="@+id/wrapper_card_details_poster"
-        app:layout_constraintEnd_toEndOf="@+id/tv_details_title"
-        app:layout_constraintStart_toStartOf="@+id/tv_details_title">
+        app:layout_constraintBottom_toBottomOf="@+id/v_detail_poster_shade"
+        app:layout_constraintEnd_toEndOf="@+id/v_detail_poster_shade"
+        app:layout_constraintStart_toStartOf="@+id/v_detail_poster_shade">
 
         <ImageView
             android:id="@+id/iv_details_release_icon"
