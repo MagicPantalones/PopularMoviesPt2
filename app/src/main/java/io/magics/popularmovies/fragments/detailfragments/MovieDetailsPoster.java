@@ -1,22 +1,34 @@
 package io.magics.popularmovies.fragments.detailfragments;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestFutureTarget;
 import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.ImageViewTarget;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.Transition;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -84,26 +96,18 @@ public class MovieDetailsPoster extends Fragment {
 
         Context context = getContext();
 
-        GlideApp.with(this)
+        GlideApp.with(mPoster)
                 .load(posterUrlConverter(getOptimalImgSize(context), mMovie.getPosterUrl()))
-                .placeholder(R.drawable.bg_loading_realydarkgrey)
-                .listener(new RequestListener<Drawable>() {
-
-                    @SuppressWarnings("ConstantConditions")
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .dontAnimate()
+                .dontTransform()
+                .into(new ImageViewTarget<Drawable>(mPoster) {
                     @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        ((MovieDetailsFragment)getParentFragment()).startSharedElementTransition();
-                        return false;
+                    protected void setResource(@Nullable Drawable resource) {
+                        mPoster.setImageDrawable(resource);
+                        getParentFragment().startPostponedEnterTransition();
                     }
-
-                    @SuppressWarnings("ConstantConditions")
-                    @Override
-                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        ((MovieDetailsFragment)getParentFragment()).startSharedElementTransition();
-                        return false;
-                    }
-                })
-                .into(mPoster);
+                });
 
         mTitle.setText(mMovie.getTitle());
         mReleaseDate.setText(formatDate(mMovie.getReleaseDate()));

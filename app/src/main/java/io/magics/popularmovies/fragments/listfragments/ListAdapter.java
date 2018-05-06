@@ -55,7 +55,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
     private String mListType;
 
     public interface PosterClickHandler {
-        void onClick(View holder, Movie movie);
+        void onClick(View holder, Movie movie, String transitionIdentifier);
     }
 
     //Help from https://medium.com/@ayhamorfali/android-detect-when-the-recyclerview-reaches-the-bottom-43f810430e1e
@@ -139,9 +139,9 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
 
         GlideApp.with(iv)
                 .load(posterUrl)
-                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .placeholder(R.drawable.bg_loading_realydarkgrey)
-                .transition(DrawableTransitionOptions.withCrossFade())
+                .dontTransform()
                 .into(new ImageViewTarget<Drawable>(iv) {
                     
                     @Override
@@ -217,12 +217,18 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         }
 
         void setTransitionName(Movie movie){
-            ViewCompat.setTransitionName(mViewHolderWrapper, mListType + movie.getPosterUrl());
+            mCvWrapper.setClipToOutline(true);
+            ViewCompat.setTransitionName(mViewHolderWrapper,
+                    "background" + mListType + movie.getPosterUrl());
+            ViewCompat.setTransitionName(mCvWrapper,
+                    "posterWrapper" + mListType + movie.getPosterUrl());
+            ViewCompat.setTransitionName(mIv,
+                    "image" + mListType + movie.getPosterUrl());
         }
 
         @Override
         public void onClick(View v) {
-            mClickHandler.onClick(v, mMovieData.get(getAdapterPosition()));
+            mClickHandler.onClick(v, mMovieData.get(getAdapterPosition()), mListType);
         }
 
     }

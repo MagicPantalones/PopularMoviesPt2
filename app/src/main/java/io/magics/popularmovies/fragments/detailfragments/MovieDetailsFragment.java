@@ -12,6 +12,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.SharedElementCallback;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
@@ -31,6 +32,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -103,7 +105,7 @@ public class MovieDetailsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        postponeEnterTransition();
         if (getArguments() != null) {
             mMovie = getArguments().getParcelable(ARG_MOVIE);
             mIsFavourite = getArguments().getBoolean(ARG_IS_FAVOURITE);
@@ -129,7 +131,14 @@ public class MovieDetailsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        ViewCompat.setTransitionName(mMainCardWrapper, mTransitionName);
+        mWrapTest.setClipToOutline(true);
+
+        ViewCompat.setTransitionName(mMainCardWrapper,
+                "background" + mTransitionName + mMovie.getPosterUrl());
+        ViewCompat.setTransitionName(mWrapTest,
+                "posterWrapper" + mTransitionName + mMovie.getPosterUrl());
+        ViewCompat.setTransitionName(mNestedViewPager,
+                "image" + mTransitionName + mMovie.getPosterUrl());
 
         mNestedViewPager.setOffscreenPageLimit(4);
         mNestedViewPager.setAdapter(mPagerAdapter);
@@ -137,8 +146,6 @@ public class MovieDetailsFragment extends Fragment {
         mTitlesIndicator.setupWithViewPager(mNestedViewPager, true);
 
         mBtnToolbarBack.setOnClickListener(v -> getActivity().onBackPressed());
-
-        mMainCardWrapper.setPreventCornerOverlap(true);
 
         //noinspection ConstantConditions
         mAnimator = new AnimationHelper(getContext(), mMovie, mFavFabAnim, mFavFab);
@@ -168,29 +175,6 @@ public class MovieDetailsFragment extends Fragment {
         mAnimator.disposeAnimations();
         mUnbinder.unbind();
         super.onDestroyView();
-    }
-
-    public void startSharedElementTransition(){
-        startPostponedEnterTransition();
-
-        int cx = mWrapTest.getWidth() / 2;
-        int cy = mWrapTest.getHeight() / 2;
-        float finalRadius = (float) Math.hypot(cx, cy);
-
-        Animator anim = ViewAnimationUtils.createCircularReveal(mWrapTest,
-                cx, cy, 0, finalRadius);
-
-        anim.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                anim.removeListener(this);
-                mFavFab.show();
-            }
-        });
-
-        mWrapTest.setVisibility(View.VISIBLE);
-        anim.start();
     }
 
     public interface DetailFragInteractionHandler {

@@ -13,6 +13,8 @@ import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.transition.AutoTransition;
 import android.transition.ChangeBounds;
+import android.transition.Explode;
+import android.transition.Fade;
 import android.transition.Slide;
 import android.transition.TransitionInflater;
 import android.transition.TransitionValues;
@@ -157,46 +159,35 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
     }
 
     @Override
-    public void onClick(View holder, Movie movie) {
+    public void onClick(View holder, Movie movie, String transitionIdentifier) {
         mDataProvider.setMovieAndFetch(movie);
 
-        View posterImg = holder.findViewById(R.id.cv_poster_wrapper);
+        View poster = holder.findViewById(R.id.iv_poster);
+        View posterWrapper = holder.findViewById(R.id.cv_poster_wrapper);
         View bg = holder.findViewById(R.id.cv_view_holder_wrapper);
+
         MovieDetailsFragment newFrag = MovieDetailsFragment.newInstance(movie,
-                mFavListVM.checkIfFavourite(movie.getMovieId()),
-                ViewCompat.getTransitionName(bg));
+                mFavListVM.checkIfFavourite(movie.getMovieId()), transitionIdentifier);
 
-        int imgCx = posterImg.getWidth() / 2;
-        int imgCy = posterImg.getHeight() / 2;
-        float initRadius = (float) Math.hypot(imgCx, imgCy);
+        Fragment currFrag = mAppFragManager.findFragmentById(R.id.container_main);
 
-        Animator anim = ViewAnimationUtils
-                .createCircularReveal(posterImg, imgCx, imgCy, initRadius, 0);
+        currFrag.setExitTransition(new Fade());
 
-
-
-        anim.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                anim.removeListener(this);
-                newFrag.setSharedElementEnterTransition(TransitionInflater.from(MovieListsActivity.this)
-                        .inflateTransition(android.R.transition.move));
-                newFrag.postponeEnterTransition();
-                posterImg.setVisibility(View.INVISIBLE);
-
-                mAppFragManager.beginTransaction()
-                        .addSharedElement(bg, bg.getTransitionName())
-                        .addToBackStack(null)
-                        .replace(R.id.container_main, newFrag, DETAIL_FRAGMENT_TAG)
-                        .commit();
-            }
-        });
+        newFrag.setSharedElementEnterTransition(TransitionInflater.from(this)
+                .inflateTransition(android.R.transition.move));
 
         mUpFab.hide();
 
+        mAppFragManager.beginTransaction()
+                .addSharedElement(poster, ViewCompat.getTransitionName(poster))
+                .addSharedElement(posterWrapper, ViewCompat.getTransitionName(posterWrapper))
+                .addSharedElement(bg, ViewCompat.getTransitionName(bg))
+                .addToBackStack(null)
+                .replace(R.id.container_main, newFrag, DETAIL_FRAGMENT_TAG)
+                .commit();
+
         holder.findViewById(R.id.v_card_shadow).setVisibility(View.INVISIBLE);
-        anim.start();
+
     }
 
     /*

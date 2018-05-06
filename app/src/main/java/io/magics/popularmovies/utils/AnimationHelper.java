@@ -1,6 +1,8 @@
 package io.magics.popularmovies.utils;
 
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -16,6 +18,7 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.transition.Slide;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.animation.BounceInterpolator;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
@@ -117,6 +120,15 @@ public class AnimationHelper {
         mIvFabAnimation.setVisibility(View.VISIBLE);
         mFabAnim.start();
 
+    }
+
+    public Animator getAnimatorForPosterWrapper(View view){
+        int cx = view.getWidth() / 2;
+        int cy = view.getHeight() / 2;
+        float finalRadius = (float) Math.hypot(cx, cy);
+
+        return ViewAnimationUtils.createCircularReveal(view,
+                cx, cy, 0, finalRadius);
     }
 
     public void disposeAnimations() {
