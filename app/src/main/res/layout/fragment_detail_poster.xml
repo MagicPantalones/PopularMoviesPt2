@@ -1,91 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/nested_poster_wrapper"
-    style="@style/MovieCardStyle.PosterCard"
-    app:cardUseCompatPadding="false"
-    android:transitionGroup="true"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:transitionGroup="false">
 
-    <android.support.constraint.ConstraintLayout
+    <android.support.v7.widget.CardView
+        android:id="@+id/nested_poster_wrapper"
+        style="@style/MovieCardStyle.PosterCard"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:transitionGroup="true"
+        android:layout_margin="8dp"
+        app:cardUseCompatPadding="false">
 
-        <ImageView
-            android:id="@+id/iv_poster_details"
+        <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="fitXY"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="ContentDescription"
-            tools:src="@drawable/minions_poster_placehodler" />
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/iv_poster_details"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:elevation="0dp"
+                android:scaleType="fitXY"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="ContentDescription"
+                tools:src="@drawable/minions_poster_placehodler" />
 
 
-    <View
-        android:id="@+id/v_detail_poster_shade"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_gravity="bottom"
-        android:elevation="4dp"
-        android:background="@drawable/fg_fading_shade_light"
-        app:layout_constraintBottom_toBottomOf="@+id/iv_poster_details"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+            <View
+                android:id="@+id/v_detail_poster_shade"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_gravity="bottom"
+                android:background="@drawable/fg_fading_shade_light"
+                android:elevation="4dp"
+                app:layout_constraintBottom_toBottomOf="@+id/iv_poster_details"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
 
-    <TextView
-        android:id="@+id/tv_details_title"
-        style="@style/MovieCardStyle.Text.Normal"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:elevation="4dp"
-        android:textColor="@color/colorPrimaryDark"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@+id/wrapper_details_release"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:text="Lord of the rings:\nFellowship of the ring" />
+            <TextView
+                android:id="@+id/tv_details_title"
+                style="@style/MovieCardStyle.Text.Normal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:elevation="4dp"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toTopOf="@+id/wrapper_details_release"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:text="Lord of the rings:\nFellowship of the ring" />
 
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/wrapper_details_release"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:elevation="4dp"
-        app:layout_constraintBottom_toBottomOf="@+id/v_detail_poster_shade"
-        app:layout_constraintEnd_toEndOf="@+id/v_detail_poster_shade"
-        app:layout_constraintStart_toStartOf="@+id/v_detail_poster_shade">
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/wrapper_details_release"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:elevation="4dp"
+                app:layout_constraintBottom_toBottomOf="@+id/v_detail_poster_shade"
+                app:layout_constraintEnd_toEndOf="@+id/v_detail_poster_shade"
+                app:layout_constraintStart_toStartOf="@+id/v_detail_poster_shade">
 
-        <ImageView
-            android:id="@+id/iv_details_release_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp"
-            android:contentDescription="@string/release_calendar_a11y"
-            android:tint="@color/colorPrimaryDark"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_date_range_black_24dp" />
+                <ImageView
+                    android:id="@+id/iv_details_release_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp"
+                    android:contentDescription="@string/release_calendar_a11y"
+                    android:tint="@color/colorPrimaryDark"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/ic_date_range_black_24dp" />
 
-        <TextView
-            android:id="@+id/tv_details_release"
-            style="@style/MovieCardStyle.Text.Normal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:textColor="@color/colorPrimaryDark"
-            app:layout_constraintBottom_toBottomOf="@+id/iv_details_release_icon"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/iv_details_release_icon"
-            app:layout_constraintTop_toTopOf="@+id/iv_details_release_icon"
-            tools:text="September 20th, 2017" />
+                <TextView
+                    android:id="@+id/tv_details_release"
+                    style="@style/MovieCardStyle.Text.Normal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:textColor="@color/colorPrimaryDark"
+                    app:layout_constraintBottom_toBottomOf="@+id/iv_details_release_icon"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/iv_details_release_icon"
+                    app:layout_constraintTop_toTopOf="@+id/iv_details_release_icon"
+                    tools:text="September 20th, 2017" />
 
 
-    </android.support.constraint.ConstraintLayout>
-    </android.support.constraint.ConstraintLayout>
-</android.support.v7.widget.CardView>
+            </android.support.constraint.ConstraintLayout>
+        </android.support.constraint.ConstraintLayout>
+    </android.support.v7.widget.CardView>
+</android.support.constraint.ConstraintLayout>

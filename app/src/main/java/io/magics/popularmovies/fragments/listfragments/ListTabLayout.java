@@ -127,8 +127,10 @@ public class ListTabLayout extends Fragment {
                     return;
                 }
 
-                sharedElements
-                        .put(names.get(0), selectedVh.itemView.findViewById(R.id.cv_poster_wrapper));
+                sharedElements.put(names.get(0),
+                        selectedVh.itemView.findViewById(R.id.cv_poster_wrapper));
+
+                sharedElements.put(names.get(1), selectedVh.itemView.findViewById(R.id.iv_poster));
             }
         });
 

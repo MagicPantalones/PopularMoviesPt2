@@ -89,6 +89,7 @@ public class MovieDetailsPoster extends Fragment {
         Context context = getContext();
 
         view.findViewById(R.id.nested_poster_wrapper).setTransitionName(mTransitionId);
+        mPoster.setTransitionName("poster" + mTransitionId);
 
         GlideApp.with(this)
                 .load(posterUrlConverter(getOptimalImgSize(context), mMovie.getPosterUrl()))

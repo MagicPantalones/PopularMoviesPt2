@@ -30,13 +30,14 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="54dp"
+        android:layout_marginTop="62dp"
         android:transitionGroup="false">
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
+            android:transitionGroup="false"
             android:layout_marginTop="8dp">
 
             <android.support.v4.view.ViewPager
@@ -46,6 +47,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                android:transitionGroup="false"
                 tools:background="@drawable/bg_loading_realydarkgrey" />
 
             <android.support.constraint.ConstraintLayout

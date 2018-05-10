@@ -153,6 +153,7 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
         selectedPosition = selectedPos;
 
         View posterWrapper = holder.findViewById(R.id.cv_poster_wrapper);
+        View poster = holder.findViewById(R.id.iv_poster);
 
         MovieDetailsFragment newFrag = MovieDetailsFragment.newInstance(movie,
                 mFavListVM.checkIfFavourite(movie.getMovieId()), transitionIdentifier);
@@ -162,6 +163,7 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
         mAppFragManager.beginTransaction()
                 .setReorderingAllowed(true)
                 .addSharedElement(posterWrapper, posterWrapper.getTransitionName())
+                .addSharedElement(poster, poster.getTransitionName())
                 .replace(R.id.container_main, newFrag, DETAIL_FRAGMENT_TAG)
                 .addToBackStack(null)
                 .commit();

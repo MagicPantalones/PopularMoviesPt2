@@ -10,7 +10,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.SharedElementCallback;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.CardView;
+import android.transition.ChangeClipBounds;
+import android.transition.Transition;
 import android.transition.TransitionInflater;
+import android.transition.TransitionSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -103,8 +106,11 @@ public class MovieDetailsFragment extends Fragment {
         mPagerAdapter = new MovieDetailsPagerAdapter(mMovie,
                 mTransitionName + mMovie.getPosterUrl(), getChildFragmentManager());
 
-        setSharedElementEnterTransition(TransitionInflater.from(getContext())
-                .inflateTransition(R.transition.card_enter_transition));
+
+        TransitionSet enterTran = (TransitionSet) TransitionInflater.from(getContext())
+                .inflateTransition(R.transition.card_enter_transition);
+
+        setSharedElementEnterTransition(enterTran);
 
         setEnterSharedElementCallback(new SharedElementCallback() {
             @Override
@@ -118,6 +124,7 @@ public class MovieDetailsFragment extends Fragment {
                 }
 
                 sharedElements.put(names.get(0), view.findViewById(R.id.nested_poster_wrapper));
+                sharedElements.put(names.get(1), view.findViewById(R.id.iv_poster_details));
             }
         });
 

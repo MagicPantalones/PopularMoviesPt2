@@ -4,8 +4,36 @@
     android:duration="375"
     android:interpolator="@android:interpolator/fast_out_slow_in"
     android:transitionOrdering="together">
-    <changeClipBounds/>
-    <changeTransform/>
-    <changeBounds/>
-    <changeImageTransform/>
+    <targets>
+        <target android:excludeId="@id/app_bar_tab_layout"/>
+        <target android:excludeId="@+id/toolbar_detail_fragment"/>
+    </targets>
+    <changeClipBounds>
+        <targets>
+            <target android:targetId="@+id/iv_poster"/>
+            <target android:targetId="@+id/iv_poster_details"/>
+            <target android:targetId="@+id/cv_poster_wrapper"/>
+            <target android:targetId="@+id/nested_poster_wrapper"/>
+        </targets>
+    </changeClipBounds>
+    <changeTransform android:reparentWithOverlay="true" android:reparent="true">
+        <targets>
+            <target android:targetId="@+id/cv_poster_wrapper"/>
+            <target android:targetId="@+id/nested_poster_wrapper"/>
+        </targets>
+    </changeTransform>
+    <changeBounds>
+        <targets>
+            <target android:targetId="@+id/iv_poster"/>
+            <target android:targetId="@+id/iv_poster_details"/>
+            <target android:targetId="@+id/cv_poster_wrapper"/>
+            <target android:targetId="@+id/nested_poster_wrapper"/>
+        </targets>
+    </changeBounds>
+    <changeImageTransform>
+        <targets>
+            <target android:targetId="@+id/iv_poster"/>
+            <target android:targetId="@+id/iv_poster_details"/>
+        </targets>
+    </changeImageTransform>
 </transitionSet>

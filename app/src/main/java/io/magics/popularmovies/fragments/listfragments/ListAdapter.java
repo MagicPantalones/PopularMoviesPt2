@@ -226,6 +226,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
 
         void setTransitionNames(Movie movie){
             mCvWrapper.setTransitionName(mListType + movie.getPosterUrl());
+            mIv.setTransitionName("poster" + mListType + movie.getPosterUrl());
         }
 
     }
