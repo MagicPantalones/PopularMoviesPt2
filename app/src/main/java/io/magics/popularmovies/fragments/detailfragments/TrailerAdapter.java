@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 
+import com.bumptech.glide.request.target.Target;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +50,8 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
         trailerIv.setContentDescription(trailer.getName());
         GlideApp.with(trailerIv)
                 .load(trailerImgUrl)
+                .dontTransform()
+                .override(Target.SIZE_ORIGINAL)
                 .into(trailerIv);
 
     }

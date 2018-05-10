@@ -1,56 +1,36 @@
 package io.magics.popularmovies.fragments.detailfragments;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.LayoutTransition;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.SharedElementCallback;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.CardView;
-import android.transition.Transition;
 import android.transition.TransitionInflater;
-import android.transition.TransitionListenerAdapter;
-import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import devlight.io.library.ntb.NavigationTabBar;
 import io.magics.popularmovies.R;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.utils.AnimationHelper;
-import io.magics.popularmovies.utils.MovieUtils;
-
-import static io.magics.popularmovies.utils.MovieUtils.*;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link MovieDetailsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class MovieDetailsFragment extends Fragment {
 
     public static final String ARG_MOVIE = "movie";
@@ -77,8 +57,6 @@ public class MovieDetailsFragment extends Fragment {
     ImageView mBtnToolbarBack;
     @BindView(R.id.titles_indicator)
     TabLayout mTitlesIndicator;
-    @BindView(R.id.wrap_test)
-    FrameLayout mWrapTest;
 
 
     private Unbinder mUnbinder;
@@ -105,7 +83,9 @@ public class MovieDetailsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        postponeEnterTransition();
+
+
+
         if (getArguments() != null) {
             mMovie = getArguments().getParcelable(ARG_MOVIE);
             mIsFavourite = getArguments().getBoolean(ARG_IS_FAVOURITE);
@@ -120,7 +100,30 @@ public class MovieDetailsFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_detail_movie, container, false);
         mUnbinder = ButterKnife.bind(this, root);
 
-        mPagerAdapter = new MovieDetailsPagerAdapter(mMovie, getChildFragmentManager());
+        mPagerAdapter = new MovieDetailsPagerAdapter(mMovie,
+                mTransitionName + mMovie.getPosterUrl(), getChildFragmentManager());
+
+        setSharedElementEnterTransition(TransitionInflater.from(getContext())
+                .inflateTransition(R.transition.card_enter_transition));
+
+        setEnterSharedElementCallback(new SharedElementCallback() {
+            @Override
+            public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
+                Fragment posterFrag = (Fragment) mPagerAdapter.instantiateItem(mNestedViewPager, 0);
+
+                View view = posterFrag.getView();
+
+                if (view == null){
+                    return;
+                }
+
+                sharedElements.put(names.get(0), view.findViewById(R.id.nested_poster_wrapper));
+            }
+        });
+
+        if (savedInstanceState == null) {
+            postponeEnterTransition();
+        }
 
         return root;
 
@@ -131,17 +134,9 @@ public class MovieDetailsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mWrapTest.setClipToOutline(true);
-
-        ViewCompat.setTransitionName(mMainCardWrapper,
-                "background" + mTransitionName + mMovie.getPosterUrl());
-        ViewCompat.setTransitionName(mWrapTest,
-                "posterWrapper" + mTransitionName + mMovie.getPosterUrl());
-        ViewCompat.setTransitionName(mNestedViewPager,
-                "image" + mTransitionName + mMovie.getPosterUrl());
-
         mNestedViewPager.setOffscreenPageLimit(4);
         mNestedViewPager.setAdapter(mPagerAdapter);
+
 
         mTitlesIndicator.setupWithViewPager(mNestedViewPager, true);
 

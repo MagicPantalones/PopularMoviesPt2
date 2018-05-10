@@ -3,13 +3,13 @@ package io.magics.popularmovies.fragments;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.view.ViewGroup;
 
 import io.magics.popularmovies.fragments.listfragments.ListFragment;
 
 
-public class MovieListsPagerAdapter extends FragmentPagerAdapter {
+public class MovieListsPagerAdapter extends FragmentStatePagerAdapter {
 
     private static final int PAGE_COUNT = 3;
     private String[] tabTitles = new String[] {"Top Rated", "Popular", "Favourites"};
@@ -52,8 +52,6 @@ public class MovieListsPagerAdapter extends FragmentPagerAdapter {
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         ListFragment createdFrag = (ListFragment) super.instantiateItem(container, position);
-        createdFrag.setAllowEnterTransitionOverlap(true);
-        createdFrag.setAllowReturnTransitionOverlap(true);
 
         switch (position){
             case 0:

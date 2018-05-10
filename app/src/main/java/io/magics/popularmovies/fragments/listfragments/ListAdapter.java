@@ -11,8 +11,8 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.res.ResourcesCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -24,9 +24,12 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.ImageViewTarget;
+import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 
 import java.util.ArrayList;
@@ -47,15 +50,17 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
 
     private List<Movie> mMovieData = new ArrayList<>();
     private int mViewWidth;
-    private final PosterClickHandler mClickHandler;
+    private final ListItemEventHandler mClickHandler;
     private ReachedEndHandler mReachedEndHandler;
     private MovieUtils.ImageSize mImageSize;
     private int mDefaultColor;
+    private int mSelectedPosition;
 
     private String mListType;
 
-    public interface PosterClickHandler {
-        void onClick(View holder, Movie movie, String transitionIdentifier);
+    public interface ListItemEventHandler {
+        void onClick(View holder, Movie movie, String transitionIdentifier, int selectedPosition);
+        void onImageLoaded(int adapterposition);
     }
 
     //Help from https://medium.com/@ayhamorfali/android-detect-when-the-recyclerview-reaches-the-bottom-43f810430e1e
@@ -63,13 +68,13 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         void endReached();
     }
 
-    public ListAdapter(PosterClickHandler posterClickHandler) {
-        this.mClickHandler = posterClickHandler;
+    public ListAdapter(ListItemEventHandler listItemEventHandler) {
+        this.mClickHandler = listItemEventHandler;
         mListType = "favourites";
     }
 
-    public ListAdapter(PosterClickHandler posterClickHandler, ViewModel viewModel, int listType) {
-        this.mClickHandler = posterClickHandler;
+    public ListAdapter(ListItemEventHandler listItemEventHandler, ViewModel viewModel, int listType) {
+        this.mClickHandler = listItemEventHandler;
         mReachedEndHandler = () -> {
             if (viewModel instanceof TopListViewModel) ((TopListViewModel) viewModel).notifyGetMoreTopPages();
             else if (viewModel instanceof PopListViewModel) ((PopListViewModel) viewModel).notifyGetMorePopPages();
@@ -101,7 +106,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         String posterUrl;
         Movie mfg = mMovieData.get(position);
         ImageView iv = holder.mIv;
-        CardView cvWrapper = holder.mCvWrapper;
         TextView tvTitle = holder.mTvTitle;
         ProgressBar pbVotes = holder.mPbVoteBar;
         TextView tvVotes = holder.mTvVote;
@@ -112,36 +116,43 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
             mReachedEndHandler.endReached();
         }
 
-        //How to get compatPadding dimens taken from Janholds answer here:
-        //https://stackoverflow.com/questions/34656252/cardview-cardusecompatpadding
-
-        double cos45 = Math.cos(Math.toRadians(45));
-        float elevation = cvWrapper.getCardElevation();
-        float radius = cvWrapper.getRadius();
-
-        int compatPad = (int) ((elevation + (1 - cos45) * radius) +
-                (elevation * 1.5 + (1 - cos45) * radius));
-
-        int centerImg = ((ViewGroup) cvWrapper.getParent()).getPaddingStart() * 2 + compatPad * 2;
-
-        int imgViewWidth = mViewWidth - centerImg;
-        int imgViewHeight = imgViewWidth / 2 * 3;
-
-        iv.setLayoutParams(new FrameLayout.LayoutParams(imgViewWidth, imgViewHeight));
-
         tvTitle.setText(mfg.getTitle());
         pbVotes.setProgress(mfg.getVoteAverage().intValue() * 10);
         tvVotes.setText(String.valueOf(mfg.getVoteAverage()));
         iv.setContentDescription(mfg.getTitle());
         shadow.setImageDrawable(holder.mGradientDrawable.mutate());
 
-        holder.setTransitionName(mfg);
+        holder.setTransitionNames(mfg);
+
+        int parentPadding = ((ViewGroup) holder.mCvWrapper.getParent()).getPaddingStart() * 4;
+        int posterHeight = (mViewWidth - parentPadding) / 2 * 3;
+
+        iv.setMinimumHeight(posterHeight);
+
+        holder.itemView.setOnClickListener(v -> {
+            mSelectedPosition = holder.getAdapterPosition();
+            mClickHandler.onClick(v, mfg, mListType, mSelectedPosition);
+        });
 
         GlideApp.with(iv)
                 .load(posterUrl)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .placeholder(R.drawable.bg_loading_realydarkgrey)
                 .dontTransform()
+                .override(Target.SIZE_ORIGINAL)
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        mClickHandler.onImageLoaded(position);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        mClickHandler.onImageLoaded(position);
+                        return false;
+                    }
+                })
                 .into(new ImageViewTarget<Drawable>(iv) {
                     
                     @Override
@@ -187,15 +198,13 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         notifyDataSetChanged();
     }
 
-    public class PosterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class PosterViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.iv_poster)
         ImageView mIv;
         @BindView(R.id.v_card_shadow)
         ImageView mShadowLayer;
         @BindView(R.id.cv_poster_wrapper)
         CardView mCvWrapper;
-        @BindView(R.id.cv_view_holder_wrapper)
-        CardView mViewHolderWrapper;
         @BindView(R.id.tv_movie_title_list)
         TextView mTvTitle;
         @BindView(R.id.pb_list_vote)
@@ -208,7 +217,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         public PosterViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            itemView.setOnClickListener(this);
 
             mGradientDrawable = (GradientDrawable) ResourcesCompat.getDrawable(
                     itemView.getResources(),
@@ -216,19 +224,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
                     itemView.getContext().getTheme());
         }
 
-        void setTransitionName(Movie movie){
-            mCvWrapper.setClipToOutline(true);
-            ViewCompat.setTransitionName(mViewHolderWrapper,
-                    "background" + mListType + movie.getPosterUrl());
-            ViewCompat.setTransitionName(mCvWrapper,
-                    "posterWrapper" + mListType + movie.getPosterUrl());
-            ViewCompat.setTransitionName(mIv,
-                    "image" + mListType + movie.getPosterUrl());
-        }
-
-        @Override
-        public void onClick(View v) {
-            mClickHandler.onClick(v, mMovieData.get(getAdapterPosition()), mListType);
+        void setTransitionNames(Movie movie){
+            mCvWrapper.setTransitionName(mListType + movie.getPosterUrl());
         }
 
     }

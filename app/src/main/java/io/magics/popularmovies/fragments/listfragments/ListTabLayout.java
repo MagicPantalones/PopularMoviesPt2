@@ -10,13 +10,20 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.SharedElementCallback;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.RecyclerView;
 import android.transition.Slide;
+import android.transition.TransitionInflater;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
+
+import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,16 +64,14 @@ public class ListTabLayout extends Fragment {
         View root = inflater.inflate(R.layout.fragment_list_tab_layout, container, false);
         mUnbinder = ButterKnife.bind(this, root);
 
+        mAppFragManager = getChildFragmentManager();
+        mAdapter = new MovieListsPagerAdapter(mAppFragManager);
+
         return root;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
-        mAppFragManager = getChildFragmentManager();
-
-
-        mAdapter = new MovieListsPagerAdapter(mAppFragManager);
 
         mViewPager.setOffscreenPageLimit(3);
         mViewPager.setAdapter(mAdapter);
@@ -81,6 +86,9 @@ public class ListTabLayout extends Fragment {
 
         mTabLayout.setupWithViewPager(mViewPager);
 
+        postponeEnterTransition();
+        prepareTransitions();
+
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -94,6 +102,36 @@ public class ListTabLayout extends Fragment {
 
     public void notifyUpFabPressed() {
         mAdapter.getOneListFragment(mTabLayout.getSelectedTabPosition()).scrollRecyclerViewToTop();
+    }
+
+    private void prepareTransitions(){
+        setExitTransition(TransitionInflater.from(getContext())
+                .inflateTransition(R.transition.list_exit_transition));
+
+        setExitSharedElementCallback(new SharedElementCallback() {
+            @Override
+            public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
+
+                ListFragment currentList = mAdapter
+                        .getOneListFragment(mTabLayout.getSelectedTabPosition());
+                RecyclerView listRecycler = currentList.mRecyclerView;
+
+                if (listRecycler == null){
+                    return;
+                }
+
+                RecyclerView.ViewHolder selectedVh = listRecycler
+                        .findViewHolderForAdapterPosition(MovieListsActivity.selectedPosition);
+
+                if (selectedVh == null || selectedVh.itemView == null){
+                    return;
+                }
+
+                sharedElements
+                        .put(names.get(0), selectedVh.itemView.findViewById(R.id.cv_poster_wrapper));
+            }
+        });
+
     }
 
     public interface TabLayoutPageEvents {

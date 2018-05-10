@@ -3,39 +3,25 @@ package io.magics.popularmovies.fragments.listfragments;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.SharedElementCallback;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.transition.Explode;
-import android.transition.Fade;
-import android.transition.Slide;
-import android.transition.Transition;
-import android.transition.TransitionInflater;
-import android.transition.TransitionSet;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import io.magics.popularmovies.MovieListsActivity;
 import io.magics.popularmovies.R;
-import io.magics.popularmovies.fragments.detailfragments.MovieDetailsFragment;
 import io.magics.popularmovies.models.Movie;
-import io.magics.popularmovies.utils.MovieUtils;
 import io.magics.popularmovies.utils.MovieUtils.ScrollDirection;
 import io.magics.popularmovies.viewmodels.FavListViewModel;
 import io.magics.popularmovies.viewmodels.PopListViewModel;
@@ -69,7 +55,6 @@ public class ListFragment extends Fragment {
     private Unbinder mUnbinder;
 
     private ListAdapter mAdapter;
-    private GridLayoutManager mGridManager;
 
     private TopListViewModel mTopVm;
     private PopListViewModel mPopVm;
@@ -104,25 +89,29 @@ public class ListFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_list, container, false);
         mUnbinder = ButterKnife.bind(this, root);
 
-        switch (mFragType){
+        switch (mFragType) {
             case 0:
                 mTopVm = ViewModelProviders.of(getActivity()).get(TopListViewModel.class);
-                mAdapter = new ListAdapter((ListAdapter.PosterClickHandler) getContext(), mTopVm,
+                if (mAdapter != null) break;
+                mAdapter = new ListAdapter((ListAdapter.ListItemEventHandler) getContext(), mTopVm,
                         mFragType);
                 break;
             case 1:
                 mPopVm = ViewModelProviders.of(getActivity()).get(PopListViewModel.class);
-                mAdapter = new ListAdapter((ListAdapter.PosterClickHandler) getContext(), mPopVm,
+                if (mAdapter != null) break;
+                mAdapter = new ListAdapter((ListAdapter.ListItemEventHandler) getContext(), mPopVm,
                         mFragType);
                 break;
             case 2:
                 mFavVm = ViewModelProviders.of(getActivity()).get(FavListViewModel.class);
-                mAdapter = new ListAdapter((ListAdapter.PosterClickHandler) getContext());
+                if (mAdapter != null) break;
+                mAdapter = new ListAdapter((ListAdapter.ListItemEventHandler) getContext());
                 break;
             default:
                 //should never happen
                 break;
         }
+
 
         return root;
     }
@@ -132,10 +121,7 @@ public class ListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mGridManager = new GridLayoutManager(getContext(), 2);
-
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.setLayoutManager(mGridManager);
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -152,7 +138,7 @@ public class ListFragment extends Fragment {
             else mAdapter.setMovieData(movies);
         };
 
-        switch (mFragType){
+        switch (mFragType) {
             case 0:
                 mTopVm.mTopList.observe(getActivity(), movieObserver);
                 break;
@@ -184,7 +170,7 @@ public class ListFragment extends Fragment {
         mListener = null;
     }
 
-    public void scrollRecyclerViewToTop(){ mRecyclerView.smoothScrollToPosition(0); }
+    public void scrollRecyclerViewToTop() { mRecyclerView.smoothScrollToPosition(0); }
 
 
     public interface FragmentListener {

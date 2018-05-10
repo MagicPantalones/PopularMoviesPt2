@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/list_wrapper"
     android:layout_centerHorizontal="true"
     tools:context="io.magics.popularmovies.fragments.listfragments.ListFragment">
@@ -10,10 +11,12 @@
         android:id="@+id/rv_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         tools:listitem="@layout/fragment_list_view_holder"
         android:visibility="visible"
-        tools:layoutManager="android.support.v7.widget.GridLayoutManager"
-        tools:spanCount="2"
+        app:layoutManager="android.support.v7.widget.GridLayoutManager"
+        app:spanCount="2"
         />
     <TextView
         android:id="@+id/tv_list_error"

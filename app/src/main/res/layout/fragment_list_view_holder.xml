@@ -1,26 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/view_holder_list"
-    android:layout_marginTop="8dp"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     >
     <!-- contentDescription is set programmatically -->
     <android.support.v7.widget.CardView
         android:id="@+id/cv_view_holder_wrapper"
         style="@style/MovieCardStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:transitionGroup="false"
         app:cardElevation="2dp"
-        app:cardUseCompatPadding="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        app:cardUseCompatPadding="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <android.support.constraint.ConstraintLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            >
+            android:padding="8dp">
 
             <ImageView
                 android:id="@+id/v_card_shadow"
@@ -42,9 +49,9 @@
                 android:lines="2"
                 android:maxLines="2"
                 android:textAllCaps="true"
+                app:layout_constraintBottom_toTopOf="@+id/vote_wrapper_list"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cv_poster_wrapper"
                 tools:text="Lord of the rings: Fellowship of the ring" />
 
             <android.support.constraint.Guideline
@@ -52,26 +59,28 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.91"
-                />
+                app:layout_constraintGuide_percent="0.91" />
+
             <android.support.constraint.ConstraintLayout
                 android:id="@+id/vote_wrapper_list"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
-                android:paddingTop="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_movie_title_list">
+                app:layout_constraintStart_toStartOf="parent">
 
                 <ProgressBar
                     android:id="@+id/pb_list_vote"
                     style="@style/MovieCardStyle.VoteBar"
                     android:layout_width="100dp"
                     android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/tv_list_vote"
@@ -88,19 +97,21 @@
 
             <android.support.v7.widget.CardView
                 android:id="@+id/cv_poster_wrapper"
-                style="@style/MovieCardStyle"
-                android:layout_width="wrap_content"
+                style="@style/MovieCardStyle.PosterCard"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:transitionGroup="true"
+                app:cardUseCompatPadding="false"
+                app:layout_constraintBottom_toTopOf="@+id/tv_movie_title_list"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
                     android:id="@+id/iv_poster"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:adjustViewBounds="true"
-                    android:layout_gravity="bottom"
                     android:scaleType="fitXY"
                     tools:ignore="contentDescription"
                     tools:src="@drawable/minions_poster_placehodler" />
@@ -109,4 +120,4 @@
 
         </android.support.constraint.ConstraintLayout>
     </android.support.v7.widget.CardView>
-</android.support.design.widget.CoordinatorLayout>
+</android.support.constraint.ConstraintLayout>
