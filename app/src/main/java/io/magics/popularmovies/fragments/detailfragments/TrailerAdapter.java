@@ -1,10 +1,12 @@
 package io.magics.popularmovies.fragments.detailfragments;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 
 
@@ -27,7 +29,8 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
     private OnTrailerSelect mTrailerClickListener;
 
     public interface OnTrailerSelect{
-        void onTrailerSelect(TrailerResult trailerResult);
+        void onPlayTrailer(TrailerResult trailerResult);
+        void onShareTrailer(Intent trailer);
     }
 
     public TrailerAdapter(OnTrailerSelect listener){
@@ -48,6 +51,19 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
         String trailerImgUrl = MovieUtils.youtubeStillUrlConverter(trailer.getKey());
 
         trailerIv.setContentDescription(trailer.getName());
+
+        holder.btnShare.setOnClickListener(v -> {
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(Intent.EXTRA_TEXT,
+                    "https://www.youtube.com/watch?v=" + trailer.getKey());
+            mTrailerClickListener.onShareTrailer(shareIntent);
+        });
+
+        holder.btnPlay.setOnClickListener(v -> {
+            mTrailerClickListener.onPlayTrailer(trailer);
+        });
+
         GlideApp.with(trailerIv)
                 .load(trailerImgUrl)
                 .dontTransform()
@@ -71,20 +87,18 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
         notifyDataSetChanged();
     }
 
-    public class TrailerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class TrailerViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.iv_trailer_img)
         ImageView ivTrailerImg;
+        @BindView(R.id.btn_share)
+        Button btnShare;
+        @BindView(R.id.btn_play)
+        Button btnPlay;
 
         public TrailerViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            itemView.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-            mTrailerClickListener.onTrailerSelect(mTrailerList.get(getAdapterPosition()));
         }
     }
 }

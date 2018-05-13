@@ -34,9 +34,11 @@ import com.bumptech.glide.request.transition.Transition;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.magics.popularmovies.MovieListsActivity;
 import io.magics.popularmovies.R;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.utils.GlideApp;
@@ -55,6 +57,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
     private MovieUtils.ImageSize mImageSize;
     private int mDefaultColor;
     private int mSelectedPosition;
+
+    private AtomicBoolean mTransitionStarted;
 
     private String mListType;
 
@@ -90,7 +94,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         Boolean orientation = context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
         mDefaultColor = ResourcesCompat.getColor(context.getResources(), R.color.colorSecondary, context.getTheme());
         mImageSize = MovieUtils.getOptimalImgSize(context);
-
+        mTransitionStarted = new AtomicBoolean();
 
         //Sets the ViewHolder sizes based on the devise's orientation.
         mViewWidth = orientation ? parent.getMeasuredWidth() / 2 : parent.getMeasuredWidth() / 3;
@@ -124,7 +128,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
 
         holder.setTransitionNames(mfg);
 
-        int parentPadding = ((ViewGroup) holder.mCvWrapper.getParent()).getPaddingStart() * 4;
+        int parentPadding = ((ViewGroup) holder.mCvWrapper.getParent()).getPaddingStart() * 6;
         int posterHeight = (mViewWidth - parentPadding) / 2 * 3;
 
         iv.setMinimumHeight(posterHeight);
@@ -143,13 +147,19 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        mClickHandler.onImageLoaded(position);
+                        if (MovieListsActivity.selectedPosition == position &&
+                                !mTransitionStarted.getAndSet(true)) {
+                            mClickHandler.onImageLoaded(position);
+                        }
                         return false;
                     }
 
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        mClickHandler.onImageLoaded(position);
+                        if (MovieListsActivity.selectedPosition == position &&
+                                !mTransitionStarted.getAndSet(true)) {
+                            mClickHandler.onImageLoaded(position);
+                        }
                         return false;
                     }
                 })

@@ -14,11 +14,7 @@
     <string name="details_no_trailers" translatable="true">No Trailers Available!</string>
     <string name="details_no_reviews" translatable="true">No Reviews Available!</string>
 
-    <string name="shared_element_poster_img" translatable="false">sePoster</string>
-    <string name="shared_element_title_txt" translatable="false">seTitle</string>
-    <string name="shared_element_vote_bar" translatable="false">seVoteBar</string>
-    <string name="shared_element_vote_num" translatable="false">seVoteNum</string>
-    <string name="shared_element_background" translatable="false">seBackground</string>
+    <string name="shared_element_toolbar" translatable="false">seToolbar</string>
 
     <string name="play_trailer_text" translatable="true">Play</string>
     <string name="share_trailer_text" translatable="true">Share</string>

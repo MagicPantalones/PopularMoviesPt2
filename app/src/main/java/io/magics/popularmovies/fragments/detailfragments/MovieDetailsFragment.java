@@ -10,13 +10,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.SharedElementCallback;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.CardView;
-import android.transition.ChangeClipBounds;
-import android.transition.Transition;
+import android.support.v7.widget.Toolbar;
 import android.transition.TransitionInflater;
 import android.transition.TransitionSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -60,6 +60,8 @@ public class MovieDetailsFragment extends Fragment {
     ImageView mBtnToolbarBack;
     @BindView(R.id.titles_indicator)
     TabLayout mTitlesIndicator;
+    @BindView(R.id.toolbar_detail_fragment)
+    Toolbar mToolbar;
 
 
     private Unbinder mUnbinder;
@@ -87,8 +89,6 @@ public class MovieDetailsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-
         if (getArguments() != null) {
             mMovie = getArguments().getParcelable(ARG_MOVIE);
             mIsFavourite = getArguments().getBoolean(ARG_IS_FAVOURITE);
@@ -106,11 +106,10 @@ public class MovieDetailsFragment extends Fragment {
         mPagerAdapter = new MovieDetailsPagerAdapter(mMovie,
                 mTransitionName + mMovie.getPosterUrl(), getChildFragmentManager());
 
-
-        TransitionSet enterTran = (TransitionSet) TransitionInflater.from(getContext())
+        TransitionSet sharedTransition = (TransitionSet) TransitionInflater.from(getContext())
                 .inflateTransition(R.transition.card_enter_transition);
 
-        setSharedElementEnterTransition(enterTran);
+        setSharedElementEnterTransition(sharedTransition);
 
         setEnterSharedElementCallback(new SharedElementCallback() {
             @Override
@@ -125,6 +124,7 @@ public class MovieDetailsFragment extends Fragment {
 
                 sharedElements.put(names.get(0), view.findViewById(R.id.nested_poster_wrapper));
                 sharedElements.put(names.get(1), view.findViewById(R.id.iv_poster_details));
+                sharedElements.put(names.get(2), mToolbar);
             }
         });
 
@@ -137,6 +137,7 @@ public class MovieDetailsFragment extends Fragment {
     }
 
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -149,11 +150,11 @@ public class MovieDetailsFragment extends Fragment {
 
         mBtnToolbarBack.setOnClickListener(v -> getActivity().onBackPressed());
 
-        //noinspection ConstantConditions
         mAnimator = new AnimationHelper(getContext(), mMovie, mFavFabAnim, mFavFab);
 
 
-        mAnimator.runInitialDetailAnimation(mVoteBar, mIsFavourite, null, null,
+        mAnimator.runInitialDetailAnimation(mVoteBar, mIsFavourite, 800,
+                new AccelerateDecelerateInterpolator(),
                 updatedValue -> mVoteNumber.setText(updatedValue));
 
         mFavFab.setOnClickListener(v -> {

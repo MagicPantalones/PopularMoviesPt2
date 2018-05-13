@@ -2,14 +2,17 @@ package io.magics.popularmovies;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.transition.TransitionInflater;
+import android.transition.TransitionSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.Window;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,6 +46,8 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
     FloatingActionButton mUpFab;
     @BindView(R.id.container_main)
     ViewGroup mMainContainer;
+
+    private View mDecorView;
 
     private DataProvider mDataProvider;
 
@@ -91,14 +96,7 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
 
         }
 
-        mMainContainer.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            @Override
-            public boolean onPreDraw() {
-                mMainContainer.getViewTreeObserver().removeOnPreDrawListener(this);
-                mUpFab.hide();
-                return true;
-            }
-        });
+        mDecorView = getWindow().getDecorView();
 
     }
 
@@ -152,18 +150,27 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
 
         selectedPosition = selectedPos;
 
-        View posterWrapper = holder.findViewById(R.id.cv_poster_wrapper);
-        View poster = holder.findViewById(R.id.iv_poster);
+        ListTabLayout currTabLayout = (ListTabLayout)
+                mAppFragManager.findFragmentByTag(FRAG_PAGER_TAG);
 
         MovieDetailsFragment newFrag = MovieDetailsFragment.newInstance(movie,
                 mFavListVM.checkIfFavourite(movie.getMovieId()), transitionIdentifier);
 
+        View posterWrapper = holder.findViewById(R.id.cv_poster_wrapper);
+        View poster = holder.findViewById(R.id.iv_poster);
+        View toolBar = currTabLayout.getView().findViewById(R.id.app_bar_tab_layout);
+
+        ((TransitionSet) currTabLayout.getExitTransition())
+                .excludeTarget(holder, true);
+
         mUpFab.hide();
+
 
         mAppFragManager.beginTransaction()
                 .setReorderingAllowed(true)
                 .addSharedElement(posterWrapper, posterWrapper.getTransitionName())
                 .addSharedElement(poster, poster.getTransitionName())
+                .addSharedElement(toolBar, toolBar.getTransitionName())
                 .replace(R.id.container_main, newFrag, DETAIL_FRAGMENT_TAG)
                 .addToBackStack(null)
                 .commit();

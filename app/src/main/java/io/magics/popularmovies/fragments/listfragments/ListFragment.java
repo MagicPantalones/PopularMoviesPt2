@@ -120,7 +120,7 @@ public class ListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        correctScroll();
         mRecyclerView.setAdapter(mAdapter);
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -172,6 +172,26 @@ public class ListFragment extends Fragment {
 
     public void scrollRecyclerViewToTop() { mRecyclerView.smoothScrollToPosition(0); }
 
+    private void correctScroll(){
+        mRecyclerView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                mRecyclerView.removeOnLayoutChangeListener(this);
+
+                final RecyclerView.LayoutManager manager = mRecyclerView.getLayoutManager();
+                View viewAtPos = manager.findViewByPosition(MovieListsActivity.selectedPosition);
+
+                if (viewAtPos == null || manager.isViewPartiallyVisible(viewAtPos,
+                        false, true)) {
+                    mRecyclerView.post(() ->
+                            manager.scrollToPosition(MovieListsActivity.selectedPosition));
+                }
+            }
+        });
+
+
+
+    }
 
     public interface FragmentListener {
         void onRecyclerViewScrolled(ScrollDirection scrollDirection);

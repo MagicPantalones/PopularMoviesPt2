@@ -26,6 +26,8 @@ import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import io.magics.popularmovies.R;
 import io.magics.popularmovies.models.Movie;
 
@@ -85,6 +87,13 @@ public class AnimationHelper {
 
         mVoteProgressAnim = ObjectAnimator.ofInt(progressBar, "progress",
                 ((int) Math.round(mMovie.getVoteAverage() * 10)));
+        mVoteProgressAnim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                mFab.show();
+            }
+        });
 
         mVoteProgressAnim.setDuration(duration != null ? duration : 2000);
         mVoteProgressAnim.setInterpolator(interpolator != null ?
@@ -110,24 +119,16 @@ public class AnimationHelper {
             public void onAnimationEnd(Drawable drawable) {
                 mFab.setBackgroundTintList(ColorStateList.valueOf(favCheck ?
                         mFavouriteColor : mDefaultColor));
-                mFab.show();
+                mIvFabAnimation.setImageDrawable(null);
+                mFab.setVisibility(View.VISIBLE);
                 super.onAnimationEnd(drawable);
             }
         });
 
-        mFab.hide();
+        mFab.setVisibility(View.INVISIBLE);
         mIvFabAnimation.setVisibility(View.VISIBLE);
         mFabAnim.start();
 
-    }
-
-    public Animator getAnimatorForPosterWrapper(View view){
-        int cx = view.getWidth() / 2;
-        int cy = view.getHeight() / 2;
-        float finalRadius = (float) Math.hypot(cx, cy);
-
-        return ViewAnimationUtils.createCircularReveal(view,
-                cx, cy, 0, finalRadius);
     }
 
     public void disposeAnimations() {

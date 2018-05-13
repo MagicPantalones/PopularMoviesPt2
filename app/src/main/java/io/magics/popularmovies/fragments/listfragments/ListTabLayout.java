@@ -13,14 +13,12 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.SharedElementCallback;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
-import android.transition.Slide;
+import android.support.v7.widget.Toolbar;
 import android.transition.TransitionInflater;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.widget.ImageView;
+
 
 import java.util.List;
 import java.util.Map;
@@ -40,6 +38,8 @@ public class ListTabLayout extends Fragment {
     TabLayout mTabLayout;
     @BindView(R.id.app_bar_tab_layout)
     AppBarLayout mAppBar;
+
+    private View mRoot;
 
     Unbinder mUnbinder;
 
@@ -61,13 +61,13 @@ public class ListTabLayout extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View root = inflater.inflate(R.layout.fragment_list_tab_layout, container, false);
-        mUnbinder = ButterKnife.bind(this, root);
+        mRoot = inflater.inflate(R.layout.fragment_list_tab_layout, container, false);
+        mUnbinder = ButterKnife.bind(this, mRoot);
 
         mAppFragManager = getChildFragmentManager();
         mAdapter = new MovieListsPagerAdapter(mAppFragManager);
 
-        return root;
+        return mRoot;
     }
 
     @Override
@@ -129,8 +129,8 @@ public class ListTabLayout extends Fragment {
 
                 sharedElements.put(names.get(0),
                         selectedVh.itemView.findViewById(R.id.cv_poster_wrapper));
-
                 sharedElements.put(names.get(1), selectedVh.itemView.findViewById(R.id.iv_poster));
+                sharedElements.put(names.get(2), mAppBar);
             }
         });
 

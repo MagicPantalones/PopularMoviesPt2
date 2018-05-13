@@ -81,15 +81,22 @@ public class MovieDetailsTrailers extends Fragment
         super.onDestroy();
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
-    public void onTrailerSelect(TrailerResult trailerResult) {
+    public void onPlayTrailer(TrailerResult trailerResult) {
         Intent ytAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + trailerResult.getKey()));
         try {
-            Objects.requireNonNull(getContext()).startActivity(ytAppIntent);
+            getContext().startActivity(ytAppIntent);
         } catch (ActivityNotFoundException e) {
             Intent ytWebIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + trailerResult.getKey()));
-            Objects.requireNonNull(getContext()).startActivity(ytWebIntent);
+            getContext().startActivity(ytWebIntent);
         }
 
+    }
+
+    @Override
+    public void onShareTrailer(Intent trailer) {
+        //noinspection ConstantConditions
+        getContext().startActivity(trailer);
     }
 }
