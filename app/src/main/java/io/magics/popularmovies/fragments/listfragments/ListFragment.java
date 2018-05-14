@@ -138,6 +138,7 @@ public class ListFragment extends Fragment {
             else mAdapter.setMovieData(movies);
         };
 
+
         switch (mFragType) {
             case 0:
                 mTopVm.mTopList.observe(getActivity(), movieObserver);
