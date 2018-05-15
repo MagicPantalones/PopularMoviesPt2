@@ -3,6 +3,7 @@ package io.magics.popularmovies.fragments.listfragments;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -45,6 +46,8 @@ public class ListFragment extends Fragment {
 
     private static final String ARG_FRAGMENT_TYPE = "mFragType";
 
+    private static final String KEY_OLD_RIGHT = "oldRight";
+
     private int mFragType;
 
     @BindView(R.id.rv_list)
@@ -61,6 +64,9 @@ public class ListFragment extends Fragment {
     private FavListViewModel mFavVm;
 
     private FragmentListener mListener;
+
+    private boolean mOrientation;
+    private int mOldRight;
 
     public ListFragment() {
         // Required empty public constructor
@@ -88,6 +94,14 @@ public class ListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_list, container, false);
         mUnbinder = ButterKnife.bind(this, root);
+        mOrientation = getResources().getConfiguration()
+                .orientation == Configuration.ORIENTATION_PORTRAIT;
+
+        if (savedInstanceState == null) {
+            mOldRight = -1;
+        } else {
+            mOldRight = savedInstanceState.getInt(KEY_OLD_RIGHT);
+        }
 
         switch (mFragType) {
             case 0:
@@ -157,6 +171,12 @@ public class ListFragment extends Fragment {
     }
 
     @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(KEY_OLD_RIGHT, mOldRight);
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof FragmentListener) {
@@ -171,25 +191,30 @@ public class ListFragment extends Fragment {
         mListener = null;
     }
 
-    public void scrollRecyclerViewToTop() { mRecyclerView.smoothScrollToPosition(0); }
+    public void scrollRecyclerViewToTop() {
+        mRecyclerView.smoothScrollToPosition(0);
+    }
 
-    private void correctScroll(){
+    private void correctScroll() {
         mRecyclerView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
             public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
                 mRecyclerView.removeOnLayoutChangeListener(this);
+                if (mOldRight != -1 || mOldRight == right) return;
 
-                final RecyclerView.LayoutManager manager = mRecyclerView.getLayoutManager();
+                RecyclerView.LayoutManager manager = mRecyclerView.getLayoutManager();
                 View viewAtPos = manager.findViewByPosition(MovieListsActivity.selectedPosition);
 
                 if (viewAtPos == null || manager.isViewPartiallyVisible(viewAtPos,
                         false, true)) {
-                    mRecyclerView.post(() ->
-                            manager.scrollToPosition(MovieListsActivity.selectedPosition));
+                    mRecyclerView.post(() -> {
+                        manager.scrollToPosition(MovieListsActivity.selectedPosition);
+                        mOldRight = right;
+                    });
                 }
             }
-        });
 
+        });
 
 
     }
