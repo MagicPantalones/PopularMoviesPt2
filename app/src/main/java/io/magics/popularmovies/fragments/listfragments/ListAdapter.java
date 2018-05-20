@@ -11,7 +11,6 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
@@ -19,7 +18,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -51,7 +49,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
 
 
     private List<Movie> mMovieData = new ArrayList<>();
-    private int mViewWidth;
+    private int mPosterWidth;
+    private int mPosterHeight;
     private final ListItemEventHandler mClickHandler;
     private ReachedEndHandler mReachedEndHandler;
     private MovieUtils.ImageSize mImageSize;
@@ -64,7 +63,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
 
     public interface ListItemEventHandler {
         void onClick(View holder, Movie movie, String transitionIdentifier, int selectedPosition);
-        void onImageLoaded(int adapterposition);
+        void onImageLoaded(int adapterPosition);
     }
 
     //Help from https://medium.com/@ayhamorfali/android-detect-when-the-recyclerview-reaches-the-bottom-43f810430e1e
@@ -72,12 +71,12 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         void endReached();
     }
 
-    public ListAdapter(ListItemEventHandler listItemEventHandler) {
+    ListAdapter(ListItemEventHandler listItemEventHandler) {
         this.mClickHandler = listItemEventHandler;
         mListType = "favourites";
     }
 
-    public ListAdapter(ListItemEventHandler listItemEventHandler, ViewModel viewModel, int listType) {
+    ListAdapter(ListItemEventHandler listItemEventHandler, ViewModel viewModel, int listType) {
         this.mClickHandler = listItemEventHandler;
         mReachedEndHandler = () -> {
             if (viewModel instanceof TopListViewModel) ((TopListViewModel) viewModel).notifyGetMoreTopPages();
@@ -91,15 +90,19 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
     @Override
     public PosterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
-        Boolean orientation = context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
         mDefaultColor = ResourcesCompat.getColor(context.getResources(), R.color.colorSecondary, context.getTheme());
         mImageSize = MovieUtils.getOptimalImgSize(context);
         mTransitionStarted = new AtomicBoolean();
 
-        //Sets the ViewHolder sizes based on the devise's orientation.
-        mViewWidth = orientation ? parent.getMeasuredWidth() / 2 : parent.getMeasuredWidth() / 3;
-
         View v = LayoutInflater.from(context).inflate(R.layout.fragment_list_view_holder, parent, false);
+
+        v.measure(parent.getMeasuredWidth(), parent.getMeasuredHeight());
+
+        int padding = v.findViewById(R.id.parent_wrapper_list).getPaddingStart() * 4;
+
+        mPosterHeight = (v.getMeasuredWidth() - padding) / 2 * 3;
+        mPosterWidth = mPosterHeight / 3 * 2;
+
 
         return new PosterViewHolder(v);
     }
@@ -116,6 +119,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         ImageView shadow = holder.mShadowLayer;
 
         posterUrl = MovieUtils.posterUrlConverter(mImageSize, mfg.getPosterUrl());
+
         if (position == mMovieData.size() - 5 && mReachedEndHandler != null) {
             mReachedEndHandler.endReached();
         }
@@ -126,12 +130,11 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         iv.setContentDescription(mfg.getTitle());
         shadow.setImageDrawable(holder.mGradientDrawable.mutate());
 
+
         holder.setTransitionNames(mfg);
 
-        int parentPadding = ((ViewGroup) holder.mCvWrapper.getParent()).getPaddingStart() * 6;
-        int posterHeight = (mViewWidth - parentPadding) / 2 * 3;
-
-        iv.setMinimumHeight(posterHeight);
+        iv.setMinimumWidth(mPosterWidth);
+        iv.setMinimumHeight(mPosterHeight);
 
         holder.itemView.setOnClickListener(v -> {
             mSelectedPosition = holder.getAdapterPosition();

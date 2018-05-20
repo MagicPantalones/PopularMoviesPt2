@@ -39,8 +39,6 @@ public class ListTabLayout extends Fragment {
     @BindView(R.id.app_bar_tab_layout)
     AppBarLayout mAppBar;
 
-    private View mRoot;
-
     Unbinder mUnbinder;
 
     MovieListsPagerAdapter mAdapter;
@@ -61,13 +59,16 @@ public class ListTabLayout extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        mRoot = inflater.inflate(R.layout.fragment_list_tab_layout, container, false);
-        mUnbinder = ButterKnife.bind(this, mRoot);
+        View root = inflater.inflate(R.layout.fragment_list_tab_layout, container, false);
+        mUnbinder = ButterKnife.bind(this, root);
 
         mAppFragManager = getChildFragmentManager();
         mAdapter = new MovieListsPagerAdapter(mAppFragManager);
 
-        return mRoot;
+        postponeEnterTransition();
+        prepareTransitions();
+
+        return root;
     }
 
     @Override
@@ -85,9 +86,6 @@ public class ListTabLayout extends Fragment {
         });
 
         mTabLayout.setupWithViewPager(mViewPager);
-
-        postponeEnterTransition();
-        prepareTransitions();
 
         super.onViewCreated(view, savedInstanceState);
     }

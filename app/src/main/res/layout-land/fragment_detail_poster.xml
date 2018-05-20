@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:transitionGroup="false"
+    android:clipChildren="false"
+    >
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/nested_poster_wrapper"
+        style="@style/MovieCardStyle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:transitionGroup="true"
+        android:layout_margin="8dp"
+        app:cardUseCompatPadding="false">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/tv_details_title"
+                style="@style/MovieCardStyle.Text.Normal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:elevation="4dp"
+                android:textSize="20sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Lord of the rings:\nFellowship of the ring" />
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/wrapper_details_release"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:elevation="4dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_details_title">
+
+                <ImageView
+                    android:id="@+id/iv_details_release_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:contentDescription="@string/release_calendar_a11y"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/ic_date_range_black_24dp" />
+
+                <TextView
+                    android:id="@+id/tv_details_release"
+                    style="@style/MovieCardStyle.Text.Normal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/iv_details_release_icon"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/iv_details_release_icon"
+                    app:layout_constraintTop_toTopOf="@+id/iv_details_release_icon"
+                    tools:text="September 20th, 2017" />
+
+
+            </android.support.constraint.ConstraintLayout>
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/wrapper_details_vote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:padding="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/wrapper_details_release">
+
+                <ProgressBar
+                    android:id="@+id/pb_details_vote"
+                    style="@style/MovieCardStyle.VoteBar"
+                    android:layout_width="100dp"
+                    android:layout_height="18dp"
+                    android:layout_marginStart="8dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_details_vote"
+                    style="@style/MovieCardStyle.Text.Normal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/pb_details_vote"
+                    app:layout_constraintStart_toEndOf="@id/pb_details_vote"
+                    app:layout_constraintTop_toTopOf="@+id/pb_details_vote"
+                    tools:text="7.5" />
+
+                <ImageView
+                    android:id="@+id/tv_vote_detail_icon"
+                    android:layout_width="8dp"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="6dp"
+                    android:contentDescription="@string/vote_heart_icon_a11y"
+                    app:layout_constraintBottom_toBottomOf="@+id/pb_details_vote"
+                    app:layout_constraintStart_toStartOf="@+id/pb_details_vote"
+                    app:layout_constraintTop_toTopOf="@+id/pb_details_vote"
+                    app:srcCompat="@drawable/ic_heart_fab_static" />
+            </android.support.constraint.ConstraintLayout>
+        </android.support.constraint.ConstraintLayout>
+    </android.support.v7.widget.CardView>
+</android.support.constraint.ConstraintLayout>

@@ -1,6 +1,7 @@
 package io.magics.popularmovies;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.res.Configuration;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -46,8 +47,6 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
     FloatingActionButton mUpFab;
     @BindView(R.id.container_main)
     ViewGroup mMainContainer;
-
-    private View mDecorView;
 
     private DataProvider mDataProvider;
 
@@ -96,7 +95,9 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
 
         }
 
-        mDecorView = getWindow().getDecorView();
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mUpFab.setRotation(-90);
+        }
 
     }
 
@@ -117,6 +118,13 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
         if (fragCount == 0) {
             super.onBackPressed();
         } else {
+            MovieDetailsFragment frag = (MovieDetailsFragment)
+                    mAppFragManager.findFragmentByTag(DETAIL_FRAGMENT_TAG);
+
+            if (frag != null) {
+                frag.prepareToGetPopped();
+            }
+
             mAppFragManager.popBackStack();
         }
 
@@ -177,10 +185,10 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
     }
 
     @Override
-    public void onImageLoaded(int adapterPos) {
+    public void onImageLoaded(int adapterPosition) {
         ListTabLayout tabFrag = (ListTabLayout) mAppFragManager.findFragmentByTag(FRAG_PAGER_TAG);
 
-        if (adapterPos == selectedPosition) {
+        if (adapterPosition == selectedPosition) {
             tabFrag.startPostponedEnterTransition();
         }
     }

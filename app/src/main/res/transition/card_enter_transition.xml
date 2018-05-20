@@ -12,12 +12,15 @@
         <targets>
             <target android:targetId="@+id/iv_poster"/>
             <target android:targetId="@+id/iv_poster_details"/>
+            <target android:targetId="@+id/details_poster_horizontal"/>
+            <target android:targetId="@+id/horizontal_poster_wrapper"/>
             <target android:targetId="@+id/cv_poster_wrapper"/>
             <target android:targetId="@+id/nested_poster_wrapper"/>
         </targets>
     </changeClipBounds>
     <changeTransform>
         <targets>
+            <target android:targetId="@+id/horizontal_poster_wrapper"/>
             <target android:targetId="@+id/cv_poster_wrapper"/>
             <target android:targetId="@+id/nested_poster_wrapper"/>
         </targets>
@@ -26,6 +29,8 @@
         <targets>
             <target android:targetId="@+id/iv_poster"/>
             <target android:targetId="@+id/iv_poster_details"/>
+            <target android:targetId="@+id/details_poster_horizontal"/>
+            <target android:targetId="@+id/horizontal_poster_wrapper"/>
             <target android:targetId="@+id/cv_poster_wrapper"/>
             <target android:targetId="@+id/nested_poster_wrapper"/>
         </targets>
@@ -34,6 +39,7 @@
         <targets>
             <target android:targetId="@+id/iv_poster"/>
             <target android:targetId="@+id/iv_poster_details"/>
+            <target android:targetId="@+id/details_poster_horizontal"/>
         </targets>
     </changeImageTransform>
     <!-- as ref:

@@ -12,8 +12,8 @@
         android:id="@+id/toolbar_detail_fragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:transitionName="@string/shared_element_toolbar"
-        android:background="@drawable/bg_toolbar_list">
+        android:background="@drawable/bg_toolbar_list"
+        android:transitionName="@string/shared_element_toolbar">
 
         <ImageView
             android:id="@+id/btn_detail_bar_back"
@@ -39,61 +39,38 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
-            android:transitionGroup="false"
-            android:layout_marginTop="8dp">
+            android:transitionGroup="false">
+
+            <FrameLayout
+                android:id="@+id/horizontal_poster_wrapper"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/details_poster_horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitXY"
+                    tools:ignore="ContentDescription"
+                    tools:src="@drawable/minions_poster_placehodler" />
+            </FrameLayout>
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/nested_details_container"
-                android:layout_width="256dp"
-                android:layout_height="384dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_margin="8dp"
+                android:layout_marginStart="8dp"
                 android:transitionGroup="false"
-                tools:background="@drawable/bg_loading_realydarkgrey" />
-
-            <android.support.constraint.ConstraintLayout
-                android:id="@+id/wrapper_details_vote"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:padding="8dp"
+                app:layout_constraintBottom_toTopOf="@+id/titles_indicator"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/titles_indicator">
-
-                <ProgressBar
-                    android:id="@+id/pb_details_vote"
-                    style="@style/MovieCardStyle.VoteBar"
-                    android:layout_width="100dp"
-                    android:layout_height="18dp"
-                    android:layout_marginStart="8dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/tv_details_vote"
-                    style="@style/MovieCardStyle.Text.Normal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    app:layout_constraintBottom_toBottomOf="@+id/pb_details_vote"
-                    app:layout_constraintStart_toEndOf="@id/pb_details_vote"
-                    app:layout_constraintTop_toTopOf="@+id/pb_details_vote"
-                    tools:text="7.5" />
-
-                <ImageView
-                    android:id="@+id/tv_vote_detail_icon"
-                    android:layout_width="8dp"
-                    android:layout_height="0dp"
-                    android:layout_marginStart="6dp"
-                    android:contentDescription="@string/vote_heart_icon_a11y"
-                    app:layout_constraintBottom_toBottomOf="@+id/pb_details_vote"
-                    app:layout_constraintStart_toStartOf="@+id/pb_details_vote"
-                    app:layout_constraintTop_toTopOf="@+id/pb_details_vote"
-                    app:srcCompat="@drawable/ic_heart_fab_static" />
-            </android.support.constraint.ConstraintLayout>
+                app:layout_constraintStart_toEndOf="@+id/horizontal_poster_wrapper"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="1.0"
+                tools:background="@drawable/bg_loading_realydarkgrey" />
 
             <ImageView
                 android:id="@+id/fav_fab_anim"
@@ -110,27 +87,25 @@
                 android:id="@+id/fav_fab"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
                 android:layout_marginStart="8dp"
                 android:contentDescription="@string/favourite_btn_a11y"
                 android:scaleType="fitCenter"
                 android:theme="@style/Fab"
                 android:visibility="invisible"
-                tools:visibility="visible"
-                app:layout_constraintBottom_toBottomOf="@+id/nested_details_container"
-                app:layout_constraintEnd_toEndOf="@+id/nested_details_container"
-                app:layout_constraintStart_toEndOf="@+id/nested_details_container"
-                app:layout_constraintTop_toBottomOf="@+id/nested_details_container"
-                app:srcCompat="@drawable/ic_heart_fab_static" />
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/nested_details_container"
+                app:srcCompat="@drawable/ic_heart_fab_static"
+                tools:visibility="visible" />
 
             <android.support.design.widget.TabLayout
                 android:id="@+id/titles_indicator"
                 android:layout_width="90dp"
                 android:layout_height="12dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/nested_details_container"
                 app:layout_constraintStart_toStartOf="@+id/nested_details_container"
-                app:layout_constraintTop_toBottomOf="@+id/nested_details_container"
                 app:tabBackground="@drawable/tab_titles_indicator_selector"
                 app:tabGravity="center"
                 app:tabIndicatorHeight="0dp" />

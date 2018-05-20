@@ -1,6 +1,7 @@
 package io.magics.popularmovies.fragments.detailfragments;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.load.DataSource;
@@ -37,8 +39,16 @@ public class MovieDetailsPoster extends Fragment {
     private Movie mMovie;
     private String mTransitionId;
 
+    @Nullable
     @BindView(R.id.iv_poster_details)
     ImageView mPoster;
+    @Nullable
+    @BindView(R.id.pb_details_vote)
+    ProgressBar mVoteBar;
+    @Nullable
+    @BindView(R.id.tv_details_vote)
+    TextView mVoteNumber;
+
     @BindView(R.id.tv_details_title)
     TextView mTitle;
     @BindView(R.id.tv_details_release)
@@ -86,10 +96,37 @@ public class MovieDetailsPoster extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Context context = getContext();
+        mTitle.setText(mMovie.getTitle());
+        mReleaseDate.setText(formatDate(mMovie.getReleaseDate()));
 
-        view.findViewById(R.id.nested_poster_wrapper).setTransitionName(mTransitionId);
+        if (getContext().getResources().getConfiguration().orientation ==
+                Configuration.ORIENTATION_LANDSCAPE) {
+            initLandscapeLayout();
+        } else {
+            initPortraitLayout(getContext(), view.findViewById(R.id.nested_poster_wrapper));
+        }
+
+    }
+
+    @Override
+    public void onDetach() {
+        if (mUnbinder != null) mUnbinder.unbind();
+        super.onDetach();
+    }
+
+    private void initLandscapeLayout() {
+
+        mVoteBar.setProgress((int) (mMovie.getVoteAverage() * 10));
+        mVoteNumber.setText(String.valueOf(mMovie.getVoteAverage()));
+
+    }
+
+    private void initPortraitLayout(Context context, View posterWrapper) {
+        posterWrapper.setTransitionName(mTransitionId);
+
         mPoster.setTransitionName("poster" + mTransitionId);
+
+        mPoster.setContentDescription(mMovie.getTitle());
 
         GlideApp.with(this)
                 .load(posterUrlConverter(getOptimalImgSize(context), mMovie.getPosterUrl()))
@@ -99,26 +136,21 @@ public class MovieDetailsPoster extends Fragment {
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        getParentFragment().startPostponedEnterTransition();
+                        if (getParentFragment() != null) {
+                            getParentFragment().startPostponedEnterTransition();
+                        }
                         return false;
                     }
 
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        getParentFragment().startPostponedEnterTransition();
+                        if (getParentFragment() != null) {
+                            getParentFragment().startPostponedEnterTransition();
+                        }
                         return false;
                     }
                 })
                 .into(mPoster);
-
-        mTitle.setText(mMovie.getTitle());
-        mReleaseDate.setText(formatDate(mMovie.getReleaseDate()));
-
     }
 
-    @Override
-    public void onDetach() {
-        if (mUnbinder != null) mUnbinder.unbind();
-        super.onDetach();
-    }
 }

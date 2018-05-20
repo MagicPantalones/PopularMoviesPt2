@@ -137,6 +137,13 @@ public class ListFragment extends Fragment {
         correctScroll();
         mRecyclerView.setAdapter(mAdapter);
 
+        if (getContext().getResources().getConfiguration().orientation ==
+                Configuration.ORIENTATION_LANDSCAPE) {
+            GridLayoutManager manager = (GridLayoutManager) mRecyclerView.getLayoutManager();
+            manager.setSpanCount(1);
+            manager.setOrientation(GridLayoutManager.HORIZONTAL);
+        }
+
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
