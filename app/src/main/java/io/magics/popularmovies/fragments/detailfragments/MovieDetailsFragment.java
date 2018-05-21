@@ -75,6 +75,10 @@ public class MovieDetailsFragment extends Fragment {
     TabLayout mTitlesIndicator;
     @BindView(R.id.toolbar_detail_fragment)
     Toolbar mToolbar;
+    @BindView(R.id.icon_left_hint)
+    ImageView mGoLeftHint;
+    @BindView(R.id.icon_right_hint)
+    ImageView mGoRightHint;
 
     @Nullable
     @BindView(R.id.pb_details_vote)
@@ -92,6 +96,7 @@ public class MovieDetailsFragment extends Fragment {
 
     private Unbinder mUnbinder;
     private DetailFragInteractionHandler mFragInteractionHandler;
+    private View.OnClickListener mArrowHintClickListener;
 
     private MovieDetailsPagerAdapter mPagerAdapter;
     private AnimatedVectorDrawableCompat mAnimatedFabDrawable;
@@ -158,6 +163,34 @@ public class MovieDetailsFragment extends Fragment {
 
         mNestedViewPager.setOffscreenPageLimit(4);
         mNestedViewPager.setAdapter(mPagerAdapter);
+        mNestedViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                if (position == 0){
+                    mGoLeftHint.setVisibility(View.INVISIBLE);
+                    mGoRightHint.setVisibility(View.VISIBLE);
+                } else if (position == 3) {
+                    mGoLeftHint.setVisibility(View.VISIBLE);
+                    mGoRightHint.setVisibility(View.INVISIBLE);
+                } else {
+                    mGoLeftHint.setVisibility(View.VISIBLE);
+                    mGoRightHint.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        mGoRightHint.setOnClickListener(v -> {
+            if (mGoRightHint.getVisibility() == View.VISIBLE) {
+                mNestedViewPager.setCurrentItem(mNestedViewPager.getCurrentItem() + 1, true);
+            }
+        });
+
+        mGoLeftHint.setOnClickListener(v -> {
+            if (mGoLeftHint.getVisibility() == View.VISIBLE) {
+                mNestedViewPager.setCurrentItem(mNestedViewPager.getCurrentItem() - 1, true);
+            }
+        });
 
         mTitlesIndicator.setupWithViewPager(mNestedViewPager, true);
 

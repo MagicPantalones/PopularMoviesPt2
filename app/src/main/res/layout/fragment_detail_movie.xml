@@ -12,8 +12,8 @@
         android:id="@+id/toolbar_detail_fragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:transitionName="@string/shared_element_toolbar"
-        android:background="@drawable/bg_toolbar_list">
+        android:background="@drawable/bg_toolbar_list"
+        android:transitionName="@string/shared_element_toolbar">
 
         <ImageView
             android:id="@+id/btn_detail_bar_back"
@@ -39,17 +39,17 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
-            android:transitionGroup="false"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="8dp"
+            android:transitionGroup="false">
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/nested_details_container"
                 android:layout_width="256dp"
                 android:layout_height="384dp"
+                android:transitionGroup="false"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:transitionGroup="false"
                 tools:background="@drawable/bg_loading_realydarkgrey" />
 
             <android.support.constraint.ConstraintLayout
@@ -116,12 +116,12 @@
                 android:scaleType="fitCenter"
                 android:theme="@style/Fab"
                 android:visibility="invisible"
-                tools:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="@+id/nested_details_container"
                 app:layout_constraintEnd_toEndOf="@+id/nested_details_container"
                 app:layout_constraintStart_toEndOf="@+id/nested_details_container"
                 app:layout_constraintTop_toBottomOf="@+id/nested_details_container"
-                app:srcCompat="@drawable/ic_heart_fab_static" />
+                app:srcCompat="@drawable/ic_heart_fab_static"
+                tools:visibility="visible" />
 
             <android.support.design.widget.TabLayout
                 android:id="@+id/titles_indicator"
@@ -134,6 +134,41 @@
                 app:tabBackground="@drawable/tab_titles_indicator_selector"
                 app:tabGravity="center"
                 app:tabIndicatorHeight="0dp" />
+
+            <ImageView
+                android:id="@+id/icon_left_hint"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:paddingStart="8dp"
+                android:alpha="0.7"
+                android:src="@drawable/ic_menu_left"
+                android:tint="@color/colorSecondary"
+                android:visibility="invisible"
+                android:elevation="4dp"
+                app:layout_constraintBottom_toBottomOf="@+id/nested_details_container"
+                app:layout_constraintEnd_toStartOf="@+id/nested_details_container"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/nested_details_container"
+                tools:ignore="ContentDescription" />
+
+            <ImageView
+                android:id="@+id/icon_right_hint"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:paddingEnd="8dp"
+                android:alpha="0.7"
+                android:src="@drawable/ic_menu_right"
+                android:tint="@color/colorSecondary"
+                android:elevation="4dp"
+                app:layout_constraintBottom_toBottomOf="@+id/nested_details_container"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/nested_details_container"
+                app:layout_constraintTop_toTopOf="@+id/nested_details_container"
+                tools:ignore="ContentDescription" />
         </android.support.constraint.ConstraintLayout>
 
     </android.support.v7.widget.CardView>

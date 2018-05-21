@@ -67,7 +67,6 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
         GlideApp.with(trailerIv)
                 .load(trailerImgUrl)
                 .dontTransform()
-                .override(Target.SIZE_ORIGINAL)
                 .into(trailerIv);
 
     }

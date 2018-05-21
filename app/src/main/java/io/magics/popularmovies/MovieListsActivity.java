@@ -35,8 +35,7 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
         MovieDetailsFragment.DetailFragInteractionHandler, ListTabLayout.TabLayoutPageEvents,
         ListAdapter.ListItemEventHandler {
 
-    //TODO Add horizontal layout support.
-    //TODO Inspect for memoryleaks
+    //TODO Inspect for memoryleaks/Remove LeakCanary
 
     private static final String FRAG_PAGER_TAG = "pagerTag";
     private static final String DETAIL_FRAGMENT_TAG = "detailFrag";
@@ -50,11 +49,7 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
 
     private DataProvider mDataProvider;
 
-    private TopListViewModel mTopListVM;
-    private PopListViewModel mPopListVM;
     private FavListViewModel mFavListVM;
-    private TrailersViewModel mTrailerVm;
-    private ReviewsViewModel mReviewVm;
 
     private Unbinder mUnbinder;
 
@@ -66,14 +61,15 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
         setContentView(R.layout.activity_movie_lists);
         mUnbinder = ButterKnife.bind(this);
 
-        mTopListVM = ViewModelProviders.of(this).get(TopListViewModel.class);
-        mPopListVM = ViewModelProviders.of(this).get(PopListViewModel.class);
+        TopListViewModel topListVM = ViewModelProviders.of(this).get(TopListViewModel.class);
+        PopListViewModel popListVM = ViewModelProviders.of(this).get(PopListViewModel.class);
         mFavListVM = ViewModelProviders.of(this).get(FavListViewModel.class);
-        mTrailerVm = ViewModelProviders.of(this).get(TrailersViewModel.class);
-        mReviewVm = ViewModelProviders.of(this).get(ReviewsViewModel.class);
 
-        mDataProvider = new DataProvider(this, mTopListVM, mPopListVM, mFavListVM,
-                mTrailerVm, mReviewVm);
+        TrailersViewModel trailerVm = ViewModelProviders.of(this).get(TrailersViewModel.class);
+        ReviewsViewModel reviewVm = ViewModelProviders.of(this).get(ReviewsViewModel.class);
+
+        mDataProvider = new DataProvider(this, topListVM, popListVM, mFavListVM,
+                trailerVm, reviewVm);
 
         mAppFragManager = getSupportFragmentManager();
 
@@ -99,6 +95,12 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
             mUpFab.setRotation(-90);
         }
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mUpFab.hide();
     }
 
     @Override

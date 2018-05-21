@@ -4,6 +4,7 @@ package io.magics.popularmovies.fragments.detailfragments;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -62,6 +63,12 @@ public class MovieDetailsTrailers extends Fragment
         TrailerAdapter adapter = new TrailerAdapter(this);
 
         mRvTrailerRecycler.setAdapter(adapter);
+
+        if (getContext().getResources().getConfiguration().orientation ==
+                Configuration.ORIENTATION_LANDSCAPE) {
+            LinearLayoutManager manager = (LinearLayoutManager) mRvTrailerRecycler.getLayoutManager();
+            manager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        }
 
         //noinspection ConstantConditions
         mViewModel.mTrailers.observe(getActivity(), trailerResults -> {
