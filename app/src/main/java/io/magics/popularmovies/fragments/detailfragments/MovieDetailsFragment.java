@@ -61,7 +61,7 @@ public class MovieDetailsFragment extends Fragment {
     @BindView(R.id.fav_fab)
     FloatingActionButton mFavFab;
     @BindView(R.id.fav_fab_anim)
-    ImageView mFavFabAnim;
+    ImageView mIvFavFabAnim;
     @BindView(R.id.nested_details_container)
     ViewPager mNestedViewPager;
     @BindView(R.id.btn_detail_bar_back)
@@ -156,6 +156,8 @@ public class MovieDetailsFragment extends Fragment {
 
         mNestedViewPager.setOffscreenPageLimit(4);
         mNestedViewPager.setAdapter(mPagerAdapter);
+
+        //Sets the visibility of the arrows on the sides of the nested CardView
         mNestedViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
             @Override
             public void onPageSelected(int position) {
@@ -177,6 +179,7 @@ public class MovieDetailsFragment extends Fragment {
             }
         });
 
+        //Sets the behaviour of the arrows
         mGoRightHint.setOnClickListener(v -> {
             if (mGoRightHint.getVisibility() == View.VISIBLE) {
                 mNestedViewPager.setCurrentItem(mNestedViewPager.getCurrentItem() + 1, true);
@@ -189,19 +192,25 @@ public class MovieDetailsFragment extends Fragment {
             }
         });
 
+        //Found that a dotted ViewPager indicator gave the best visual result.
+        //Tried a lot of different indicators.
         mTitlesIndicator.setupWithViewPager(mNestedViewPager, true);
 
         mBtnToolbarBack.setOnClickListener(v -> getActivity().onBackPressed());
 
+        //Notifies the listener in the Activity so it adds or removes a movie from the SQLite database.
+        //Then animates the button.
         mFavFab.setOnClickListener(v -> {
             mFragInteractionHandler.favFabClicked(mMovie, mIsFavourite);
             mIsFavourite = !mIsFavourite;
             fabAnim();
         });
 
+        //Initializes the correct methods based on the layout configuration.
+        //The detail fragment and the nested ViewPager contains different Views based on the screen orientation.
         if (getContext().getResources().getConfiguration().orientation ==
                 Configuration.ORIENTATION_LANDSCAPE) {
-            initLandscapeLayout(getContext());
+            initLandscapeLayout();
         } else {
             initPortraitLayout();
         }
@@ -243,28 +252,40 @@ public class MovieDetailsFragment extends Fragment {
         }
     }
 
+    /**
+     * Based on the value in {@link #mIsFavourite} sets the correct AnimatedVectorDrawable.
+     * Tried to make the app have a MinSdk of 19. But since I had made this project way bigger than
+     * expected, I used a MinSdk of 21 to avoid a lot of SDK checks.
+     * <br></br>
+     * I wanted to animate the background of the FAB as well as the icon, so i chose to hide the FAB
+     * and have a seperate ImageView with the animation instead.
+     */
     private void fabAnim() {
 
         mAnimatedFabDrawable = AnimatedVectorDrawableCompat.create(getContext(), mIsFavourite ?
                 R.drawable.ic_anim_heart_to_fav : R.drawable.ic_anim_heart_from_fav);
 
-        mFavFabAnim.setImageDrawable(mAnimatedFabDrawable);
+        mIvFavFabAnim.setImageDrawable(mAnimatedFabDrawable);
 
         if (mAnimatedFabDrawable != null) {
             mAnimatedFabDrawable.registerAnimationCallback(new Animatable2Compat.AnimationCallback() {
                 @Override
                 public void onAnimationEnd(Drawable drawable) {
                     mAnimatedFabDrawable.unregisterAnimationCallback(this);
+
                     mFavFab.setBackgroundTintList(ColorStateList.valueOf(mIsFavourite ?
                             mFavColor : mDefColor));
-                    mFavFabAnim.setImageDrawable(null);
+
+                    mIvFavFabAnim.setImageDrawable(null);
+
                     mFavFab.setVisibility(View.VISIBLE);
+
                     super.onAnimationEnd(drawable);
                 }
             });
 
             mFavFab.setVisibility(View.INVISIBLE);
-            mFavFabAnim.setVisibility(View.VISIBLE);
+            mIvFavFabAnim.setVisibility(View.VISIBLE);
             mAnimatedFabDrawable.start();
         }
 
@@ -302,13 +323,26 @@ public class MovieDetailsFragment extends Fragment {
 
     }
 
-
+    /**
+     * When the configuration is in portrait, the majority of the information gets shown in the
+     * nested ViewPager. But the {@link #mVoteBar} and {@link #mVoteNumber} views are in the
+     * viewPager when the config is Landscape
+     */
     private void initPortraitLayout() {
         mVoteBar.setProgress((int) (mMovie.getVoteAverage() * 10));
         mVoteNumber.setText(String.valueOf(mMovie.getVoteAverage()));
     }
 
-    private void initLandscapeLayout(Context context) {
+
+    /**
+     * Initiates and prepares the fragment to be laid out in Landscape orientation.
+     *
+     * The movie poster's width is set based on the height of the poster, which is set to
+     * MATCH_PARENT in the layout XML. Therefore the {@link #mPosterHorizontal}'s width gets
+     * set, and the postponed transition gets started,
+     * after the layout has been measured in {@link Target#getSize}.
+     */
+    private void initLandscapeLayout() {
 
         mWrapperHorizontal.setTransitionName(mTransitionName + mMovie.getPosterUrl());
 
@@ -316,7 +350,7 @@ public class MovieDetailsFragment extends Fragment {
         mPosterHorizontal.setContentDescription(mMovie.getTitle());
 
         GlideApp.with(this)
-                .load(posterUrlConverter(getOptimalImgSize(context), mMovie.getPosterUrl()))
+                .load(posterUrlConverter(getOptimalImgSize(getContext()), mMovie.getPosterUrl()))
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .dontTransform()
                 .override(Target.SIZE_ORIGINAL)

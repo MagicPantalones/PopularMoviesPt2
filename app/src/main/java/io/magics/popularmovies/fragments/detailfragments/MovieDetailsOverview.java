@@ -16,9 +16,6 @@ import butterknife.Unbinder;
 import io.magics.popularmovies.R;
 import io.magics.popularmovies.models.Movie;
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class MovieDetailsOverview extends Fragment {
 
     private static final String ARG_MOVIE = "movie";

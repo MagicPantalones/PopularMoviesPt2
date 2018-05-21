@@ -32,6 +32,7 @@ public class MovieListsPagerAdapter extends FragmentStatePagerAdapter {
             case 2:
                 return ListFragment.newInstance(ListFragment.FAV_FRAGMENT);
             default:
+                //Should never happen
                 return null;
         }
     }
@@ -47,7 +48,8 @@ public class MovieListsPagerAdapter extends FragmentStatePagerAdapter {
         return tabTitles[position];
     }
 
-    //Based on Tony Chans answer on https://stackoverflow.com/questions/14035090/how-to-get-existing-fragments-when-using-fragmentpageradapter
+    //Based on Tony Chans answer at
+    //https://stackoverflow.com/questions/14035090/how-to-get-existing-fragments-when-using-fragmentpageradapter
     @SuppressWarnings("NullableProblems")
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
@@ -78,8 +80,7 @@ public class MovieListsPagerAdapter extends FragmentStatePagerAdapter {
             case ListFragment.FAV_FRAGMENT:
                 return mFavFrag;
             default:
-                //Should never happen.
-                throw new IllegalArgumentException("Wrong Fragment Type");
+                return null;
         }
     }
 

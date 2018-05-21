@@ -77,10 +77,22 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
 
     ListAdapter(ListItemEventHandler listItemEventHandler, ViewModel viewModel, int listType) {
         this.mClickHandler = listItemEventHandler;
+
+        /*
+        Calls a listener in the provided ViewModel, that will call another listener in
+        MovieListsActivity#mDataProvider to fetch another page from the API,
+        when a ViewHolder's position is almost at the end.
+         */
         mReachedEndHandler = () -> {
-            if (viewModel instanceof TopListViewModel) ((TopListViewModel) viewModel).notifyGetMoreTopPages();
-            else if (viewModel instanceof PopListViewModel) ((PopListViewModel) viewModel).notifyGetMorePopPages();
+            if (viewModel instanceof TopListViewModel) {
+                ((TopListViewModel) viewModel).notifyGetMoreTopPages();
+            }
+            else if (viewModel instanceof PopListViewModel) {
+                ((PopListViewModel) viewModel).notifyGetMorePopPages();
+            }
         };
+
+        //Uses the list type to provide an extra identifier for the SharedElement's transition name.
         if (listType == ListFragment.TOP_FRAGMENT) mListType = "topRated";
         else if (listType == ListFragment.POP_FRAGMENT) mListType = "popular";
     }
@@ -89,18 +101,37 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
     @Override
     public PosterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
-        mDefaultColor = ResourcesCompat.getColor(context.getResources(), R.color.colorSecondary, context.getTheme());
+        mDefaultColor = ResourcesCompat.getColor(context.getResources(), R.color.colorSecondary,
+                context.getTheme());
         mImageSize = MovieUtils.getOptimalImgSize(context);
         mTransitionStarted = new AtomicBoolean();
 
-        View v = LayoutInflater.from(context).inflate(R.layout.fragment_list_view_holder, parent, false);
+        View v = LayoutInflater.from(context).inflate(R.layout.fragment_list_view_holder, parent,
+                false);
+
+        /*
+        Measures the parent ViewHolder to decide the poster's size. This done to programmatically
+        set the ViewHolder sizes based on the user's device size.
+
+        The majority of movie posters have a apect ratio of 2:3, and the ViewHolder have the same
+        padding and margin on both the start and end (2 * 8dp on each side).
+        Therefore the padding is multiplied by 4 before the value is subtracted from the ViewHolder's
+        Width.
+
+        Then I have the width, which is divided by 2 to get the aspect ratio multiplier.
+        The aspect ratio multiplier is multiplied by 3, to get the poster height. And multiplied by
+        2 to get the poster width.
+
+        This is so i don't have to create different layout files for different screen sizes.
+         */
 
         v.measure(parent.getMeasuredWidth(), parent.getMeasuredHeight());
 
         int padding = v.findViewById(R.id.parent_wrapper_list).getPaddingStart() * 4;
 
-        mPosterHeight = (v.getMeasuredWidth() - padding) / 2 * 3;
-        mPosterWidth = mPosterHeight / 3 * 2;
+        int aspectRatioMultiplier = v.getMeasuredWidth() - padding / 2;
+        mPosterHeight = aspectRatioMultiplier * 3;
+        mPosterWidth = aspectRatioMultiplier * 2;
 
 
         return new PosterViewHolder(v);
@@ -129,7 +160,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         iv.setContentDescription(mfg.getTitle());
         shadow.setImageDrawable(holder.mGradientDrawable.mutate());
 
-
         holder.setTransitionNames(mfg);
 
         iv.setMinimumWidth(mPosterWidth);
@@ -149,7 +179,9 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        if (MovieListsActivity.selectedPosition == position &&
+                        //Uses AtomicBoolean mTransitionStarted to avoid calling
+                        // #startPostponedEnterTransition() multiple times.
+                        if (MovieListsActivity.getSelectedPosition() == position &&
                                 !mTransitionStarted.getAndSet(true)) {
                             mClickHandler.onImageLoaded(position);
                         }
@@ -158,7 +190,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
 
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        if (MovieListsActivity.selectedPosition == position &&
+                        if (MovieListsActivity.getSelectedPosition() == position &&
                                 !mTransitionStarted.getAndSet(true)) {
                             mClickHandler.onImageLoaded(position);
                         }
@@ -171,6 +203,17 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
                     public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
                         iv.setImageDrawable(resource.getCurrent());
 
+                        /*
+                        Checks if MovieData#ShadowInt has been set in the Movie Object.
+                        If it has not been set, it will use the Palette class to try to find the
+                        most vibrant color in the poster's bitmap.
+                        If that is not found, it will try to get a dark vibrant color, then the
+                        most dominant color, and if that fails, it will revert to the secondary app
+                        color.
+
+                        When it has found the color or the object contained a color int. It will set
+                        this color to the gradient that peeks out from under the poster.
+                         */
                         if (mfg.getShadowInt() == -1) {
                             Bitmap b = ((BitmapDrawable) resource).getBitmap();
 
@@ -236,6 +279,15 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
                     itemView.getContext().getTheme());
         }
 
+        /**
+         * Sets the shared element transition name of the ImageView containing the poster and the
+         * CardView wrapping the ImageView.
+         *
+         * It uses the poster url from the API to set an unique transition name.
+         * It also uses the listType to set the name. Since the movie can appear in multiple lists.
+         *
+         * @param movie The movie belonging to the ViewHolder.
+         */
         void setTransitionNames(Movie movie){
             mCvWrapper.setTransitionName(mListType + movie.getPosterUrl());
             mIv.setTransitionName("poster" + mListType + movie.getPosterUrl());

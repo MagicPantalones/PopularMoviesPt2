@@ -71,6 +71,7 @@ public class ListTabLayout extends Fragment {
         mViewPager.setOffscreenPageLimit(3);
         mViewPager.setAdapter(mAdapter);
 
+        //Informs the parent MovieListsActivity to hide/show the UpFab button on pagedrag/-change.
         mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageScrollStateChanged(int state) {
@@ -105,7 +106,6 @@ public class ListTabLayout extends Fragment {
     private void prepareTransitions(){
         setExitTransition(TransitionInflater.from(getContext())
                 .inflateTransition(R.transition.list_exit_transition));
-
         setExitSharedElementCallback(new SharedElementCallback() {
             @Override
             public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
@@ -118,8 +118,9 @@ public class ListTabLayout extends Fragment {
                     return;
                 }
 
+                @SuppressWarnings("ConstantConditions")
                 RecyclerView.ViewHolder selectedVh = listRecycler
-                        .findViewHolderForAdapterPosition(MovieListsActivity.selectedPosition);
+                        .findViewHolderForAdapterPosition(MovieListsActivity.getSelectedPosition());
 
                 if (selectedVh == null || selectedVh.itemView == null){
                     return;

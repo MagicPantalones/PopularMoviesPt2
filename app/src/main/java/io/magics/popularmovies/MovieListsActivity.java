@@ -35,7 +35,7 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
     private static final String FRAG_PAGER_TAG = "pagerTag";
     private static final String DETAIL_FRAGMENT_TAG = "detailFrag";
 
-    public static int selectedPosition;
+    private static int selectedPosition;
 
     @BindView(R.id.up_fab)
     FloatingActionButton mUpFab;
@@ -48,6 +48,13 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
 
     private FragmentManager mAppFragManager;
 
+    /**
+     * Creates and initialize the {@link DataProvider}, {@link TopListViewModel},
+     * {@link PopListViewModel}, {@link FavListViewModel}, {@link TrailersViewModel} and
+     * {@link ReviewsViewModel} that fetches and stores the API data from TheMovieDatabase.
+     *
+     * @see DataProvider DataProvider
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,8 +83,8 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
 
 
         if (savedInstanceState == null) {
-
-            selectedPosition = 0;
+            //A ViewHolder has not been selected yet so it sets the position to 0.
+            setSelectedPosition(0);
             mAppFragManager.beginTransaction()
                     .replace(android.R.id.content, ListTabLayout.newInstance(), FRAG_PAGER_TAG)
                     .commit();
@@ -93,6 +100,8 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
     @Override
     protected void onResume() {
         super.onResume();
+        //Have to hide the UpFab in onResume to avoid it showing if the device is rotated when a
+        //detail fragment is showing.
         mUpFab.hide();
     }
 
@@ -152,7 +161,7 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
     public void onClick(View holder, Movie movie, String transitionIdentifier, int selectedPos) {
         mDataProvider.setMovieAndFetch(movie);
 
-        selectedPosition = selectedPos;
+        setSelectedPosition(selectedPos);
 
         ListTabLayout currTabLayout = (ListTabLayout)
                 mAppFragManager.findFragmentByTag(FRAG_PAGER_TAG);
@@ -162,13 +171,11 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
 
         View posterWrapper = holder.findViewById(R.id.cv_poster_wrapper);
         View poster = holder.findViewById(R.id.iv_poster);
+        //Found a suggested solution to use the AppBar as a shared element, but had no success.
+        //Have not removed yet, because I think I'm on the right path and intend to figure it out.
         View toolBar = currTabLayout.getView().findViewById(R.id.app_bar_tab_layout);
 
-        ((TransitionSet) currTabLayout.getExitTransition())
-                .excludeTarget(holder, true);
-
         mUpFab.hide();
-
 
         mAppFragManager.beginTransaction()
                 .setReorderingAllowed(true)
@@ -189,13 +196,20 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
         }
     }
 
+    public static int getSelectedPosition() { return selectedPosition; }
+
+    public static void setSelectedPosition(int position) { selectedPosition = position; }
+
     /*
-    Resources/Tutorials for this project:
-    - FragmentTransitions:
+    Activity/Fragment Transition Resources/Tutorials for this project:
+    - Used:
+        http://mikescamell.com/shared-element-transitions-part-4-recyclerview/
+        https://github.com/google/android-transition-examples/tree/master/GridToPager
+
+    - Saved for later:
         https://medium.com/workday-engineering/android-inbox-material-transitions-for-recyclerview-7ae3cb241aed
         https://medium.com/bynder-tech/how-to-use-material-transitions-in-fragment-transactions-5a62b9d0b26b
         https://www.androiddesignpatterns.com/2014/12/activity-fragment-transitions-in-android-lollipop-part1.html
-        http://mikescamell.com/shared-element-transitions-part-4-recyclerview/
         https://developer.android.com/training/animation/reveal-or-hide-view
      */
 

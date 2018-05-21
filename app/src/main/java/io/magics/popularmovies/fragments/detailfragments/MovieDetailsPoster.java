@@ -104,7 +104,7 @@ public class MovieDetailsPoster extends Fragment {
                 Configuration.ORIENTATION_LANDSCAPE) {
             initLandscapeLayout();
         } else {
-            initPortraitLayout(getContext(), view.findViewById(R.id.nested_poster_wrapper));
+            initPortraitLayout(view.findViewById(R.id.nested_poster_wrapper));
         }
 
     }
@@ -115,6 +115,9 @@ public class MovieDetailsPoster extends Fragment {
         super.onDetach();
     }
 
+    /**
+     * Same as {@link MovieDetailsFragment#initPortraitLayout()}
+     */
     private void initLandscapeLayout() {
 
         mVoteBar.setProgress((int) (mMovie.getVoteAverage() * 10));
@@ -122,7 +125,15 @@ public class MovieDetailsPoster extends Fragment {
 
     }
 
-    private void initPortraitLayout(Context context, View posterWrapper) {
+    /**
+     * Mostly the same as {@link MovieDetailsFragment#initLandscapeLayout()}.
+     * However, the poster size is already set in the container, so no extra measurement is required.
+     *
+     * @param posterWrapper the CardView wrapping the ImageView. The CardView also has to be passed
+     *                      as a shared element, otherwise the poster's corners won't be round
+     *                      during the transition, and it will look weird.
+     */
+    private void initPortraitLayout(View posterWrapper) {
         posterWrapper.setTransitionName(mTransitionId);
 
         mPoster.setTransitionName("poster" + mTransitionId);
@@ -130,7 +141,7 @@ public class MovieDetailsPoster extends Fragment {
         mPoster.setContentDescription(mMovie.getTitle());
 
         GlideApp.with(this)
-                .load(posterUrlConverter(getOptimalImgSize(context), mMovie.getPosterUrl()))
+                .load(posterUrlConverter(getOptimalImgSize(getContext()), mMovie.getPosterUrl()))
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .dontTransform()
                 .override(Target.SIZE_ORIGINAL)

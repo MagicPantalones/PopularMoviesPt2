@@ -34,6 +34,7 @@ class MovieDetailsPagerAdapter extends FragmentPagerAdapter {
             case 3:
                 return new MovieDetailsReviews();
             default:
+                //Should not happen
                 return null;
         }
 

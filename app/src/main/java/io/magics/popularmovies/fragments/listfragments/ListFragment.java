@@ -30,14 +30,6 @@ import io.magics.popularmovies.viewmodels.TopListViewModel;
 
 import static io.magics.popularmovies.utils.MovieUtils.toggleViewVisibility;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link FragmentListener} interface
- * to handle interaction events.
- * Use the {@link ListFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ListFragment extends Fragment {
 
     public static final int TOP_FRAGMENT = 0;
@@ -94,6 +86,7 @@ public class ListFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_list, container, false);
         mUnbinder = ButterKnife.bind(this, root);
 
+        //Initializing the screen rotation check for the OnLayoutChanged listener
         if (savedInstanceState == null) {
             mOldRight = -1;
         } else {
@@ -131,9 +124,13 @@ public class ListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        //See #correctScroll
         correctScroll();
+
         mRecyclerView.setAdapter(mAdapter);
 
+        //Prepares the GridLayoutManager for a horizontal layout
         if (getContext().getResources().getConfiguration().orientation ==
                 Configuration.ORIENTATION_LANDSCAPE) {
             GridLayoutManager manager = (GridLayoutManager) mRecyclerView.getLayoutManager();
@@ -141,6 +138,8 @@ public class ListFragment extends Fragment {
             manager.setOrientation(GridLayoutManager.HORIZONTAL);
         }
 
+        /*To get the wanted behaviour of the up navigation FAB. It communicates when the
+          RecyclerView is scrolled */
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -151,11 +150,12 @@ public class ListFragment extends Fragment {
             }
         });
 
+        /* Chose to use LiveData instead of RxJava in my ViewModels.
+           LiveData had a lot more documentation for use in ViewModel classes */
         Observer<List<Movie>> movieObserver = movies -> {
             if (movies == null || movies.isEmpty()) toggleViewVisibility(mRecyclerView, mTvError);
             else mAdapter.setMovieData(movies);
         };
-
 
         switch (mFragType) {
             case 0:
@@ -177,6 +177,7 @@ public class ListFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
+        //Saves the right coordinates of the layout.
         outState.putInt(KEY_OLD_RIGHT, mOldRight);
     }
 
@@ -191,6 +192,7 @@ public class ListFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+        //Don't know if I have to null check the Unbinder, but better safe than sorry.
         if (mUnbinder != null) mUnbinder.unbind();
         mListener = null;
     }
@@ -199,6 +201,25 @@ public class ListFragment extends Fragment {
         mRecyclerView.smoothScrollToPosition(0);
     }
 
+    /**
+     * From <a href="https://github.com/google/android-transition-examples/tree/master/GridToPager">
+     *     https://github.com/google/android-transition-examples/tree/master/GridToPager</a>
+     *     <br></br>
+     *     <br></br>
+     * Since my RecyclerView's ViewHolders would clip the appbar when exiting.<br></br>
+     * This method will set an OnLayoutChanged listener that will adjust the RecyclerView's
+     * LayoutManagerPosition to show the full ViewHolder when navigating back to the list from a
+     * detail fragment.
+     * <br></br>
+     * <br></br>
+     * The listener will not adjust the position if the device is rotated since the
+     * {@link MovieListsActivity#getSelectedPosition} return value beeing static and not set until
+     * after navigating away from the detail fragment.
+     * <br></br>
+     * <br></br>
+     * If you know of a prettier or better way to do this, please let me know :)
+     */
+
     private void correctScroll() {
         mRecyclerView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
@@ -206,13 +227,13 @@ public class ListFragment extends Fragment {
                 mRecyclerView.removeOnLayoutChangeListener(this);
                 if (mOldRight != -1 || mOldRight == right) return;
 
-                RecyclerView.LayoutManager manager = mRecyclerView.getLayoutManager();
-                View viewAtPos = manager.findViewByPosition(MovieListsActivity.selectedPosition);
+                final RecyclerView.LayoutManager manager = mRecyclerView.getLayoutManager();
+                View viewAtPos = manager.findViewByPosition(MovieListsActivity.getSelectedPosition());
 
                 if (viewAtPos == null || manager.isViewPartiallyVisible(viewAtPos,
                         false, true)) {
                     mRecyclerView.post(() -> {
-                        manager.scrollToPosition(MovieListsActivity.selectedPosition);
+                        manager.scrollToPosition(MovieListsActivity.getSelectedPosition());
                         mOldRight = right;
                     });
                 }

@@ -35,6 +35,11 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
 
         holder.mTvAuthor.setText(review.getAuthor());
 
+        /*
+        The returned CharSet from the API is formatted as MarkDown.
+        I use an external library that parses the CharSet, creates a text spannable, and sets it
+        to the TextView.
+        */
         Markwon.setMarkdown(holder.mMdvReview, review.getContent());
 
     }

@@ -17,7 +17,7 @@ public class ReviewResult implements Parcelable
     @Expose
     private String content;
 
-    public final static Parcelable.Creator<ReviewResult> CREATOR = new Creator<ReviewResult>() {
+    public static final Parcelable.Creator<ReviewResult> CREATOR = new Creator<ReviewResult>() {
 
 
         @SuppressWarnings({

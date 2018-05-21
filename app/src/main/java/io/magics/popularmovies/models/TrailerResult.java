@@ -20,7 +20,7 @@ public class TrailerResult implements Parcelable
     @Expose
     private String site;
 
-    public final static Parcelable.Creator<TrailerResult> CREATOR = new Creator<TrailerResult>() {
+    public static final Parcelable.Creator<TrailerResult> CREATOR = new Creator<TrailerResult>() {
         @SuppressWarnings({
             "unchecked"
         })

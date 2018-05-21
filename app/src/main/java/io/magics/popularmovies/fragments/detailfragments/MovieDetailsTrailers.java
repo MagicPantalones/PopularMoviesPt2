@@ -65,7 +65,8 @@ public class MovieDetailsTrailers extends Fragment
         //noinspection ConstantConditions
         if (getContext().getResources().getConfiguration().orientation ==
                 Configuration.ORIENTATION_LANDSCAPE) {
-            LinearLayoutManager manager = (LinearLayoutManager) mRvTrailerRecycler.getLayoutManager();
+            LinearLayoutManager manager =
+                    (LinearLayoutManager) mRvTrailerRecycler.getLayoutManager();
             manager.setOrientation(LinearLayoutManager.HORIZONTAL);
         }
 
@@ -87,19 +88,26 @@ public class MovieDetailsTrailers extends Fragment
         super.onDestroy();
     }
 
+    /*
+     * Get's the intent from the Adapter, and starts a YouTube activity. If the user does not have
+     * YouTube installed it will launch the user's web-browser with the YouTube link
+     */
     @SuppressWarnings("ConstantConditions")
     @Override
     public void onPlayTrailer(TrailerResult trailerResult) {
-        Intent ytAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + trailerResult.getKey()));
+        Intent ytAppIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:"
+                + trailerResult.getKey()));
         try {
             getContext().startActivity(ytAppIntent);
         } catch (ActivityNotFoundException e) {
-            Intent ytWebIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + trailerResult.getKey()));
+            Intent ytWebIntent = new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("http://www.youtube.com/watch?v=" + trailerResult.getKey()));
             getContext().startActivity(ytWebIntent);
         }
 
     }
 
+    //Shares the YouTube URL for the trailer.
     @Override
     public void onShareTrailer(Intent trailer) {
         //noinspection ConstantConditions
