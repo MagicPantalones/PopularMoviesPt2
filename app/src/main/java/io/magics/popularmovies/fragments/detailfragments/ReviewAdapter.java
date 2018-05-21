@@ -19,7 +19,7 @@ import ru.noties.markwon.Markwon;
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder> {
 
-    private List<ReviewResult> mReviewData = new ArrayList<>();
+    private final List<ReviewResult> mReviewData = new ArrayList<>();
 
 
     @NonNull
@@ -57,7 +57,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         @BindView(R.id.tv_author) TextView mTvAuthor;
 
 
-        public ReviewViewHolder(View itemView) {
+        ReviewViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }

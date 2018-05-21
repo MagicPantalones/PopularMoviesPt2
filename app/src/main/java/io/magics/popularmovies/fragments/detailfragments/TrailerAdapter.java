@@ -10,8 +10,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 
-import com.bumptech.glide.request.target.Target;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,15 +23,15 @@ import io.magics.popularmovies.utils.MovieUtils;
 
 public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerViewHolder> {
 
-    private List<TrailerResult> mTrailerList = new ArrayList<>();
-    private OnTrailerSelect mTrailerClickListener;
+    private final List<TrailerResult> mTrailerList = new ArrayList<>();
+    private final OnTrailerSelect mTrailerClickListener;
 
     public interface OnTrailerSelect{
         void onPlayTrailer(TrailerResult trailerResult);
         void onShareTrailer(Intent trailer);
     }
 
-    public TrailerAdapter(OnTrailerSelect listener){
+    TrailerAdapter(OnTrailerSelect listener){
         this.mTrailerClickListener = listener;
     }
 
@@ -60,9 +58,7 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
             mTrailerClickListener.onShareTrailer(shareIntent);
         });
 
-        holder.btnPlay.setOnClickListener(v -> {
-            mTrailerClickListener.onPlayTrailer(trailer);
-        });
+        holder.btnPlay.setOnClickListener(v -> mTrailerClickListener.onPlayTrailer(trailer));
 
         GlideApp.with(trailerIv)
                 .load(trailerImgUrl)
@@ -95,7 +91,7 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
         @BindView(R.id.btn_play)
         Button btnPlay;
 
-        public TrailerViewHolder(View itemView) {
+        TrailerViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }

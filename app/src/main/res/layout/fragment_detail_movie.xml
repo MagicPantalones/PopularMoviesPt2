@@ -70,7 +70,8 @@
                     android:layout_marginStart="8dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="InconsistentLayout" />
 
                 <TextView
                     android:id="@+id/tv_details_vote"
@@ -81,7 +82,8 @@
                     app:layout_constraintBottom_toBottomOf="@+id/pb_details_vote"
                     app:layout_constraintStart_toEndOf="@id/pb_details_vote"
                     app:layout_constraintTop_toTopOf="@+id/pb_details_vote"
-                    tools:text="7.5" />
+                    tools:text="7.5"
+                    tools:ignore="InconsistentLayout" />
 
                 <ImageView
                     android:id="@+id/tv_vote_detail_icon"
@@ -151,7 +153,7 @@
                 app:layout_constraintEnd_toStartOf="@+id/nested_details_container"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/nested_details_container"
-                tools:ignore="ContentDescription" />
+                tools:ignore="ContentDescription,RtlSymmetry" />
 
             <ImageView
                 android:id="@+id/icon_right_hint"
@@ -168,7 +170,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/nested_details_container"
                 app:layout_constraintTop_toTopOf="@+id/nested_details_container"
-                tools:ignore="ContentDescription" />
+                tools:ignore="ContentDescription,RtlSymmetry" />
         </android.support.constraint.ConstraintLayout>
 
     </android.support.v7.widget.CardView>

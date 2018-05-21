@@ -1,22 +1,20 @@
 package io.magics.popularmovies.fragments.detailfragments;
 
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.view.ViewGroup;
 
 import io.magics.popularmovies.models.Movie;
 
-public class MovieDetailsPagerAdapter extends FragmentPagerAdapter {
+class MovieDetailsPagerAdapter extends FragmentPagerAdapter {
 
     private static final int PAGE_COUNT = 4;
 
-    private Movie mMovie;
-    private String mTransitionId;
+    private final Movie mMovie;
+    private final String mTransitionId;
 
 
-    public MovieDetailsPagerAdapter(Movie movie, String transitionId, FragmentManager fm) {
+    MovieDetailsPagerAdapter(Movie movie, String transitionId, FragmentManager fm) {
         super(fm);
         mMovie = movie;
         mTransitionId = transitionId;

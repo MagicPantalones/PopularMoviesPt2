@@ -34,6 +34,7 @@ public class ReviewResult implements Parcelable
     }
     ;
 
+    @SuppressWarnings("WeakerAccess")
     protected ReviewResult(Parcel in) {
         this.author = ((String) in.readValue((String.class.getClassLoader())));
         this.content = ((String) in.readValue((String.class.getClassLoader())));

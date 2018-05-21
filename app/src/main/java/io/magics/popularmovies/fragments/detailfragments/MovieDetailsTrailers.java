@@ -17,8 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.Objects;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -64,6 +62,7 @@ public class MovieDetailsTrailers extends Fragment
 
         mRvTrailerRecycler.setAdapter(adapter);
 
+        //noinspection ConstantConditions
         if (getContext().getResources().getConfiguration().orientation ==
                 Configuration.ORIENTATION_LANDSCAPE) {
             LinearLayoutManager manager = (LinearLayoutManager) mRvTrailerRecycler.getLayoutManager();

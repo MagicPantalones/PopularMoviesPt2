@@ -3,7 +3,6 @@ package io.magics.popularmovies.viewmodels;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.magics.popularmovies.models.TrailerResult;

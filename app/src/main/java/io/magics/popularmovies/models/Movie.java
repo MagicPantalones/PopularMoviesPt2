@@ -1,10 +1,6 @@
 
 package io.magics.popularmovies.models;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -46,6 +42,7 @@ public class Movie implements Parcelable {
         }
     };
 
+    @SuppressWarnings("WeakerAccess")
     protected Movie(Parcel in) {
         this.posterUrl = ((String) in.readValue((String.class.getClassLoader())));
         this.overview = ((String) in.readValue((String.class.getClassLoader())));

@@ -12,7 +12,7 @@ import io.magics.popularmovies.fragments.listfragments.ListFragment;
 public class MovieListsPagerAdapter extends FragmentStatePagerAdapter {
 
     private static final int PAGE_COUNT = 3;
-    private String[] tabTitles = new String[] {"Top Rated", "Popular", "Favourites"};
+    private static final String[] tabTitles = new String[] {"Top Rated", "Popular", "Favourites"};
 
     private ListFragment mTopFrag;
     private ListFragment mPopFrag;

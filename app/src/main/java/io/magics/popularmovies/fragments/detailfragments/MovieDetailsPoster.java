@@ -31,6 +31,7 @@ import static io.magics.popularmovies.utils.MovieUtils.formatDate;
 import static io.magics.popularmovies.utils.MovieUtils.getOptimalImgSize;
 import static io.magics.popularmovies.utils.MovieUtils.posterUrlConverter;
 
+@SuppressWarnings("ConstantConditions")
 public class MovieDetailsPoster extends Fragment {
 
     private static final String ARG_MOVIE = "passedMovie";
@@ -54,7 +55,7 @@ public class MovieDetailsPoster extends Fragment {
     @BindView(R.id.tv_details_release)
     TextView mReleaseDate;
 
-    Unbinder mUnbinder;
+    private Unbinder mUnbinder;
 
     public MovieDetailsPoster() {
         // Required empty public constructor

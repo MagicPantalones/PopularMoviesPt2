@@ -7,6 +7,7 @@ import android.os.Parcel;
 
 import com.google.gson.annotations.Expose;
 
+@SuppressWarnings("CanBeFinal")
 public class ApiResult implements Parcelable
 {
 
@@ -34,19 +35,16 @@ public class ApiResult implements Parcelable
 
     };
 
+    @SuppressWarnings("WeakerAccess")
     protected ApiResult(Parcel in) {
         this.page = ((Integer) in.readValue((Integer.class.getClassLoader())));
         in.readList(this.movies, (Movie.class.getClassLoader()));
         this.totalPages = ((Integer) in.readValue((Integer.class.getClassLoader())));
     }
 
-    public ApiResult() {}
-
     public Integer getPage() { return page; }
 
     public List<Movie> getMovies() { return movies; }
-
-    public Movie getSingleMovie(int i) { return movies.get(i); }
 
     public Integer getTotalPages() { return totalPages; }
 

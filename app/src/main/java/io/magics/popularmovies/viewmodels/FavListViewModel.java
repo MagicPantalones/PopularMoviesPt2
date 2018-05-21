@@ -11,8 +11,8 @@ import io.magics.popularmovies.models.Movie;
 
 public class FavListViewModel extends ViewModel {
 
-    public MutableLiveData<List<Movie>> mFavList = new MutableLiveData<>();
-    private List<Integer> mMoviesId = new ArrayList<>();
+    public final MutableLiveData<List<Movie>> mFavList = new MutableLiveData<>();
+    private final List<Integer> mMoviesId = new ArrayList<>();
 
     public void setFavList(List<Movie> favList) {
 

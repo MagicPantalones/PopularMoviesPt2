@@ -11,10 +11,11 @@ import com.google.gson.annotations.SerializedName;
 public class Trailers implements Parcelable
 {
 
+    @SuppressWarnings("CanBeFinal")
     @SerializedName("results")
     @Expose
     private List<TrailerResult> trailerResults = null;
-    public final static Parcelable.Creator<Trailers> CREATOR = new Creator<Trailers>() {
+    public static final Parcelable.Creator<Trailers> CREATOR = new Creator<Trailers>() {
 
 
         @SuppressWarnings({
@@ -31,6 +32,7 @@ public class Trailers implements Parcelable
     }
     ;
 
+    @SuppressWarnings("WeakerAccess")
     protected Trailers(Parcel in) {
         in.readList(this.trailerResults, (TrailerResult.class.getClassLoader()));
     }

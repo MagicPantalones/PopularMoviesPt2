@@ -14,6 +14,7 @@ public class Reviews implements Parcelable
     @SerializedName("page")
     @Expose
     private Integer page;
+    @SuppressWarnings("CanBeFinal")
     @SerializedName("results")
     @Expose
     private List<ReviewResult> reviewResults = null;
@@ -23,7 +24,7 @@ public class Reviews implements Parcelable
     @SerializedName("total_results")
     @Expose
     private Integer totalResults;
-    public final static Parcelable.Creator<Reviews> CREATOR = new Creator<Reviews>() {
+    public static final Parcelable.Creator<Reviews> CREATOR = new Creator<Reviews>() {
 
 
         @SuppressWarnings({
@@ -40,6 +41,7 @@ public class Reviews implements Parcelable
     }
     ;
 
+    @SuppressWarnings("WeakerAccess")
     protected Reviews(Parcel in) {
         this.page = ((Integer) in.readValue((Integer.class.getClassLoader())));
         in.readList(this.reviewResults, (ReviewResult.class.getClassLoader()));
@@ -50,20 +52,12 @@ public class Reviews implements Parcelable
     public Reviews() {
     }
 
-    public Integer getPage() {
-        return page;
-    }
-
     public List<ReviewResult> getReviewResults() {
         return reviewResults;
     }
 
     public Integer getTotalPages() {
         return totalPages;
-    }
-
-    public Integer getTotalResults() {
-        return totalResults;
     }
 
     public void writeToParcel(Parcel dest, int flags) {

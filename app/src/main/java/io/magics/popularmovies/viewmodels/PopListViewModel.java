@@ -16,7 +16,7 @@ public class PopListViewModel extends ViewModel {
         void getPopPages();
     }
 
-    public MutableLiveData<List<Movie>> mPopList = new MutableLiveData<>();
+    public final MutableLiveData<List<Movie>> mPopList = new MutableLiveData<>();
 
     private GetMorePopPagesListener mNotifyListener;
 

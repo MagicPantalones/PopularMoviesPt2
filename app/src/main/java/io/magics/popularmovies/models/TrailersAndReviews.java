@@ -7,6 +7,7 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+@SuppressWarnings("CanBeFinal")
 public class TrailersAndReviews implements Parcelable
 {
 
@@ -16,7 +17,7 @@ public class TrailersAndReviews implements Parcelable
     @SerializedName("reviews")
     @Expose
     private Reviews reviews;
-    public final static Parcelable.Creator<TrailersAndReviews> CREATOR = new Creator<TrailersAndReviews>() {
+    public static final Parcelable.Creator<TrailersAndReviews> CREATOR = new Creator<TrailersAndReviews>() {
 
 
         @SuppressWarnings({
@@ -33,12 +34,10 @@ public class TrailersAndReviews implements Parcelable
     }
     ;
 
+    @SuppressWarnings("WeakerAccess")
     protected TrailersAndReviews(Parcel in) {
         this.trailers = ((Trailers) in.readValue((Trailers.class.getClassLoader())));
         this.reviews = ((Reviews) in.readValue((Reviews.class.getClassLoader())));
-    }
-
-    public TrailersAndReviews() {
     }
 
     public Trailers getTrailers() {

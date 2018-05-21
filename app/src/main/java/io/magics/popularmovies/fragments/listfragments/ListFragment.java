@@ -65,7 +65,6 @@ public class ListFragment extends Fragment {
 
     private FragmentListener mListener;
 
-    private boolean mOrientation;
     private int mOldRight;
 
     public ListFragment() {
@@ -90,12 +89,10 @@ public class ListFragment extends Fragment {
 
     @SuppressWarnings("ConstantConditions")
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_list, container, false);
         mUnbinder = ButterKnife.bind(this, root);
-        mOrientation = getResources().getConfiguration()
-                .orientation == Configuration.ORIENTATION_PORTRAIT;
 
         if (savedInstanceState == null) {
             mOldRight = -1;

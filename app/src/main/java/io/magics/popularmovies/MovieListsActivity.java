@@ -3,17 +3,12 @@ package io.magics.popularmovies;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.res.Configuration;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.transition.TransitionInflater;
 import android.transition.TransitionSet;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.view.Window;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -44,8 +39,6 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
 
     @BindView(R.id.up_fab)
     FloatingActionButton mUpFab;
-    @BindView(R.id.container_main)
-    ViewGroup mMainContainer;
 
     private DataProvider mDataProvider;
 
@@ -86,7 +79,7 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
 
             selectedPosition = 0;
             mAppFragManager.beginTransaction()
-                    .replace(R.id.container_main, ListTabLayout.newInstance(), FRAG_PAGER_TAG)
+                    .replace(android.R.id.content, ListTabLayout.newInstance(), FRAG_PAGER_TAG)
                     .commit();
 
         }
@@ -154,6 +147,7 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
             mUpFab.show();
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void onClick(View holder, Movie movie, String transitionIdentifier, int selectedPos) {
         mDataProvider.setMovieAndFetch(movie);
@@ -181,7 +175,7 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
                 .addSharedElement(posterWrapper, posterWrapper.getTransitionName())
                 .addSharedElement(poster, poster.getTransitionName())
                 .addSharedElement(toolBar, toolBar.getTransitionName())
-                .replace(R.id.container_main, newFrag, DETAIL_FRAGMENT_TAG)
+                .replace(android.R.id.content, newFrag, DETAIL_FRAGMENT_TAG)
                 .addToBackStack(null)
                 .commit();
     }

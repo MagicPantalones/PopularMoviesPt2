@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 
 import io.magics.popularmovies.database.FavouritesDBHelper.FavouritesEntry;
 
+@SuppressWarnings("ConstantConditions")
 public class FavouritesProvider extends ContentProvider {
 
     private static final int FAVOURITE_ID = 100;
@@ -77,12 +78,12 @@ public class FavouritesProvider extends ContentProvider {
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
 
         Long id;
-        switch (sUriMatcher.match(uri)){
-            case FAVOURITE_DIR:
-                id = mDbHelper.getWritableDatabase().insert(FavouritesEntry.TABLE_NAME_FAVOURITES, null, values);
-                break;
-            default:
-                throw new UnsupportedOperationException("Unknown URI " + uri);
+
+        if (sUriMatcher.match(uri) == FAVOURITE_DIR) {
+            id = mDbHelper.getWritableDatabase().insert(FavouritesEntry.TABLE_NAME_FAVOURITES, null, values);
+
+        } else {
+            throw new UnsupportedOperationException("Unknown URI " + uri);
         }
         if (id == -1){
             return null;

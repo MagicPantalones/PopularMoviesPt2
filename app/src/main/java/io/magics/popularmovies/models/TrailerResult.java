@@ -34,6 +34,7 @@ public class TrailerResult implements Parcelable
 
     };
 
+    @SuppressWarnings("WeakerAccess")
     protected TrailerResult(Parcel in) {
         this.key = ((String) in.readValue((String.class.getClassLoader())));
         this.name = ((String) in.readValue((String.class.getClassLoader())));

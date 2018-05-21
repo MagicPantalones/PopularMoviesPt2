@@ -3,17 +3,14 @@ package io.magics.popularmovies.fragments.listfragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.SharedElementCallback;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,13 +36,11 @@ public class ListTabLayout extends Fragment {
     @BindView(R.id.app_bar_tab_layout)
     AppBarLayout mAppBar;
 
-    Unbinder mUnbinder;
+    private Unbinder mUnbinder;
 
-    MovieListsPagerAdapter mAdapter;
+    private MovieListsPagerAdapter mAdapter;
 
-    FragmentManager mAppFragManager;
-
-    TabLayoutPageEvents mPageEventsListener;
+    private TabLayoutPageEvents mPageEventsListener;
 
     public ListTabLayout() {
         // Required empty public constructor
@@ -56,14 +51,13 @@ public class ListTabLayout extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_list_tab_layout, container, false);
         mUnbinder = ButterKnife.bind(this, root);
 
-        mAppFragManager = getChildFragmentManager();
-        mAdapter = new MovieListsPagerAdapter(mAppFragManager);
+        mAdapter = new MovieListsPagerAdapter(getChildFragmentManager());
 
         postponeEnterTransition();
         prepareTransitions();
@@ -96,6 +90,12 @@ public class ListTabLayout extends Fragment {
             mPageEventsListener = (TabLayoutPageEvents) context;
         }
         super.onAttach(context);
+    }
+
+    @Override
+    public void onDetach() {
+        if (mUnbinder != null) mUnbinder.unbind();
+        super.onDetach();
     }
 
     public void notifyUpFabPressed() {

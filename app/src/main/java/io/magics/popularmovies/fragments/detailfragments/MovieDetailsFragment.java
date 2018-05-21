@@ -20,21 +20,15 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.transition.TransitionInflater;
 import android.transition.TransitionSet;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 
-import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
 import java.util.List;
@@ -51,11 +45,12 @@ import static io.magics.popularmovies.utils.MovieUtils.getOptimalImgSize;
 import static io.magics.popularmovies.utils.MovieUtils.posterUrlConverter;
 
 
+@SuppressWarnings("ConstantConditions")
 public class MovieDetailsFragment extends Fragment {
 
-    public static final String ARG_MOVIE = "movie";
-    public static final String ARG_IS_FAVOURITE = "isFavourite";
-    public static final String ARG_TRANSITION_NAME = "transitionName";
+    private static final String ARG_MOVIE = "movie";
+    private static final String ARG_IS_FAVOURITE = "isFavourite";
+    private static final String ARG_TRANSITION_NAME = "transitionName";
 
     private Movie mMovie;
     private boolean mIsFavourite;
@@ -96,13 +91,12 @@ public class MovieDetailsFragment extends Fragment {
 
     private Unbinder mUnbinder;
     private DetailFragInteractionHandler mFragInteractionHandler;
-    private View.OnClickListener mArrowHintClickListener;
 
     private MovieDetailsPagerAdapter mPagerAdapter;
     private AnimatedVectorDrawableCompat mAnimatedFabDrawable;
 
-    int mDefColor;
-    int mFavColor;
+    private int mDefColor;
+    private int mFavColor;
 
     public MovieDetailsFragment() {
         // Required empty public constructor
@@ -156,7 +150,6 @@ public class MovieDetailsFragment extends Fragment {
     }
 
 
-    @SuppressWarnings("ConstantConditions")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -167,15 +160,19 @@ public class MovieDetailsFragment extends Fragment {
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
-                if (position == 0){
-                    mGoLeftHint.setVisibility(View.INVISIBLE);
-                    mGoRightHint.setVisibility(View.VISIBLE);
-                } else if (position == 3) {
-                    mGoLeftHint.setVisibility(View.VISIBLE);
-                    mGoRightHint.setVisibility(View.INVISIBLE);
-                } else {
-                    mGoLeftHint.setVisibility(View.VISIBLE);
-                    mGoRightHint.setVisibility(View.VISIBLE);
+                switch (position) {
+                    case 0:
+                        mGoLeftHint.setVisibility(View.INVISIBLE);
+                        mGoRightHint.setVisibility(View.VISIBLE);
+                        break;
+                    case 3:
+                        mGoLeftHint.setVisibility(View.VISIBLE);
+                        mGoRightHint.setVisibility(View.INVISIBLE);
+                        break;
+                    default:
+                        mGoLeftHint.setVisibility(View.VISIBLE);
+                        mGoRightHint.setVisibility(View.VISIBLE);
+                        break;
                 }
             }
         });
@@ -246,7 +243,6 @@ public class MovieDetailsFragment extends Fragment {
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
     private void fabAnim() {
 
         mAnimatedFabDrawable = AnimatedVectorDrawableCompat.create(getContext(), mIsFavourite ?

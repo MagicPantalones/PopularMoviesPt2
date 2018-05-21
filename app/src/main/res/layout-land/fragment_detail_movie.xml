@@ -49,14 +49,15 @@
                 app:cardElevation="2dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="InconsistentLayout">
 
                 <ImageView
                     android:id="@+id/details_poster_horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="fitXY"
-                    tools:ignore="ContentDescription"
+                    tools:ignore="ContentDescription,InconsistentLayout"
                     tools:src="@drawable/minions_poster_placehodler" />
             </android.support.v7.widget.CardView>
 

@@ -5,10 +5,7 @@
     <string name="release_calendar_a11y" translatable="true">Release date</string>
     <string name="vote_heart_icon_a11y" translatable="true">Average Votes</string>
 
-    <string name="nav_poster_title" translatable="true">Poster</string>
     <string name="nav_overview_title" translatable="true">Overview</string>
-    <string name="nav_trailers_title" translatable="true">Trailers</string>
-    <string name="nav_reviews_title" translatable="true">Reviews</string>
 
     <string name="list_no_network_available" translatable="true">No Network Available!</string>
     <string name="details_no_trailers" translatable="true">No Trailers Available!</string>

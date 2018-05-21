@@ -16,7 +16,7 @@ public class TopListViewModel extends ViewModel {
         void getTopPages();
     }
 
-    public MutableLiveData<List<Movie>> mTopList = new MutableLiveData<>();
+    public final MutableLiveData<List<Movie>> mTopList = new MutableLiveData<>();
     private GetMoreTopPagesListener mNotifyListener;
 
     private int mLastPage = 1;

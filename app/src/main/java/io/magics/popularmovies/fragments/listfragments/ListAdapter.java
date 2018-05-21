@@ -3,7 +3,6 @@ package io.magics.popularmovies.fragments.listfragments;
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
@@ -224,10 +223,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         ProgressBar mPbVoteBar;
         @BindView(R.id.tv_list_vote)
         TextView mTvVote;
-        GradientDrawable mGradientDrawable;
+        final GradientDrawable mGradientDrawable;
 
 
-        public PosterViewHolder(View itemView) {
+        PosterViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
