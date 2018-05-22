@@ -54,7 +54,7 @@ public class MovieDetailsFragment extends Fragment {
 
     private Movie mMovie;
     private boolean mIsFavourite;
-    private String mTransitionName;
+    private int mTransitionName;
 
     @BindView(R.id.wrapper_details_main_card)
     CardView mMainCardWrapper;
@@ -103,12 +103,12 @@ public class MovieDetailsFragment extends Fragment {
     }
 
     public static MovieDetailsFragment newInstance(Movie movie, boolean isFavourite,
-                                                   String transitionName) {
+                                                   int transitionName) {
         MovieDetailsFragment fragment = new MovieDetailsFragment();
         Bundle args = new Bundle();
         args.putParcelable(ARG_MOVIE, movie);
         args.putBoolean(ARG_IS_FAVOURITE, isFavourite);
-        args.putString(ARG_TRANSITION_NAME, transitionName);
+        args.putInt(ARG_TRANSITION_NAME, transitionName);
         fragment.setArguments(args);
         return fragment;
     }
@@ -120,7 +120,7 @@ public class MovieDetailsFragment extends Fragment {
         if (getArguments() != null) {
             mMovie = getArguments().getParcelable(ARG_MOVIE);
             mIsFavourite = getArguments().getBoolean(ARG_IS_FAVOURITE);
-            mTransitionName = getArguments().getString(ARG_TRANSITION_NAME);
+            mTransitionName = getArguments().getInt(ARG_TRANSITION_NAME);
         }
 
     }
@@ -251,6 +251,8 @@ public class MovieDetailsFragment extends Fragment {
             mNestedViewPager.setCurrentItem(0, false);
         }
     }
+
+    public int getParentListType(){ return mTransitionName; }
 
     /**
      * Based on the value in {@link #mIsFavourite} sets the correct AnimatedVectorDrawable.

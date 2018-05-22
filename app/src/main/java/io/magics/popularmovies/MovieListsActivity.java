@@ -7,7 +7,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.transition.TransitionSet;
 import android.view.View;
 
 import butterknife.BindView;
@@ -30,10 +29,8 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
         MovieDetailsFragment.DetailFragInteractionHandler, ListTabLayout.TabLayoutPageEvents,
         ListAdapter.ListItemEventHandler {
 
-    //TODO Inspect for memoryleaks/Remove LeakCanary
-
     private static final String FRAG_PAGER_TAG = "pagerTag";
-    private static final String DETAIL_FRAGMENT_TAG = "detailFrag";
+    public static final String DETAIL_FRAGMENT_TAG = "detailFrag";
 
     private static int selectedPosition;
 
@@ -158,7 +155,7 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
 
     @SuppressWarnings("ConstantConditions")
     @Override
-    public void onClick(View holder, Movie movie, String transitionIdentifier, int selectedPos) {
+    public void onClick(View holder, Movie movie, int transitionIdentifier, int selectedPos) {
         mDataProvider.setMovieAndFetch(movie);
 
         setSelectedPosition(selectedPos);

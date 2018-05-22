@@ -22,6 +22,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import io.magics.popularmovies.MovieListsActivity;
 import io.magics.popularmovies.R;
+import io.magics.popularmovies.fragments.detailfragments.MovieDetailsFragment;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.utils.MovieUtils.ScrollDirection;
 import io.magics.popularmovies.viewmodels.FavListViewModel;
@@ -30,6 +31,7 @@ import io.magics.popularmovies.viewmodels.TopListViewModel;
 
 import static io.magics.popularmovies.utils.MovieUtils.toggleViewVisibility;
 
+@SuppressWarnings("ConstantConditions")
 public class ListFragment extends Fragment {
 
     public static final int TOP_FRAGMENT = 0;
@@ -79,7 +81,7 @@ public class ListFragment extends Fragment {
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -120,7 +122,7 @@ public class ListFragment extends Fragment {
         return root;
     }
 
-    @SuppressWarnings("ConstantConditions")
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -227,6 +229,11 @@ public class ListFragment extends Fragment {
                 mRecyclerView.removeOnLayoutChangeListener(this);
                 if (mOldRight != -1 || mOldRight == right) return;
 
+                final MovieDetailsFragment shownFrag = (MovieDetailsFragment) getActivity()
+                        .getSupportFragmentManager()
+                        .findFragmentByTag(MovieListsActivity.DETAIL_FRAGMENT_TAG);
+
+                if (shownFrag == null || shownFrag.getParentListType() != mFragType) return;
                 final RecyclerView.LayoutManager manager = mRecyclerView.getLayoutManager();
                 View viewAtPos = manager.findViewByPosition(MovieListsActivity.getSelectedPosition());
 

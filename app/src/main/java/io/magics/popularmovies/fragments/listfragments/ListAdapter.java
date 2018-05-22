@@ -58,10 +58,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
 
     private AtomicBoolean mTransitionStarted;
 
-    private String mListType;
+    private int mListType;
 
     public interface ListItemEventHandler {
-        void onClick(View holder, Movie movie, String transitionIdentifier, int selectedPosition);
+        void onClick(View holder, Movie movie, int transitionIdentifier, int selectedPosition);
         void onImageLoaded(int adapterPosition);
     }
 
@@ -72,7 +72,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
 
     ListAdapter(ListItemEventHandler listItemEventHandler) {
         this.mClickHandler = listItemEventHandler;
-        mListType = "favourites";
+        mListType = ListFragment.FAV_FRAGMENT;
     }
 
     ListAdapter(ListItemEventHandler listItemEventHandler, ViewModel viewModel, int listType) {
@@ -93,8 +93,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         };
 
         //Uses the list type to provide an extra identifier for the SharedElement's transition name.
-        if (listType == ListFragment.TOP_FRAGMENT) mListType = "topRated";
-        else if (listType == ListFragment.POP_FRAGMENT) mListType = "popular";
+        mListType = listType;
     }
 
     @NonNull
