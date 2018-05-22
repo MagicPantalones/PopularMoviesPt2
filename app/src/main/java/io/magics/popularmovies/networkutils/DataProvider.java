@@ -28,6 +28,32 @@ import static io.magics.popularmovies.utils.MovieUtils.createMovieFromCursor;
 import static io.magics.popularmovies.utils.MovieUtils.getClientForMovieList;
 import static io.magics.popularmovies.utils.MovieUtils.makeContentVals;
 
+/**
+ * <p>This data class does all calls, except for downloading movie posters (Glide does that), for data
+ * from TheMovieDataBase API.</p>
+ *
+ * <p>I decided of going for a seperate class to handle all of the networking and async tasks, like
+ * reading and writing to the database. And doing all calls and SQLite fetching using RxJava
+ * together with a Retrofit & OkHttp3 client.</p>
+ *
+ * <p>{@link #initialiseApp()} Does all the initial calls, as well as registering this instance as
+ * {@link #getTopPages()} & {@link #getPopPages()} listeners. These listeners just gets the next
+ * API page if available. <br> The movie lists that are returned from TMDB is usually to long to reach
+ * the end manually, but I still made the check as a routine</p>
+ *
+ * <p>The {@link #setMovieAndFetch(Movie)} method is called only when a movie is selected in the list
+ * and will do a call for the movie details from TMDB.</p>
+ *
+ * <p>Since reading and writing to the SQLite DB needs a Context, an activity context,
+ * {@link #mContext}, is passed in the constructor. The context gets cleared, together with
+ * disposing any active RxJava Observers, in {@link #dispose()}. <br>
+ * I have not found any memory leaks yet with LeakCanary, and I have not noticed any yet either.
+ * </p>
+ *
+ * <p>NOTE! {@link #TMDB_API_KEY} is set from the BuildConfig file. Create a variable called
+ * {@code TheMovieDbApiKey}, in the {@code gradle.properties} file, and assign your API key to it.</p>
+ *
+ */
 public class DataProvider
         implements TopListViewModel.GetMoreTopPagesListener, PopListViewModel.GetMorePopPagesListener{
 
@@ -210,7 +236,12 @@ public class DataProvider
                     mTrailerVm.setTrailers(new ArrayList<>());
                 });
     }
-
+    /*
+    As the API rarely returns more than one page of reviews. The class only calls for a second
+    page if there are more than 1.
+    Will make a similar listener for the reviews if the API gets more popular and the movies gets
+    more reviews.
+    */
     private Disposable getMoreReviewPages(){
         return getClientForMovieList().create(TMDBApi.class)
                 .getMoreReviews(mDetailMovie.getMovieId(), TMDB_API_KEY, LOCALE, 2)

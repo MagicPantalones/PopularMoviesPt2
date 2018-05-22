@@ -79,7 +79,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         this.mClickHandler = listItemEventHandler;
 
         /*
-        Calls a listener in the provided ViewModel, that will call another listener in
+        Calls a method in the provided ViewModel, that will call a listener for
         MovieListsActivity#mDataProvider to fetch another page from the API,
         when a ViewHolder's position is almost at the end.
          */
@@ -129,7 +129,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
 
         int padding = v.findViewById(R.id.parent_wrapper_list).getPaddingStart() * 4;
 
-        int aspectRatioMultiplier = v.getMeasuredWidth() - padding / 2;
+        int aspectRatioMultiplier = (v.getMeasuredWidth() - padding) / 2;
         mPosterHeight = aspectRatioMultiplier * 3;
         mPosterWidth = aspectRatioMultiplier * 2;
 

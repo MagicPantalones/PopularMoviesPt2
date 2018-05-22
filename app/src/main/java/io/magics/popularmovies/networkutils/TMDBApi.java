@@ -9,6 +9,11 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
+/**
+ * An interface needed for the Retrofit client and RxJava
+ * @see DataProvider
+ * @see io.magics.popularmovies.utils.MovieUtils
+ */
 interface TMDBApi {
 
     @GET("movie/{sortingMethod}")

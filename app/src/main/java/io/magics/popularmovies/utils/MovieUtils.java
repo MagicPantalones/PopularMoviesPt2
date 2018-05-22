@@ -30,10 +30,15 @@ import static io.magics.popularmovies.utils.MovieUtils.ImageSize.SIZE_MEDIUM;
 
 
 /**
- * Helper Utils for project
- * Created by Erik on 17.02.2018.
+ * <h6>Utility class for project.</h6>
+ * <p>Some methods and enums that was used in multiple classes</p>
+ *
+ * <p>However, some method thats only used once like {@link #createMovieFromCursor(Cursor, int)}, or
+ * {@link #getClientForMovieList()}, which are only used in the
+ * {@link io.magics.popularmovies.networkutils.DataProvider} class, is kept here as the methods
+ * could be static and it made the class less cluttered.</p>
+ *
  */
-
 public class MovieUtils {
 
     private static final String TAG = MovieUtils.class.getSimpleName();
@@ -59,6 +64,7 @@ public class MovieUtils {
             v.setVisibility(v.getVisibility() == View.VISIBLE ? View.INVISIBLE : View.VISIBLE);
         }
     }
+
 
     public static Movie createMovieFromCursor(Cursor cursor, int position){
         Movie retMovie = new Movie();

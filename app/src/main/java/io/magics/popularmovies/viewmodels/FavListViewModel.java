@@ -16,6 +16,8 @@ public class FavListViewModel extends ViewModel {
 
     public void setFavList(List<Movie> favList) {
 
+        //The ID's from the Movies to be assigned to the LiveData List.
+        //This is to avoid calling the value of the LiveData to only check an ID.
         for (Movie m : favList) {
             mMoviesId.add(m.getMovieId());
         }
@@ -43,6 +45,11 @@ public class FavListViewModel extends ViewModel {
         mFavList.setValue(mL);
     }
 
+    /**
+     * Will compare the provided ID with an ID in {@link #mMoviesId}
+     * @param movieId the provided Movie ID
+     * @return true if the movie is in the list or false otherwise.
+     */
     public boolean checkIfFavourite(int movieId){
         for (int i : mMoviesId){
             if (movieId == i) return true;
