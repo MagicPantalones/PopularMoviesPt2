@@ -18,12 +18,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 
-import io.magics.popularmovies.database.FavouritesDBHelper.FavouritesEntry;
+import io.magics.popularmovies.database.PopularMoviesDBHelper.MovieEntries;
 import io.magics.popularmovies.models.Movie;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import ru.noties.markwon.renderer.html.ImageSize;
 
 import static io.magics.popularmovies.utils.MovieUtils.ImageSize.SIZE_DEFAULT;
 import static io.magics.popularmovies.utils.MovieUtils.ImageSize.SIZE_MEDIUM;
@@ -83,8 +84,7 @@ public class MovieUtils {
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean checkForDuplicateList(List<Movie> currentMovies, List<Movie> fetchedList){
-        return !fetchedList.isEmpty() && !currentMovies.isEmpty() &&
-                currentMovies.get(currentMovies.size() - 20).getMovieId()
+        return !currentMovies.isEmpty() && fetchedList.isEmpty() && currentMovies.get(currentMovies.size() - 20).getMovieId()
                 .equals(fetchedList.get(0).getMovieId());
     }
 
@@ -161,13 +161,13 @@ public class MovieUtils {
     public static ContentValues makeContentVals(Movie movie){
         ContentValues cv = new ContentValues();
 
-        cv.put(FavouritesEntry.COLUMN_POSTER_PATH, movie.getPosterUrl());
-        cv.put(FavouritesEntry.COLUMN_OVERVIEW, movie.getOverview());
-        cv.put(FavouritesEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
-        cv.put(FavouritesEntry.COLUMN_MOVIE_ID, movie.getMovieId());
-        cv.put(FavouritesEntry.COLUMN_TITLE, movie.getTitle());
-        cv.put(FavouritesEntry.COLUMN_VOTE_AVERAGE, movie.getVoteAverage());
-        cv.put(FavouritesEntry.COLUMN_COLOR_PATH, Integer.toString(movie.getShadowInt()));
+        cv.put(MovieEntries.COLUMN_POSTER_PATH, movie.getPosterUrl());
+        cv.put(MovieEntries.COLUMN_OVERVIEW, movie.getOverview());
+        cv.put(MovieEntries.COLUMN_RELEASE_DATE, movie.getReleaseDate());
+        cv.put(MovieEntries.COLUMN_MOVIE_ID, movie.getMovieId());
+        cv.put(MovieEntries.COLUMN_TITLE, movie.getTitle());
+        cv.put(MovieEntries.COLUMN_VOTE_AVERAGE, movie.getVoteAverage());
+        cv.put(MovieEntries.COLUMN_COLOR_PATH, Integer.toString(movie.getShadowInt()));
 
         return cv;
     }

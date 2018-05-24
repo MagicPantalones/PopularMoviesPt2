@@ -29,6 +29,8 @@ import io.magics.popularmovies.fragments.MovieListsPagerAdapter;
 
 public class ListTabLayout extends Fragment {
 
+    private static final String KEY_SELECTED_TAB = "selectedTab";
+
     @BindView(R.id.view_pager)
     ViewPager mViewPager;
     @BindView(R.id.sliding_tabs)
@@ -82,6 +84,11 @@ public class ListTabLayout extends Fragment {
 
         mTabLayout.setupWithViewPager(mViewPager);
 
+        if (savedInstanceState != null) {
+            mViewPager.setCurrentItem(savedInstanceState.getInt(KEY_SELECTED_TAB),
+                    false);
+        }
+
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -97,6 +104,12 @@ public class ListTabLayout extends Fragment {
     public void onDetach() {
         if (mUnbinder != null) mUnbinder.unbind();
         super.onDetach();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(KEY_SELECTED_TAB, mTabLayout.getSelectedTabPosition());
     }
 
     public void notifyUpFabPressed() {

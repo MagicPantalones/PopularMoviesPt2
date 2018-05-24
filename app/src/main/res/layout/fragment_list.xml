@@ -1,32 +1,37 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/list_wrapper"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/list_wrapper"
     android:layout_centerHorizontal="true"
     tools:context="io.magics.popularmovies.fragments.listfragments.ListFragment">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_list"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        tools:listitem="@layout/fragment_list_view_holder"
-        android:visibility="visible"
-        app:layoutManager="android.support.v7.widget.GridLayoutManager"
-        app:spanCount="2"
-        />
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:visibility="visible"
+            app:layoutManager="android.support.v7.widget.GridLayoutManager"
+            app:spanCount="2"
+            tools:listitem="@layout/fragment_list_view_holder" />
+    </android.support.v4.widget.SwipeRefreshLayout>
+
     <TextView
         android:id="@+id/tv_list_error"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/list_no_network_available"
-        android:textSize="48sp"
-        android:rotation="-45"
         android:fontFamily="@font/asap_medium"
         android:gravity="center"
-        android:visibility="gone"
-        />
+        android:rotation="-45"
+        android:text="@string/list_no_network_available"
+        android:textSize="48sp"
+        android:visibility="gone" />
 </FrameLayout>

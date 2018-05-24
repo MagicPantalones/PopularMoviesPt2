@@ -9,6 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -16,6 +19,7 @@ import io.magics.popularmovies.fragments.detailfragments.MovieDetailsFragment;
 import io.magics.popularmovies.fragments.listfragments.ListAdapter;
 import io.magics.popularmovies.fragments.listfragments.ListFragment;
 import io.magics.popularmovies.fragments.listfragments.ListTabLayout;
+import io.magics.popularmovies.models.ApiResult;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.networkutils.DataProvider;
 import io.magics.popularmovies.utils.MovieUtils.ScrollDirection;
@@ -32,6 +36,8 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
     private static final String FRAG_PAGER_TAG = "pagerTag";
     public static final String DETAIL_FRAGMENT_TAG = "detailFrag";
 
+    private static final String KEY_VM_STATE = "vmState";
+
     private static int selectedPosition;
 
     @BindView(R.id.up_fab)
@@ -39,6 +45,8 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
 
     private DataProvider mDataProvider;
 
+    private TopListViewModel mTopListVm;
+    private PopListViewModel mPopListVm;
     private FavListViewModel mFavListVM;
 
     private Unbinder mUnbinder;
@@ -56,19 +64,34 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_lists);
+
         mUnbinder = ButterKnife.bind(this);
 
-        TopListViewModel topListVM = ViewModelProviders.of(this).get(TopListViewModel.class);
-        PopListViewModel popListVM = ViewModelProviders.of(this).get(PopListViewModel.class);
+        mTopListVm = ViewModelProviders.of(this).get(TopListViewModel.class);
+        mPopListVm = ViewModelProviders.of(this).get(PopListViewModel.class);
         mFavListVM = ViewModelProviders.of(this).get(FavListViewModel.class);
 
         TrailersViewModel trailerVm = ViewModelProviders.of(this).get(TrailersViewModel.class);
         ReviewsViewModel reviewVm = ViewModelProviders.of(this).get(ReviewsViewModel.class);
 
-        mDataProvider = new DataProvider(this, topListVM, popListVM, mFavListVM,
-                trailerVm, reviewVm);
-
         mAppFragManager = getSupportFragmentManager();
+
+        if (savedInstanceState == null) {
+            //A ViewHolder has not been selected yet so it sets the position to 0.
+            mDataProvider = new DataProvider(this, mTopListVm, mPopListVm, mFavListVM,
+                    trailerVm, reviewVm);
+            setSelectedPosition(0);
+            mAppFragManager.beginTransaction()
+                    .replace(android.R.id.content, ListTabLayout.newInstance(), FRAG_PAGER_TAG)
+                    .commit();
+
+        } else {
+            List<ApiResult> state = savedInstanceState.getParcelableArrayList(KEY_VM_STATE);
+            if (state != null) {
+                mDataProvider = new DataProvider(this, mTopListVm, mPopListVm, mFavListVM,
+                        trailerVm, reviewVm, state);
+            }
+        }
 
         mDataProvider.initialiseApp();
 
@@ -77,16 +100,6 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
                     .findFragmentByTag(FRAG_PAGER_TAG);
             if (tabFrag != null) tabFrag.notifyUpFabPressed();
         });
-
-
-        if (savedInstanceState == null) {
-            //A ViewHolder has not been selected yet so it sets the position to 0.
-            setSelectedPosition(0);
-            mAppFragManager.beginTransaction()
-                    .replace(android.R.id.content, ListTabLayout.newInstance(), FRAG_PAGER_TAG)
-                    .commit();
-
-        }
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             mUpFab.setRotation(-90);
@@ -107,6 +120,15 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
         if (mDataProvider != null) mDataProvider.dispose();
         if (mUnbinder != null) mUnbinder.unbind();
         super.onDestroy();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        List<ApiResult> apiResults = new ArrayList<>();
+        apiResults.add(mTopListVm.getPageStates());
+        apiResults.add(mPopListVm.getPageStates());
+        outState.putParcelableArrayList(KEY_VM_STATE, (ArrayList<ApiResult>) apiResults);
     }
 
     //Solution to fragment backPressed listener by Hw.Master
@@ -137,6 +159,11 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
                 mUpFab.getVisibility() == View.VISIBLE) mUpFab.hide();
         else if (scrollDirection == ScrollDirection.SCROLL_UP &&
                 mUpFab.getVisibility() != View.VISIBLE) mUpFab.show();
+    }
+
+    @Override
+    public void onRefreshRequest(int listType) {
+        mDataProvider.refreshList(listType);
     }
 
     @Override

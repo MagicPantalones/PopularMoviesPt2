@@ -25,6 +25,11 @@ public class FavListViewModel extends ViewModel {
         mFavList.setValue(favList);
     }
 
+    public void clearPages(){
+        mFavList.setValue(new ArrayList<>());
+        mMoviesId.clear();
+    }
+
     public void addToList(Movie movie){
         List<Movie> mL = mFavList.getValue() != null ? mFavList.getValue() : new ArrayList<>();
         mL.add(movie);

@@ -33,6 +33,22 @@ public class TopListViewModel extends ViewModel {
         mIsLastPageLoaded = mCurrentPage + 1 > mLastPage;
     }
 
+    public void clearPages(){
+        mLastPage = 1;
+        mIsLastPageSet = false;
+        mCurrentPage = 1;
+        mIsLastPageLoaded = false;
+        mTopList.setValue(new ArrayList<>());
+    }
+
+    public ApiResult getPageStates(){
+        ApiResult states = new ApiResult();
+        states.setPage(mCurrentPage);
+        states.setTotalPages(mLastPage);
+        states.setMovies(new ArrayList<>());
+        return states;
+    }
+
     public int getCurrentPage(){ return mCurrentPage; }
 
     public boolean isLastPageLoaded(){ return mIsLastPageLoaded; }

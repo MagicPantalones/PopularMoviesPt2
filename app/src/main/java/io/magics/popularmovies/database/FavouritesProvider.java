@@ -10,29 +10,27 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import io.magics.popularmovies.database.FavouritesDBHelper.FavouritesEntry;
-
 @SuppressWarnings("ConstantConditions")
 public class FavouritesProvider extends ContentProvider {
 
     private static final int FAVOURITE_ID = 100;
     private static final int FAVOURITE_DIR = 101;
 
-    private  FavouritesDBHelper mDbHelper;
+    private PopularMoviesDBHelper mDbHelper;
     private static final UriMatcher sUriMatcher = buildUriMatcher();
 
     private static UriMatcher buildUriMatcher(){
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
-        final String auth = FavouritesDBHelper.AUTHORITY;
-        matcher.addURI(auth, FavouritesDBHelper.PATH_FAVOURITES + "/#", FAVOURITE_ID);
-        matcher.addURI(auth, FavouritesDBHelper.PATH_FAVOURITES, FAVOURITE_DIR);
+        final String auth = PopularMoviesDBHelper.AUTHORITY;
+        matcher.addURI(auth, PopularMoviesDBHelper.PATH_FAVOURITES + "/#", FAVOURITE_ID);
+        matcher.addURI(auth, PopularMoviesDBHelper.PATH_FAVOURITES, FAVOURITE_DIR);
         return matcher;
     }
 
 
     @Override
     public boolean onCreate() {
-        mDbHelper = new FavouritesDBHelper(getContext());
+        mDbHelper = new PopularMoviesDBHelper(getContext());
         return true;
     }
 
@@ -43,7 +41,7 @@ public class FavouritesProvider extends ContentProvider {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         switch (sUriMatcher.match(uri)){
             case FAVOURITE_ID:
-                cursor = db.query(FavouritesEntry.TABLE_NAME_FAVOURITES,
+                cursor = db.query(PopularMoviesDBHelper.MovieEntries.TABLE_FAVOURITES,
                         projection,
                         selection,
                         selectionArgs,
@@ -52,7 +50,7 @@ public class FavouritesProvider extends ContentProvider {
                         sortOrder);
                 break;
             case FAVOURITE_DIR:
-                cursor = db.query(FavouritesEntry.TABLE_NAME_FAVOURITES,
+                cursor = db.query(PopularMoviesDBHelper.MovieEntries.TABLE_FAVOURITES,
                         projection,
                         selection,
                         selectionArgs,
@@ -80,7 +78,7 @@ public class FavouritesProvider extends ContentProvider {
         Long id;
 
         if (sUriMatcher.match(uri) == FAVOURITE_DIR) {
-            id = mDbHelper.getWritableDatabase().insert(FavouritesEntry.TABLE_NAME_FAVOURITES, null, values);
+            id = mDbHelper.getWritableDatabase().insert(PopularMoviesDBHelper.MovieEntries.TABLE_FAVOURITES, null, values);
 
         } else {
             throw new UnsupportedOperationException("Unknown URI " + uri);
@@ -100,13 +98,13 @@ public class FavouritesProvider extends ContentProvider {
         switch (sUriMatcher.match(uri)){
             case FAVOURITE_ID:
                 del = mDbHelper.getWritableDatabase().delete(
-                        FavouritesEntry.TABLE_NAME_FAVOURITES,
+                        PopularMoviesDBHelper.MovieEntries.TABLE_FAVOURITES,
                         selection,
                         selectionArgs);
                 break;
             case FAVOURITE_DIR:
                 del = mDbHelper.getWritableDatabase().delete(
-                        FavouritesEntry.TABLE_NAME_FAVOURITES,
+                        PopularMoviesDBHelper.MovieEntries.TABLE_FAVOURITES,
                         selection,
                         selectionArgs
                 );

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -41,6 +42,7 @@ public class ListFragment extends Fragment {
     private static final String ARG_FRAGMENT_TYPE = "mFragType";
 
     private static final String KEY_OLD_RIGHT = "oldRight";
+    private static final String KEY_RECYCLER_STATE = "recyclerState";
 
     private int mFragType;
 
@@ -48,6 +50,9 @@ public class ListFragment extends Fragment {
     RecyclerView mRecyclerView;
     @BindView(R.id.tv_list_error)
     TextView mTvError;
+
+    @Nullable @BindView(R.id.swipe_refresh_list)
+    SwipeRefreshLayout mSwipeRefresher;
 
     private Unbinder mUnbinder;
 
@@ -127,6 +132,11 @@ public class ListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        if (savedInstanceState != null) {
+            GridLayoutManager manager = (GridLayoutManager) mRecyclerView.getLayoutManager();
+            manager.onRestoreInstanceState(savedInstanceState.getParcelable(KEY_RECYCLER_STATE));
+        }
+
         //See #correctScroll
         correctScroll();
 
@@ -138,6 +148,10 @@ public class ListFragment extends Fragment {
             GridLayoutManager manager = (GridLayoutManager) mRecyclerView.getLayoutManager();
             manager.setSpanCount(1);
             manager.setOrientation(GridLayoutManager.HORIZONTAL);
+        } else {
+            mSwipeRefresher.setOnRefreshListener(() -> mListener.onRefreshRequest(mFragType));
+            mSwipeRefresher.setColorSchemeResources(R.color.textColorPrimary,
+                    R.color.colorSecondaryAccent);
         }
 
         /*To get the wanted behaviour of the up navigation FAB. It communicates when the
@@ -154,10 +168,7 @@ public class ListFragment extends Fragment {
 
         /* Chose to use LiveData instead of RxJava in my ViewModels.
            LiveData had a lot more documentation for use in ViewModel classes */
-        Observer<List<Movie>> movieObserver = movies -> {
-            if (movies == null || movies.isEmpty()) toggleViewVisibility(mRecyclerView, mTvError);
-            else mAdapter.setMovieData(movies);
-        };
+        Observer<List<Movie>> movieObserver = getMovieListObserver();
 
         switch (mFragType) {
             case 0:
@@ -180,7 +191,9 @@ public class ListFragment extends Fragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         //Saves the right coordinates of the layout.
+        RecyclerView.LayoutManager manager = mRecyclerView.getLayoutManager();
         outState.putInt(KEY_OLD_RIGHT, mOldRight);
+        outState.putParcelable(KEY_RECYCLER_STATE, manager.onSaveInstanceState());
     }
 
     @Override
@@ -197,6 +210,23 @@ public class ListFragment extends Fragment {
         //Don't know if I have to null check the Unbinder, but better safe than sorry.
         if (mUnbinder != null) mUnbinder.unbind();
         mListener = null;
+    }
+
+    private Observer<List<Movie>> getMovieListObserver() {
+        return movies -> {
+            if (movies == null || movies.isEmpty()) {
+                if (mSwipeRefresher != null && mSwipeRefresher.isRefreshing()) return;
+                toggleViewVisibility(mRecyclerView, mTvError);
+            } else {
+                if (mSwipeRefresher != null && mSwipeRefresher.isRefreshing()) {
+                    mSwipeRefresher.setRefreshing(false);
+                }
+                if (mRecyclerView.getVisibility() == View.INVISIBLE) {
+                    toggleViewVisibility(mRecyclerView, mTvError);
+                }
+                mAdapter.setMovieData(movies);
+            }
+        };
     }
 
     public void scrollRecyclerViewToTop() {
@@ -253,6 +283,7 @@ public class ListFragment extends Fragment {
 
     public interface FragmentListener {
         void onRecyclerViewScrolled(ScrollDirection scrollDirection);
+        void onRefreshRequest(int listType);
     }
 
 }

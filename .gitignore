@@ -37,3 +37,4 @@ captures/
 /.idea/codeStyles/Project.xml
 /.idea/caches/build_file_checksums.ser
 /app/lint.xml
+/.idea/dbnavigator.xml
