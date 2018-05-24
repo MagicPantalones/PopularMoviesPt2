@@ -83,7 +83,8 @@ public class MovieUtils {
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean checkForDuplicateList(List<Movie> currentMovies, List<Movie> fetchedList){
-        return !currentMovies.isEmpty() && currentMovies.get(currentMovies.size() - 20).getMovieId()
+        return !fetchedList.isEmpty() && !currentMovies.isEmpty() &&
+                currentMovies.get(currentMovies.size() - 20).getMovieId()
                 .equals(fetchedList.get(0).getMovieId());
     }
 
