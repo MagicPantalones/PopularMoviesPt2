@@ -12,7 +12,6 @@ import java.util.List;
 import io.magics.popularmovies.BuildConfig;
 import io.magics.popularmovies.database.PopularMoviesDBHelper;
 import io.magics.popularmovies.database.PopularMoviesDBHelper.MovieEntries;
-import io.magics.popularmovies.models.ApiResult;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.models.ReviewResult;
 import io.magics.popularmovies.models.Reviews;
@@ -31,6 +30,7 @@ import io.reactivex.schedulers.Schedulers;
 import static io.magics.popularmovies.utils.MovieUtils.createMovieFromCursor;
 import static io.magics.popularmovies.utils.MovieUtils.getClientForMovieList;
 import static io.magics.popularmovies.utils.MovieUtils.makeContentVals;
+import static io.magics.popularmovies.utils.MovieUtils.setMoviePageNumbers;
 
 /**
  * <p>This data class does all calls, except for downloading movie posters (Glide does that), for data
@@ -70,7 +70,8 @@ public class DataProvider
             MovieEntries.COLUMN_MOVIE_ID,
             MovieEntries.COLUMN_TITLE,
             MovieEntries.COLUMN_VOTE_AVERAGE,
-            MovieEntries.COLUMN_COLOR_PATH
+            MovieEntries.COLUMN_COLOR_PATH,
+            MovieEntries.COLUMN_PAGE_NUMBER
     };
 
 
@@ -114,21 +115,6 @@ public class DataProvider
         this.mTrailerVm = trailerVm;
         this.mReviewVm = reviewVm;
         this.mDbHelper = new PopularMoviesDBHelper(context);
-    }
-
-    public DataProvider(Context context, TopListViewModel topVm, PopListViewModel popVm,
-                        FavListViewModel favVm, TrailersViewModel trailerVm,
-                        ReviewsViewModel reviewVm, List<ApiResult> vmState){
-        this.mContext = context;
-        this.mTopVm = topVm;
-        this.mPopVm = popVm;
-        this.mFavVm = favVm;
-        this.mTrailerVm = trailerVm;
-        this.mReviewVm = reviewVm;
-        this.mDbHelper = new PopularMoviesDBHelper(context);
-
-        mTopVm.setPages(vmState.get(0));
-        mPopVm.setPages(vmState.get(1));
     }
 
     public void initialiseApp(){
@@ -176,12 +162,6 @@ public class DataProvider
         mTAndRDisposable = getTrailersAndReviews();
     }
 
-    public void debugDb(){
-        disposeAllDisposables();
-        mDbHelper.deleteAllFromTable(MovieEntries.TABLE_TOP_RATED);
-        mDbHelper.deleteAllFromTable(MovieEntries.TABLE_POPULAR);
-    }
-
     public void refreshList(int listType){
         switch (listType) {
             case 0:
@@ -197,7 +177,7 @@ public class DataProvider
                         mCachedPopQueryDisposable,
                         mDbInsertPopDisposable,
                         mDeletePopTableDisposable);
-                mTopVm.clearPages();
+                mPopVm.clearPages();
                 mDeletePopTableDisposable = deleteTableAndRefresh(MovieEntries.TABLE_POPULAR);
                 break;
             case 3:
@@ -228,11 +208,15 @@ public class DataProvider
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(callback -> {
-                    mDbInsertTopDisposable = batchInsertMovies(callback.getMovies(),
+                    List<Movie> movieList = setMoviePageNumbers(
+                            callback.getMovies(), callback.getPage());
+
+                    mDbInsertTopDisposable = batchInsertMovies(movieList,
                             MovieEntries.TABLE_TOP_RATED);
+
                     mTopVm.setPages(callback);
-                    mTopVm.setTopList(callback.getMovies());
-                }, throwable -> mTopVm.setTopList(new ArrayList<>()));
+                    mTopVm.setTopList(movieList, false);
+                }, throwable -> mTopVm.setTopList(new ArrayList<>(), false));
     }
 
     private Disposable getPopList(int pageNumber){
@@ -241,11 +225,16 @@ public class DataProvider
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(callback -> {
-                    mDbInsertPopDisposable = batchInsertMovies(callback.getMovies(),
+                    List<Movie> movieList = setMoviePageNumbers(
+                            callback.getMovies(), callback.getPage());
+
+                    mDbInsertPopDisposable = batchInsertMovies(movieList,
                             MovieEntries.TABLE_POPULAR);
+
                     mPopVm.setPages(callback);
-                    mPopVm.setPopList(callback.getMovies());
-                }, throwable -> mPopVm.setPopList(new ArrayList<>()));
+                    mPopVm.setPopList(movieList, false);
+
+                }, throwable -> mPopVm.setPopList(new ArrayList<>(), false));
     }
 
     private Disposable batchInsertMovies(List<Movie> movies, String tableName) {
@@ -280,16 +269,16 @@ public class DataProvider
                 .subscribe(movies -> {
                     if (!movies.isEmpty()){
                         if (tableName.equals(MovieEntries.TABLE_TOP_RATED)) {
-                            mTopVm.setTopList(movies);
+                            mTopVm.setTopList(movies, true);
                         } else {
-                            mPopVm.setPopList(movies);
+                            mPopVm.setPopList(movies, true);
                         }
                     } else {
                         throw new UndeliverableException(
                                 new Throwable("Movie List From DB empty: " + movies.size()));
                     }
                 }, throwable -> {
-                    Log.w(TAG, "Could not restore SavedInstanceState, getting page 1.",
+                    Log.w(TAG, "DB empty, getting page 1.",
                             throwable);
                     if (tableName.equals(MovieEntries.TABLE_TOP_RATED)) {
                         mTopVm.clearPages();

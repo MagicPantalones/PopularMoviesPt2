@@ -29,6 +29,7 @@ public class Movie implements Parcelable {
     private Double voteAverage;
 
     private int shadowInt = -1;
+    private int pageNumber = 1;
 
     public static final Parcelable.Creator<Movie> CREATOR = new Creator<Movie>() {
 
@@ -75,6 +76,9 @@ public class Movie implements Parcelable {
 
     public int getShadowInt() { return shadowInt; }
     public void setShadowInt(int shadowInt) { this.shadowInt = shadowInt; }
+
+    public int getPageNumber() { return pageNumber; }
+    public void setPageNumber(int pageNumber) { this.pageNumber = pageNumber; }
 
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(posterUrl);

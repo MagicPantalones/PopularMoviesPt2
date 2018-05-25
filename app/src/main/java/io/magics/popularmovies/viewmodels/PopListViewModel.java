@@ -8,7 +8,8 @@ import java.util.List;
 
 import io.magics.popularmovies.models.ApiResult;
 import io.magics.popularmovies.models.Movie;
-import io.magics.popularmovies.utils.MovieUtils;
+
+import static io.magics.popularmovies.utils.MovieUtils.getLiveDataList;
 
 public class PopListViewModel extends ViewModel {
 
@@ -30,8 +31,6 @@ public class PopListViewModel extends ViewModel {
             mLastPage = apiResult.getTotalPages();
             mIsLastPageSet = true;
         }
-        mCurrentPage = apiResult.getPage();
-        mIsLastPageLoaded = mCurrentPage + 1 > mLastPage;
     }
 
     public void clearPages(){
@@ -42,25 +41,20 @@ public class PopListViewModel extends ViewModel {
         mPopList.setValue(new ArrayList<>());
     }
 
-    public ApiResult getPageStates(){
-        ApiResult states = new ApiResult();
-        states.setPage(mCurrentPage);
-        states.setTotalPages(mLastPage);
-        states.setMovies(new ArrayList<>());
-        return states;
-    }
-
     public int getCurrentPage(){ return mCurrentPage; }
 
     public boolean isLastPageLoaded(){ return mIsLastPageLoaded; }
 
-    public void setPopList(List<Movie> movies){
-        List<Movie> tempMovies = mPopList.getValue() != null ? mPopList.getValue() : new ArrayList<>();
+    public void setPopList(List<Movie> movies, boolean fromDb){
+        List<Movie> tempMovies = mPopList.getValue() != null && !fromDb ?
+                mPopList.getValue() : new ArrayList<>();
 
-        if (!MovieUtils.checkForDuplicateList(tempMovies, movies)) {
-            tempMovies.addAll(movies);
-            mPopList.setValue(tempMovies);
-        }
+        tempMovies = getLiveDataList(tempMovies, movies);
+
+        mCurrentPage = tempMovies.get(tempMovies.size() - 1).getPageNumber();
+        mIsLastPageLoaded = mIsLastPageSet && mCurrentPage + 1 > mLastPage;
+
+        mPopList.setValue(tempMovies);
     }
 
     public void notifyGetMorePopPages(){

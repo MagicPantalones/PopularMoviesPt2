@@ -56,6 +56,7 @@ public class MovieUtils {
     private static final int TITLE_I = 5;
     private static final int VOTE_AV_I = 6;
     private static final int COLOR_I = 7;
+    private static final int PAGE_NUM_I = 8;
 
 
     private MovieUtils(){}
@@ -64,6 +65,13 @@ public class MovieUtils {
         for (View v : views){
             v.setVisibility(v.getVisibility() == View.VISIBLE ? View.INVISIBLE : View.VISIBLE);
         }
+    }
+
+    public static List<Movie> setMoviePageNumbers(List<Movie> movies, int pageNumber) {
+        for (Movie m : movies) {
+            m.setPageNumber(pageNumber);
+        }
+        return movies;
     }
 
 
@@ -78,14 +86,25 @@ public class MovieUtils {
         retMovie.setTitle(cursor.getString(TITLE_I));
         retMovie.setVoteAverage(cursor.getDouble(VOTE_AV_I));
         retMovie.setShadowInt(Integer.valueOf(cursor.getString(COLOR_I)));
+        retMovie.setPageNumber(cursor.getInt(PAGE_NUM_I));
 
         return retMovie;
     }
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public static boolean checkForDuplicateList(List<Movie> currentMovies, List<Movie> fetchedList){
-        return !currentMovies.isEmpty() && fetchedList.isEmpty() && currentMovies.get(currentMovies.size() - 20).getMovieId()
-                .equals(fetchedList.get(0).getMovieId());
+    public static List<Movie> getLiveDataList(List<Movie> oldList, List<Movie> newList){
+
+        if (!oldList.isEmpty() && !newList.isEmpty()) {
+            int oldListPageNum = oldList.get(oldList.size() - 1).getPageNumber();
+            int newListFirstPageNum = newList.get(0).getPageNumber();
+
+            if (oldListPageNum + 1 == newListFirstPageNum){
+                oldList.addAll(newList);
+                return oldList;
+            }
+        }
+
+        if (oldList.isEmpty() && !newList.isEmpty()) return newList;
+        return oldList;
     }
 
     //Formats date to "MMM dd(ordinal number), yyyy
@@ -168,6 +187,7 @@ public class MovieUtils {
         cv.put(MovieEntries.COLUMN_TITLE, movie.getTitle());
         cv.put(MovieEntries.COLUMN_VOTE_AVERAGE, movie.getVoteAverage());
         cv.put(MovieEntries.COLUMN_COLOR_PATH, Integer.toString(movie.getShadowInt()));
+        cv.put(MovieEntries.COLUMN_PAGE_NUMBER, movie.getPageNumber());
 
         return cv;
     }

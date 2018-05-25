@@ -3,6 +3,7 @@ package io.magics.popularmovies.database;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.provider.BaseColumns;
@@ -27,10 +28,11 @@ public class PopularMoviesDBHelper extends SQLiteOpenHelper {
     //Decided to rename DB file and class. So begining from db version 1.
     //So far there are only me and reviewer who have installed app so I have not decided to get rid
     //of the old favourites.db file.
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 3;
 
     private static final String DB_HELP_TEXT_MIDDLE = " TEXT, ";
     private static final String DB_HELP_INT_MIDDLE = " INTEGER NOT NULL, ";
+    private static final String SQL_SYNTAX_DROP_TABLE = "DROP TABLE IF EXISTS ";
 
     public PopularMoviesDBHelper(Context context) {
         super(context, NAME, null, DB_VERSION);
@@ -61,13 +63,21 @@ public class PopularMoviesDBHelper extends SQLiteOpenHelper {
         Log.d(TAG, "Updating from ver." + oldVersion + " to ver." + newVersion);
 
         if (oldVersion < 1) {
-            db.execSQL("DROP TABLE IF EXISTS " + MovieEntries.TABLE_FAVOURITES);
+            db.execSQL(SQL_SYNTAX_DROP_TABLE + MovieEntries.TABLE_FAVOURITES);
             onCreate(db);
         }
+
+        if (oldVersion < 3) {
+            db.execSQL(SQL_SYNTAX_DROP_TABLE + MovieEntries.TABLE_FAVOURITES);
+            db.execSQL(SQL_SYNTAX_DROP_TABLE + MovieEntries.TABLE_TOP_RATED);
+            db.execSQL(SQL_SYNTAX_DROP_TABLE + MovieEntries.TABLE_POPULAR);
+            onCreate(db);
+        }
+
     }
 
     public Cursor getAllMovies(final String tableName, String[] projection) {
-        String sortOrder = MovieEntries._ID + " ASC";
+        String sortOrder = MovieEntries.COLUMN_PAGE_NUMBER + " ASC";
         try {
             return getReadableDatabase().query(tableName,
                     projection,
@@ -85,18 +95,21 @@ public class PopularMoviesDBHelper extends SQLiteOpenHelper {
 
     public long batchInsertMovies(List<Movie> movies, String tableName) {
         SQLiteDatabase db = this.getWritableDatabase();
-        long rowId = -1;
+
         try {
             db.beginTransaction();
             for (Movie movie : movies) {
-                rowId = db.insert(tableName, null, MovieUtils.makeContentVals(movie));
+                db.insertOrThrow(tableName, null, MovieUtils.makeContentVals(movie));
             }
             db.setTransactionSuccessful();
-        } finally {
+        }catch(SQLiteException e) {
+            Log.e(TAG, "batchInsertMovies: Insert Error ", e);
+        }
+        finally{
             db.endTransaction();
         }
 
-        return rowId;
+        return 0;
     }
 
     public int deleteAllFromTable(String tableName) {
@@ -131,6 +144,8 @@ public class PopularMoviesDBHelper extends SQLiteOpenHelper {
 
         public static final String COLUMN_COLOR_PATH = "shadow_color";
 
+        public static final String COLUMN_PAGE_NUMBER = "page_number";
+
         private static String getMovieColumns(String tableName) {
             return "CREATE TABLE " + tableName + " (" +
 
@@ -142,6 +157,7 @@ public class PopularMoviesDBHelper extends SQLiteOpenHelper {
                     COLUMN_TITLE + DB_HELP_TEXT_MIDDLE +
                     COLUMN_VOTE_AVERAGE + " REAL NOT NULL, " +
                     COLUMN_COLOR_PATH + DB_HELP_TEXT_MIDDLE +
+                    COLUMN_PAGE_NUMBER + DB_HELP_INT_MIDDLE +
 
                     " UNIQUE (" + COLUMN_MOVIE_ID + ") ON CONFLICT REPLACE);";
         }
@@ -157,5 +173,7 @@ public class PopularMoviesDBHelper extends SQLiteOpenHelper {
         private static String getCreateTableTopRated() {
             return getMovieColumns(TABLE_POPULAR);
         }
+
+
     }
 }

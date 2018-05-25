@@ -8,7 +8,8 @@ import java.util.List;
 
 import io.magics.popularmovies.models.ApiResult;
 import io.magics.popularmovies.models.Movie;
-import io.magics.popularmovies.utils.MovieUtils;
+
+import static io.magics.popularmovies.utils.MovieUtils.getLiveDataList;
 
 public class TopListViewModel extends ViewModel {
 
@@ -29,8 +30,6 @@ public class TopListViewModel extends ViewModel {
             mLastPage = apiResult.getTotalPages();
             mIsLastPageSet = true;
         }
-        mCurrentPage = apiResult.getPage();
-        mIsLastPageLoaded = mCurrentPage + 1 > mLastPage;
     }
 
     public void clearPages(){
@@ -41,25 +40,20 @@ public class TopListViewModel extends ViewModel {
         mTopList.setValue(new ArrayList<>());
     }
 
-    public ApiResult getPageStates(){
-        ApiResult states = new ApiResult();
-        states.setPage(mCurrentPage);
-        states.setTotalPages(mLastPage);
-        states.setMovies(new ArrayList<>());
-        return states;
-    }
-
     public int getCurrentPage(){ return mCurrentPage; }
 
     public boolean isLastPageLoaded(){ return mIsLastPageLoaded; }
 
-    public void setTopList(List<Movie> movies){
-        List<Movie> tempMovies =
-                mTopList.getValue() != null ? mTopList.getValue() : new ArrayList<>();
-        if (!MovieUtils.checkForDuplicateList(tempMovies, movies)) {
-            tempMovies.addAll(movies);
-            mTopList.setValue(tempMovies);
-        }
+    public void setTopList(List<Movie> movies, boolean fromDb){
+        List<Movie> tempMovies = mTopList.getValue() != null && !fromDb ?
+                mTopList.getValue() : new ArrayList<>();
+
+        tempMovies = getLiveDataList(tempMovies, movies);
+
+        mCurrentPage = tempMovies.get(tempMovies.size() - 1).getPageNumber();
+        mIsLastPageLoaded = mIsLastPageSet && mCurrentPage + 1 > mLastPage;
+
+        mTopList.setValue(tempMovies);
     }
 
     public void notifyGetMoreTopPages(){
