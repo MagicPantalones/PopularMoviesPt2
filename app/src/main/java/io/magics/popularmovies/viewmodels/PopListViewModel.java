@@ -22,7 +22,7 @@ public class PopListViewModel extends ViewModel {
     private GetMorePopPagesListener mNotifyListener;
 
     private int mLastPage = 1;
-    private int mCurrentPage = 1;
+    private int mCurrentPage = 0;
     private boolean mIsLastPageSet = false;
     private boolean mIsLastPageLoaded = false;
 
@@ -33,17 +33,18 @@ public class PopListViewModel extends ViewModel {
         }
     }
 
-    public void clearPages(){
+    public void clearPages(boolean fromBackground){
         mLastPage = 1;
         mIsLastPageSet = false;
-        mCurrentPage = 1;
+        mCurrentPage = 0;
         mIsLastPageLoaded = false;
-        mPopList.setValue(new ArrayList<>());
+        if (fromBackground) mPopList.postValue(new ArrayList<>());
+        else mPopList.setValue(new ArrayList<>());
     }
 
-    public int getCurrentPage(){ return mCurrentPage; }
-
     public boolean isLastPageLoaded(){ return mIsLastPageLoaded; }
+
+    public int getNextPage() { return mCurrentPage + 1; }
 
     public void setPopList(List<Movie> movies, boolean fromDb){
         List<Movie> tempMovies = mPopList.getValue() != null && !fromDb ?
@@ -51,10 +52,13 @@ public class PopListViewModel extends ViewModel {
 
         tempMovies = getLiveDataList(tempMovies, movies);
 
-        mCurrentPage = tempMovies.get(tempMovies.size() - 1).getPageNumber();
+        if (!tempMovies.isEmpty()) {
+            mCurrentPage = tempMovies.get(tempMovies.size() - 1).getPageNumber();
+        }
         mIsLastPageLoaded = mIsLastPageSet && mCurrentPage + 1 > mLastPage;
 
-        mPopList.setValue(tempMovies);
+        if (fromDb) mPopList.postValue(tempMovies);
+        else mPopList.setValue(tempMovies);
     }
 
     public void notifyGetMorePopPages(){

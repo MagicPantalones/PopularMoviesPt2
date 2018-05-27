@@ -72,4 +72,5 @@ dependencies {
     implementation 'ru.noties:markwon:1.0.4'
     //ViewPager Indicator Library
     implementation 'devlight.io:navigationtabbar:1.2.5'
+    debugImplementation 'com.facebook.stetho:stetho:1.5.0'
 }

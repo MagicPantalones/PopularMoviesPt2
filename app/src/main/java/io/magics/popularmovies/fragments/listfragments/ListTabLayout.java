@@ -116,7 +116,14 @@ public class ListTabLayout extends Fragment {
         mAdapter.getOneListFragment(mTabLayout.getSelectedTabPosition()).scrollRecyclerViewToTop();
     }
 
-    private void prepareTransitions(){
+    public void setConnectionState(boolean connectionState) {
+        if (mAdapter == null) return;
+        for (int i = 0; i < 2; i++) {
+            mAdapter.getOneListFragment(i).setConnectionState(connectionState);
+        }
+    }
+
+    private void prepareTransitions() {
         setExitTransition(TransitionInflater.from(getContext())
                 .inflateTransition(R.transition.list_exit_transition));
         setExitSharedElementCallback(new SharedElementCallback() {
@@ -127,7 +134,7 @@ public class ListTabLayout extends Fragment {
                         .getOneListFragment(mTabLayout.getSelectedTabPosition());
                 RecyclerView listRecycler = currentList.mRecyclerView;
 
-                if (listRecycler == null){
+                if (listRecycler == null) {
                     return;
                 }
 
@@ -135,7 +142,7 @@ public class ListTabLayout extends Fragment {
                 RecyclerView.ViewHolder selectedVh = listRecycler
                         .findViewHolderForAdapterPosition(MovieListsActivity.getSelectedPosition());
 
-                if (selectedVh == null || selectedVh.itemView == null){
+                if (selectedVh == null || selectedVh.itemView == null) {
                     return;
                 }
 

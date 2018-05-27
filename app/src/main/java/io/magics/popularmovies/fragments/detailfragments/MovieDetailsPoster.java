@@ -143,8 +143,8 @@ public class MovieDetailsPoster extends Fragment {
         GlideApp.with(this)
                 .load(posterUrlConverter(getOptimalImgSize(getContext()), mMovie.getPosterUrl()))
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .dontTransform()
-                .override(Target.SIZE_ORIGINAL)
+                .centerCrop()
+                .error(R.drawable.ic_wifi_strength_alert_outline)
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {

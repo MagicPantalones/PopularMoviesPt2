@@ -66,6 +66,8 @@ public class ListFragment extends Fragment {
 
     private int mOldRight;
 
+    private boolean mOffline;
+
     public ListFragment() {
         // Required empty public constructor
     }
@@ -149,7 +151,13 @@ public class ListFragment extends Fragment {
             manager.setSpanCount(1);
             manager.setOrientation(GridLayoutManager.HORIZONTAL);
         } else {
-            mSwipeRefresher.setOnRefreshListener(() -> mListener.onRefreshRequest(mFragType));
+            mSwipeRefresher.setOnRefreshListener(() -> {
+                if (mOffline) {
+                    mSwipeRefresher.setRefreshing(false);
+                    return;
+                }
+                mListener.onRefreshRequest(mFragType);
+            });
             mSwipeRefresher.setColorSchemeResources(R.color.textColorPrimary,
                     R.color.colorSecondaryAccent);
         }
@@ -215,7 +223,6 @@ public class ListFragment extends Fragment {
     private Observer<List<Movie>> getMovieListObserver() {
         return movies -> {
             if (movies == null || movies.isEmpty()) {
-                if (mSwipeRefresher != null && mSwipeRefresher.isRefreshing()) return;
                 toggleViewVisibility(mRecyclerView, mTvError);
             } else {
                 if (mSwipeRefresher != null && mSwipeRefresher.isRefreshing()) {
@@ -231,6 +238,11 @@ public class ListFragment extends Fragment {
 
     public void scrollRecyclerViewToTop() {
         mRecyclerView.smoothScrollToPosition(0);
+    }
+
+    public void setConnectionState(boolean connectionState) {
+        mOffline = connectionState;
+        if (mAdapter != null) mAdapter.setConnectionState(connectionState);
     }
 
     /**

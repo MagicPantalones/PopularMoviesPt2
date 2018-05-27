@@ -28,7 +28,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 
+import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
 import java.util.List;
@@ -354,8 +358,8 @@ public class MovieDetailsFragment extends Fragment {
         GlideApp.with(this)
                 .load(posterUrlConverter(getOptimalImgSize(getContext()), mMovie.getPosterUrl()))
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .dontTransform()
                 .override(Target.SIZE_ORIGINAL)
+                .error(R.drawable.ic_wifi_strength_alert_outline)
                 .into(mPosterHorizontal)
                 .getSize((width, height) -> {
                     mPosterHorizontal.setMinimumWidth(height / 3 * 2);

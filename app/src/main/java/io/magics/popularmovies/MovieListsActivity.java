@@ -2,12 +2,17 @@ package io.magics.popularmovies;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.res.Configuration;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 
 import butterknife.BindView;
@@ -19,6 +24,7 @@ import io.magics.popularmovies.fragments.listfragments.ListFragment;
 import io.magics.popularmovies.fragments.listfragments.ListTabLayout;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.networkutils.DataProvider;
+import io.magics.popularmovies.networkutils.InternetConnectionListener;
 import io.magics.popularmovies.utils.MovieUtils.ScrollDirection;
 import io.magics.popularmovies.viewmodels.FavListViewModel;
 import io.magics.popularmovies.viewmodels.PopListViewModel;
@@ -28,7 +34,7 @@ import io.magics.popularmovies.viewmodels.TrailersViewModel;
 
 public class MovieListsActivity extends AppCompatActivity implements ListFragment.FragmentListener,
         MovieDetailsFragment.DetailFragInteractionHandler, ListTabLayout.TabLayoutPageEvents,
-        ListAdapter.ListItemEventHandler {
+        ListAdapter.ListItemEventHandler, InternetConnectionListener {
 
     private static final String FRAG_PAGER_TAG = "pagerTag";
     public static final String DETAIL_FRAGMENT_TAG = "detailFrag";
@@ -37,6 +43,8 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
 
     @BindView(R.id.up_fab)
     FloatingActionButton mUpFab;
+    @BindView(R.id.container_main)
+    CoordinatorLayout mContainerMain;
 
     private DataProvider mDataProvider;
 
@@ -73,12 +81,12 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
             //A ViewHolder has not been selected yet so it sets the position to 0.
             setSelectedPosition(0);
             mAppFragManager.beginTransaction()
-                    .replace(android.R.id.content, ListTabLayout.newInstance(), FRAG_PAGER_TAG)
+                    .replace(R.id.container_main, ListTabLayout.newInstance(), FRAG_PAGER_TAG)
                     .commit();
         }
 
         mDataProvider = new DataProvider(this, topListVm, popListVm, mFavListVM,
-                trailerVm, reviewVm);
+                trailerVm, reviewVm, this);
 
         mDataProvider.initialiseApp();
 
@@ -100,6 +108,12 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
         //Have to hide the UpFab in onResume to avoid it showing if the device is rotated when a
         //detail fragment is showing.
         mUpFab.hide();
+    }
+
+    @Override
+    protected void onPause() {
+        mDataProvider.notifyPause();
+        super.onPause();
     }
 
     @Override
@@ -184,7 +198,7 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
                 .addSharedElement(posterWrapper, posterWrapper.getTransitionName())
                 .addSharedElement(poster, poster.getTransitionName())
                 .addSharedElement(toolBar, toolBar.getTransitionName())
-                .replace(android.R.id.content, newFrag, DETAIL_FRAGMENT_TAG)
+                .replace(R.id.container_main, newFrag, DETAIL_FRAGMENT_TAG)
                 .addToBackStack(null)
                 .commit();
     }
@@ -205,6 +219,23 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
     public static void setSelectedPosition(int position) {
         selectedPosition = position;
     }
+
+    @Override
+    public void onInternetUnavailable() {
+        ListTabLayout tabFrag = (ListTabLayout) mAppFragManager.findFragmentByTag(FRAG_PAGER_TAG);
+        if (tabFrag != null) tabFrag.setConnectionState(true);
+        Snackbar offlineSnackbar = Snackbar.make(mContainerMain, "Connection Failed",
+                Snackbar.LENGTH_INDEFINITE);
+        offlineSnackbar.setAction("RETRY", v -> mDataProvider.retryConnection()).show();
+    }
+
+    @Override
+    public void onInternetAvailable() {
+        ListTabLayout tabFrag = (ListTabLayout) mAppFragManager.findFragmentByTag(FRAG_PAGER_TAG);
+        if (tabFrag != null) tabFrag.setConnectionState(false);
+    }
+
+
 
     /*
     Activity/Fragment Transition Resources/Tutorials for this project:

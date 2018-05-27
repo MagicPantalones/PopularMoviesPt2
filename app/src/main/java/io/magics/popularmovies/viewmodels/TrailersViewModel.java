@@ -12,7 +12,7 @@ public class TrailersViewModel extends ViewModel {
     public MutableLiveData<List<TrailerResult>> mTrailers = new MutableLiveData<>();
 
     public void setTrailers(List<TrailerResult> trailers){
-        if (mTrailers.getValue() == null) mTrailers.setValue(trailers);
+        if (mTrailers.getValue() == null) mTrailers.postValue(trailers);
     }
 
     public void clear(){ mTrailers = new MutableLiveData<>(); }

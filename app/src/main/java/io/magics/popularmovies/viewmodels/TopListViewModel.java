@@ -21,7 +21,7 @@ public class TopListViewModel extends ViewModel {
     private GetMoreTopPagesListener mNotifyListener;
 
     private int mLastPage = 1;
-    private int mCurrentPage = 1;
+    private int mCurrentPage = 0;
     private boolean mIsLastPageSet = false;
     private boolean mIsLastPageLoaded = false;
 
@@ -32,17 +32,22 @@ public class TopListViewModel extends ViewModel {
         }
     }
 
-    public void clearPages(){
+    public void clearPages(boolean fromBackground){
         mLastPage = 1;
         mIsLastPageSet = false;
-        mCurrentPage = 1;
+        mCurrentPage = 0;
         mIsLastPageLoaded = false;
-        mTopList.setValue(new ArrayList<>());
+        if (fromBackground) mTopList.postValue(new ArrayList<>());
+        else mTopList.setValue(new ArrayList<>());
     }
 
-    public int getCurrentPage(){ return mCurrentPage; }
+    public int getNextPage() { return mCurrentPage + 1; }
 
     public boolean isLastPageLoaded(){ return mIsLastPageLoaded; }
+
+    public boolean isLiveDataSet() {
+        return mTopList.getValue() != null && !mTopList.getValue().isEmpty();
+    }
 
     public void setTopList(List<Movie> movies, boolean fromDb){
         List<Movie> tempMovies = mTopList.getValue() != null && !fromDb ?
@@ -50,10 +55,13 @@ public class TopListViewModel extends ViewModel {
 
         tempMovies = getLiveDataList(tempMovies, movies);
 
-        mCurrentPage = tempMovies.get(tempMovies.size() - 1).getPageNumber();
-        mIsLastPageLoaded = mIsLastPageSet && mCurrentPage + 1 > mLastPage;
+        if (!tempMovies.isEmpty()) {
+            mCurrentPage = tempMovies.get(tempMovies.size() - 1).getPageNumber();
+        }
 
-        mTopList.setValue(tempMovies);
+        mIsLastPageLoaded = mIsLastPageSet && mCurrentPage + 1 > mLastPage;
+        if (fromDb) mTopList.postValue(tempMovies);
+        else mTopList.setValue(tempMovies);
     }
 
     public void notifyGetMoreTopPages(){

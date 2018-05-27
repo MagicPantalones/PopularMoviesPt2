@@ -13,7 +13,7 @@ public class ReviewsViewModel extends ViewModel {
 
     public void setReviews(List<ReviewResult> reviews){
         if (mReviews.getValue() == null) {
-            mReviews.setValue(reviews);
+            mReviews.postValue(reviews);
         }
     }
 

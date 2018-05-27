@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -14,17 +13,12 @@ import android.net.Uri;
 import android.util.Log;
 import android.view.View;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 
 import io.magics.popularmovies.database.PopularMoviesDBHelper.MovieEntries;
+import io.magics.popularmovies.models.ApiResult;
 import io.magics.popularmovies.models.Movie;
-import okhttp3.OkHttpClient;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
-import ru.noties.markwon.renderer.html.ImageSize;
+import io.magics.popularmovies.networkutils.DataProvider;
 
 import static io.magics.popularmovies.utils.MovieUtils.ImageSize.SIZE_DEFAULT;
 import static io.magics.popularmovies.utils.MovieUtils.ImageSize.SIZE_MEDIUM;
@@ -34,10 +28,8 @@ import static io.magics.popularmovies.utils.MovieUtils.ImageSize.SIZE_MEDIUM;
  * <h6>Utility class for project.</h6>
  * <p>Some methods and enums that was used in multiple classes</p>
  *
- * <p>However, some method thats only used once like {@link #createMovieFromCursor(Cursor, int)}, or
- * {@link #getClientForMovieList()}, which are only used in the
- * {@link io.magics.popularmovies.networkutils.DataProvider} class, is kept here as the methods
- * could be static and it made the class less cluttered.</p>
+ * <p>However, some method thats only used once like {@link #createMovieFromCursor(Cursor, int)},
+ * is kept here as the methods could be static.</p>
  *
  */
 public class MovieUtils {
@@ -45,9 +37,6 @@ public class MovieUtils {
     private static final String TAG = MovieUtils.class.getSimpleName();
     private static final String YOUTUBE_THUMB_BASE_URL = "http://img.youtube.com/vi/";
     private static final String BASE_QUERY_IMG_URL = "https://image.tmdb.org/t/p/";
-    private static final String BASE_QUERY_API_URL = "https://api.themoviedb.org/3/";
-
-    private static final int CONNECTION_TIMEOUT = 5;
 
     private static final int POSTER_I = 1;
     private static final int OVERVIEW_I = 2;
@@ -67,11 +56,15 @@ public class MovieUtils {
         }
     }
 
-    public static List<Movie> setMoviePageNumbers(List<Movie> movies, int pageNumber) {
+    public static ApiResult setMoviePageNumbers(ApiResult apiResult) {
+        List<Movie> movies = apiResult.getMovies();
+        int pageNumber = apiResult.getPage();
         for (Movie m : movies) {
             m.setPageNumber(pageNumber);
         }
-        return movies;
+
+        apiResult.setMovies(movies);
+        return apiResult;
     }
 
 
@@ -160,21 +153,6 @@ public class MovieUtils {
                 .appendEncodedPath(youtubeKey)
                 .appendPath("0.jpg")
                 .build().toString();
-    }
-
-    public static Retrofit getClientForMovieList() {
-        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .connectTimeout(CONNECTION_TIMEOUT, TimeUnit.SECONDS)
-                .retryOnConnectionFailure(true)
-                .build();
-
-        return new Retrofit.Builder()
-                .baseUrl(BASE_QUERY_API_URL)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .client(okHttpClient)
-                .build();
     }
 
     public static ContentValues makeContentVals(Movie movie){

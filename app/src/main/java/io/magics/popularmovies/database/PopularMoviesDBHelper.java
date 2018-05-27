@@ -11,8 +11,10 @@ import android.util.Log;
 
 import java.util.List;
 
+import io.magics.popularmovies.models.ApiResult;
 import io.magics.popularmovies.models.Movie;
 import io.magics.popularmovies.utils.MovieUtils;
+import io.reactivex.Observable;
 
 @SuppressWarnings("WeakerAccess")
 public class PopularMoviesDBHelper extends SQLiteOpenHelper {
@@ -93,9 +95,8 @@ public class PopularMoviesDBHelper extends SQLiteOpenHelper {
         }
     }
 
-    public long batchInsertMovies(List<Movie> movies, String tableName) {
+    public int batchInsertMovies(List<Movie> movies, String tableName) {
         SQLiteDatabase db = this.getWritableDatabase();
-
         try {
             db.beginTransaction();
             for (Movie movie : movies) {

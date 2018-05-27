@@ -58,6 +58,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
 
     private AtomicBoolean mTransitionStarted;
 
+    private boolean mOffline = false;
+
     private int mListType;
 
     public interface ListItemEventHandler {
@@ -149,7 +151,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
 
         posterUrl = MovieUtils.posterUrlConverter(mImageSize, mfg.getPosterUrl());
 
-        if (position == mMovieData.size() - 5 && mReachedEndHandler != null) {
+        if (position == mMovieData.size() - 5 && mReachedEndHandler != null && !mOffline) {
             mReachedEndHandler.endReached();
         }
 
@@ -169,12 +171,14 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
             mClickHandler.onClick(v, mfg, mListType, mSelectedPosition);
         });
 
+
         GlideApp.with(iv)
                 .load(posterUrl)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .placeholder(R.drawable.bg_loading_realydarkgrey)
-                .dontTransform()
-                .override(Target.SIZE_ORIGINAL)
+                .error(R.drawable.ic_wifi_strength_alert_outline)
+                .onlyRetrieveFromCache(mOffline)
+                .timeout(30000)
+                .centerCrop()
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
@@ -250,6 +254,10 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
         }
         mMovieData = movies;
         notifyDataSetChanged();
+    }
+
+    public void setConnectionState(Boolean offlineMode) {
+        mOffline = offlineMode;
     }
 
     public class PosterViewHolder extends RecyclerView.ViewHolder {
