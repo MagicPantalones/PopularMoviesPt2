@@ -56,8 +56,7 @@
                     android:id="@+id/details_poster_horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scaleType="fitCenter"
-                    android:background="@color/colorPrimaryDark"
+                    android:scaleType="fitXY"
                     tools:ignore="ContentDescription,InconsistentLayout"
                     tools:src="@drawable/minions_poster_placehodler" />
             </android.support.v7.widget.CardView>

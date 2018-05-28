@@ -119,7 +119,8 @@ public class ListTabLayout extends Fragment {
     public void setConnectionState(boolean connectionState) {
         if (mAdapter == null) return;
         for (int i = 0; i < 2; i++) {
-            mAdapter.getOneListFragment(i).setConnectionState(connectionState);
+            ListFragment frag = mAdapter.getOneListFragment(i);
+            if (frag != null) frag.setConnectionState(connectionState);
         }
     }
 

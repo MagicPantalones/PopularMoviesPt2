@@ -46,6 +46,8 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
     @BindView(R.id.container_main)
     CoordinatorLayout mContainerMain;
 
+    private Snackbar mSnackError;
+
     private DataProvider mDataProvider;
 
     private FavListViewModel mFavListVM;
@@ -74,6 +76,10 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
 
         TrailersViewModel trailerVm = ViewModelProviders.of(this).get(TrailersViewModel.class);
         ReviewsViewModel reviewVm = ViewModelProviders.of(this).get(ReviewsViewModel.class);
+
+        mSnackError = Snackbar.make(mContainerMain, "Connection Failed",
+                Snackbar.LENGTH_INDEFINITE);
+        mSnackError.setAction("RETRY", v -> mDataProvider.retryConnection());
 
         mAppFragManager = getSupportFragmentManager();
 
@@ -155,7 +161,8 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
 
     @Override
     public void onRefreshRequest(int listType) {
-        mDataProvider.refreshList(listType);
+        if (!mDataProvider.getConnectionState()) mDataProvider.retryConnection();
+        else mDataProvider.refreshList(listType);
     }
 
     @Override
@@ -224,15 +231,14 @@ public class MovieListsActivity extends AppCompatActivity implements ListFragmen
     public void onInternetUnavailable() {
         ListTabLayout tabFrag = (ListTabLayout) mAppFragManager.findFragmentByTag(FRAG_PAGER_TAG);
         if (tabFrag != null) tabFrag.setConnectionState(true);
-        Snackbar offlineSnackbar = Snackbar.make(mContainerMain, "Connection Failed",
-                Snackbar.LENGTH_INDEFINITE);
-        offlineSnackbar.setAction("RETRY", v -> mDataProvider.retryConnection()).show();
+        mSnackError.show();
     }
 
     @Override
     public void onInternetAvailable() {
         ListTabLayout tabFrag = (ListTabLayout) mAppFragManager.findFragmentByTag(FRAG_PAGER_TAG);
         if (tabFrag != null) tabFrag.setConnectionState(false);
+        if (mSnackError.isShown()) mSnackError.dismiss();
     }
 
 

@@ -51,7 +51,8 @@ public class ListFragment extends Fragment {
     @BindView(R.id.tv_list_error)
     TextView mTvError;
 
-    @Nullable @BindView(R.id.swipe_refresh_list)
+    @Nullable
+    @BindView(R.id.swipe_refresh_list)
     SwipeRefreshLayout mSwipeRefresher;
 
     private Unbinder mUnbinder;
@@ -151,13 +152,8 @@ public class ListFragment extends Fragment {
             manager.setSpanCount(1);
             manager.setOrientation(GridLayoutManager.HORIZONTAL);
         } else {
-            mSwipeRefresher.setOnRefreshListener(() -> {
-                if (mOffline) {
-                    mSwipeRefresher.setRefreshing(false);
-                    return;
-                }
-                mListener.onRefreshRequest(mFragType);
-            });
+            mSwipeRefresher.setOnRefreshListener(() -> mListener.onRefreshRequest(mFragType));
+
             mSwipeRefresher.setColorSchemeResources(R.color.textColorPrimary,
                     R.color.colorSecondaryAccent);
         }
@@ -222,14 +218,16 @@ public class ListFragment extends Fragment {
 
     private Observer<List<Movie>> getMovieListObserver() {
         return movies -> {
-            if (movies == null || movies.isEmpty()) {
-                toggleViewVisibility(mRecyclerView, mTvError);
+            if ((movies == null || movies.isEmpty()) &&
+                    (mSwipeRefresher != null && mSwipeRefresher.isRefreshing())) {
+                mSwipeRefresher.setRefreshing(false);
             } else {
                 if (mSwipeRefresher != null && mSwipeRefresher.isRefreshing()) {
                     mSwipeRefresher.setRefreshing(false);
                 }
                 if (mRecyclerView.getVisibility() == View.INVISIBLE) {
-                    toggleViewVisibility(mRecyclerView, mTvError);
+                    mRecyclerView.setVisibility(View.VISIBLE);
+                    mTvError.setVisibility(View.INVISIBLE);
                 }
                 mAdapter.setMovieData(movies);
             }
@@ -243,13 +241,16 @@ public class ListFragment extends Fragment {
     public void setConnectionState(boolean connectionState) {
         mOffline = connectionState;
         if (mAdapter != null) mAdapter.setConnectionState(connectionState);
+        if (mSwipeRefresher != null && mSwipeRefresher.isRefreshing() && connectionState) {
+            mSwipeRefresher.setRefreshing(false);
+        }
     }
 
     /**
      * From <a href="https://github.com/google/android-transition-examples/tree/master/GridToPager">
-     *     https://github.com/google/android-transition-examples/tree/master/GridToPager</a>
-     *     <br></br>
-     *     <br></br>
+     * https://github.com/google/android-transition-examples/tree/master/GridToPager</a>
+     * <br></br>
+     * <br></br>
      * Since my RecyclerView's ViewHolders would clip the appbar when exiting.<br></br>
      * This method will set an OnLayoutChanged listener that will adjust the RecyclerView's
      * LayoutManagerPosition to show the full ViewHolder when navigating back to the list from a
@@ -295,6 +296,7 @@ public class ListFragment extends Fragment {
 
     public interface FragmentListener {
         void onRecyclerViewScrolled(ScrollDirection scrollDirection);
+
         void onRefreshRequest(int listType);
     }
 

@@ -100,7 +100,7 @@ public class PopularMoviesDBHelper extends SQLiteOpenHelper {
         try {
             db.beginTransaction();
             for (Movie movie : movies) {
-                db.insertOrThrow(tableName, null, MovieUtils.makeContentVals(movie));
+                db.insert(tableName, null, MovieUtils.makeContentVals(movie));
             }
             db.setTransactionSuccessful();
         }catch(SQLiteException e) {

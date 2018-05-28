@@ -68,6 +68,8 @@ import static io.magics.popularmovies.utils.MovieUtils.setMoviePageNumbers;
 public class DataProvider
         implements TopListViewModel.GetMoreTopPagesListener, PopListViewModel.GetMorePopPagesListener {
 
+    private static final String TAG = DataProvider.class.getSimpleName();
+
     private static final String[] MOVIE_DB_COLUMNS = {
             MovieEntries._ID,
             MovieEntries.COLUMN_POSTER_PATH,
@@ -170,6 +172,10 @@ public class DataProvider
                 mDeletePopTableDisposable);
     }
 
+    public boolean getConnectionState() {
+        return isInternetConnected();
+    }
+
     private void disposeDisposable(Disposable... disposables) {
         for (Disposable disposable : disposables) {
             if (disposable != null && !disposable.isDisposed()) disposable.dispose();
@@ -184,7 +190,6 @@ public class DataProvider
     }
 
     public void refreshList(int listType) {
-        if (!mIsOnline) return;
         switch (listType) {
             case 0:
                 disposeDisposable(mTopDisposable,
@@ -280,7 +285,7 @@ public class DataProvider
                 })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(apiResult -> handleApiSuccessCallback(apiResult, tableName),
-                        throwable -> handleApiFailCallback(tableName));
+                        throwable -> Log.w(TAG, "queryForCachedMovieLists: ", throwable));
 
     }
 

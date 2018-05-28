@@ -45,10 +45,6 @@ public class TopListViewModel extends ViewModel {
 
     public boolean isLastPageLoaded(){ return mIsLastPageLoaded; }
 
-    public boolean isLiveDataSet() {
-        return mTopList.getValue() != null && !mTopList.getValue().isEmpty();
-    }
-
     public void setTopList(List<Movie> movies, boolean fromDb){
         List<Movie> tempMovies = mTopList.getValue() != null && !fromDb ?
                 mTopList.getValue() : new ArrayList<>();

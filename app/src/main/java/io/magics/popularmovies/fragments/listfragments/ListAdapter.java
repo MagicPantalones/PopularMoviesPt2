@@ -178,7 +178,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.PosterViewHold
                 .error(R.drawable.ic_wifi_strength_alert_outline)
                 .onlyRetrieveFromCache(mOffline)
                 .timeout(30000)
-                .centerCrop()
+                .override(Target.SIZE_ORIGINAL)
+                .dontTransform()
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
