@@ -225,10 +225,7 @@ public class ListFragment extends Fragment {
                 if (mSwipeRefresher != null && mSwipeRefresher.isRefreshing()) {
                     mSwipeRefresher.setRefreshing(false);
                 }
-                if (mRecyclerView.getVisibility() == View.INVISIBLE) {
-                    mRecyclerView.setVisibility(View.VISIBLE);
-                    mTvError.setVisibility(View.INVISIBLE);
-                }
+                mRecyclerView.setVisibility(View.VISIBLE);
                 mAdapter.setMovieData(movies);
             }
         };
